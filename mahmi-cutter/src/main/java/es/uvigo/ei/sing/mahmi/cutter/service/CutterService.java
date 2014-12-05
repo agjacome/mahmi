@@ -1,13 +1,10 @@
 package es.uvigo.ei.sing.mahmi.cutter.service;
 
-import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
-import es.uvigo.ei.sing.mahmi.common.utils.wrappers.MultipleProteinsToCutWrapper;
-import es.uvigo.ei.sing.mahmi.common.utils.wrappers.OneProteinToCutWrapper;
-import es.uvigo.ei.sing.mahmi.cutter.cutters.CutterException;
-import es.uvigo.ei.sing.mahmi.cutter.cutters.ProteinCutterController;
-import fj.data.Validation;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -16,11 +13,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Set;
 
-import static javax.ws.rs.core.Response.Status.CREATED;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.status;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
+import es.uvigo.ei.sing.mahmi.common.utils.wrappers.MultipleProteinsToCutWrapper;
+import es.uvigo.ei.sing.mahmi.common.utils.wrappers.OneProteinToCutWrapper;
+import es.uvigo.ei.sing.mahmi.cutter.cutters.CutterException;
+import es.uvigo.ei.sing.mahmi.cutter.cutters.ProteinCutterController;
 
 @Path("/")
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -38,9 +39,17 @@ public final class CutterService {
     public Response cut(
         final OneProteinToCutWrapper wrapper
     ) {
-        return buildResponse(cutterCtrl.cutProtein(
-            wrapper.getProtein(), wrapper.getEnzymes(), wrapper.getMinSize(), wrapper.getMaxSize()
-        ));
+        val protein = wrapper.getProtein();
+        val enzymes = wrapper.getEnzymes();
+        val minSize = wrapper.getMinSize();
+        val maxSize = wrapper.getMaxSize();
+
+        try {
+            val digestions = cutterCtrl.cutProtein(protein, enzymes, minSize, maxSize);
+            return success(digestions);
+        } catch (final CutterException ce) {
+            return fail(ce);
+        }
     }
 
     @POST
@@ -48,18 +57,29 @@ public final class CutterService {
     public Response cutAll(
         final MultipleProteinsToCutWrapper wrapper
     ) {
-        return buildResponse(cutterCtrl.cutAllProteins(
-            wrapper.getProteins(), wrapper.getEnzymes(), wrapper.getMinSize(), wrapper.getMaxSize()
-        ));
+        val proteins = wrapper.getProteins();
+        val enzymes  = wrapper.getEnzymes();
+        val minSize  = wrapper.getMinSize();
+        val maxSize  = wrapper.getMaxSize();
+
+        try {
+            val digestions = cutterCtrl.cutAllProteins(proteins, enzymes, minSize, maxSize);
+            return success(digestions);
+        } catch (final CutterException ce) {
+            return fail(ce);
+        }
     }
 
-    private Response buildResponse(final Validation<CutterException, Set<Digestion>> validation) {
-        return validation.validation(
-            status(INTERNAL_SERVER_ERROR)::entity, ds -> status(CREATED).entity(setMapper(ds))
-        ).build();
+
+    private Response success(final Set<Digestion> digestions) {
+        return status(CREATED).entity(set(digestions)).build();
     }
 
-    private <A> GenericEntity<Set<A>> setMapper(final Set<A> as) {
+    private Response fail(final CutterException exception) {
+        return status(INTERNAL_SERVER_ERROR).encoding(exception.getMessage()).build();
+    }
+
+    private <A> GenericEntity<Set<A>> set(final Set<A> as) {
         return new GenericEntity<Set<A>>(as) { };
     }
 

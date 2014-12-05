@@ -1,5 +1,14 @@
 package es.uvigo.ei.sing.mahmi.cutter.cutters;
 
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.setToIdentityMap;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.Set;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
@@ -7,19 +16,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
-import fj.data.Option;
-import fj.data.Validation;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
-import java.util.Set;
-
-import static jersey.repackaged.com.google.common.collect.Sets.newHashSet;
-import static jersey.repackaged.com.google.common.collect.Sets.union;
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.setToIdentityMap;
-import static java.util.stream.Collectors.toSet;
-
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProteinCutterController {
 
@@ -32,69 +30,62 @@ public final class ProteinCutterController {
     private final PeptidesDAO   peptidesDAO;
     private final DigestionsDAO digestionsDAO;
 
+
     public static ProteinCutterController proteinCutterCtrl(
         final ProteinCutter cutter, final PeptidesDAO peptidesDAO, final DigestionsDAO digestionsDAO
     ) {
         return new ProteinCutterController(cutter, peptidesDAO, digestionsDAO);
     }
 
-    public Validation<CutterException, Set<Digestion>> cutProtein(
+
+    public Set<Digestion> cutProtein(
         final Protein protein, final Set<Enzyme> enzymes, final int minSize, final int maxSize
-    ) {
-        return getOrInsertAllDigestions(
-            cutter.cutProtein(protein, enzymes, minSize, maxSize)
-        ).f().map(CutterException::withCause);
+    ) throws CutterException {
+        val digestions = cutter.cutProtein(protein, enzymes, minSize, maxSize);
+        return insertDigestionsWithPeptides(digestions);
     }
 
-    public Validation<CutterException, Set<Digestion>> cutAllProteins(
+    public Set<Digestion> cutAllProteins(
         final Set<Protein> proteins, final Set<Enzyme> enzymes, final int minSize, final int maxSize
-    ) {
-        return getOrInsertAllDigestions(
-            cutter.cutAllProteins(proteins, enzymes, minSize, maxSize)
-        ).f().map(CutterException::withCause);
+    ) throws CutterException {
+        val digestions = cutter.cutAllProteins(proteins, enzymes, minSize, maxSize);
+        return insertDigestionsWithPeptides(digestions);
     }
 
-    private Validation<DAOException, Set<Peptide>> getOrInsertAllPeptides(final Set<Peptide> peptides) {
-        final Set<Peptide> inserted = getExistingPeptides(peptides);
-        final Set<Peptide> toInsert = peptides.parallelStream().filter(p -> !inserted.contains(p)).collect(toSet());
 
-        return peptidesDAO.insertAll(toInsert).map(itps -> union(newHashSet(itps), inserted));
+    private Set<Digestion> insertDigestionsWithPeptides(final Set<Digestion> digestions) throws CutterException {
+        val oldPeptides = digestions.parallelStream().map(Digestion::getPeptide).collect(toSet());
+        val newPeptides = insertPeptides(oldPeptides);
+
+        val newDigestions = setDigestionsPeptides(digestions, newPeptides);
+        return insertDigestions(newDigestions);
     }
 
-    private Set<Peptide> getExistingPeptides(final Set<Peptide> peptides) {
-        // FIXME: this should be handled by DAO, it's just a temporal fix
-        return peptides.parallelStream()
-            .map(p -> peptidesDAO.getBySequence(p.getSequence()))
-            .filter(v -> v.isSuccess() && v.exists(Option::isSome))
-            .map(v -> v.success().some())
-            .collect(toSet());
+    private Set<Peptide> insertPeptides(final Set<Peptide> peptides) throws CutterException {
+        try {
+            log.info("Inserting {} peptides into database", peptides);
+            return peptidesDAO.insertAll(peptides);
+        } catch (final DAOException daoe) {
+            log.error("Database error while inserting {} peptides", peptides.size());
+            throw CutterException.withCause(daoe);
+        }
     }
 
-    private Validation<DAOException, Set<Digestion>> getOrInsertAllDigestions(final Set<Digestion> digestions) {
-        final Set<Peptide> peptides = digestions.parallelStream().map(Digestion::getPeptide).collect(toSet());
-
-        return getOrInsertAllPeptides(peptides).map(ps -> replacePeptides(digestions, ps)).bind(ds -> {
-            final Set<Digestion> inserted = getExistingDigestions(ds);
-            final Set<Digestion> toInsert = ds.parallelStream().filter(d -> !inserted.contains(d)).collect(toSet());
-
-            return digestionsDAO.insertAll(toInsert).map(itds -> union(newHashSet(itds), inserted));
-        });
+    private Set<Digestion> insertDigestions(final Set<Digestion> digestions) throws CutterException {
+        try {
+            log.info("Inserting {} digestions into database", digestions);
+            return digestionsDAO.insertAll(digestions);
+        } catch (final DAOException daoe) {
+            log.error("Database error while inserting {} digestions", digestions.size());
+            throw CutterException.withCause(daoe);
+        }
     }
 
-    private Set<Digestion> getExistingDigestions(final Set<Digestion> digestions) {
-        // FIXME: this should be handled by DAO, it's just a temporal fix
-        return digestions.parallelStream()
-            .map(d -> digestionsDAO.get(d.getEnzyme().getId(), d.getProtein().getId(), d.getPeptide().getId()))
-            .filter(v -> v.isSuccess() && v.exists(Option::isSome))
-            .map(v -> v.success().some())
-            .collect(toSet());
-    }
-
-    private Set<Digestion> replacePeptides(final Set<Digestion> digestions, final Set<Peptide> peptides) {
-        final Map<Peptide, Peptide> peptideMap = setToIdentityMap(peptides);
+    private Set<Digestion> setDigestionsPeptides(final Set<Digestion> digestions, final Set<Peptide> peptides) {
+        val peptideMap = setToIdentityMap(peptides);
 
         return digestions.parallelStream().map(
-            digestion -> digestion.withPeptide(peptideMap.get(digestion.getPeptide()))
+            d -> d.withPeptide(peptideMap.get(d.getPeptide()))
         ).collect(toSet());
     }
 
