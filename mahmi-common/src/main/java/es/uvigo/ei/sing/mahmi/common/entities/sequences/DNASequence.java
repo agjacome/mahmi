@@ -3,17 +3,14 @@ package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 import static fj.Equal.listEqual;
 import static fj.Hash.listHash;
 import static fj.Monoid.monoid;
-import static fj.P.lazy;
 import static fj.data.List.asString;
 import static fj.data.List.iterableList;
 import lombok.Getter;
-import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
 import fj.Equal;
 import fj.Hash;
 import fj.Monoid;
 import fj.data.List;
-import fj.data.Option;
 
 @Getter
 public final class DNASequence implements ChemicalCompoundSequence<Nucleobase> {
@@ -28,13 +25,15 @@ public final class DNASequence implements ChemicalCompoundSequence<Nucleobase> {
         return new DNASequence(List.nil());
     }
 
-    public static Option<DNASequence> fromIterable(final Iterable<Nucleobase> seq) {
-        return Option.iif(isValidDNA(seq), lazy(u -> new DNASequence(iterableList(seq))));
+    public static DNASequence fromIterable(final Iterable<Nucleobase> seq) throws IllegalArgumentException {
+        if (isValidDNA(seq))
+            return new DNASequence(iterableList(seq));
+        else
+            throw new IllegalArgumentException("Invalid DNA sequence given");
     }
 
-    public static Option<DNASequence> fromString(final String str) {
-        val list = List.fromString(str).map(Nucleobase::fromCode);
-        return Option.sequence(list).bind(DNASequence::fromIterable);
+    public static DNASequence fromString(final String str) throws IllegalArgumentException {
+        return fromIterable(List.fromString(str).map(Nucleobase::fromCode));
     }
 
     public static Monoid<DNASequence> getMonoid() {

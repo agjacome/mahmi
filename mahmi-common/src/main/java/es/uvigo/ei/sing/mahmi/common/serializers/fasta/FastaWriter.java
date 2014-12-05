@@ -1,9 +1,6 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
-import static fj.data.Validation.fail;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,8 +11,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.fasta.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
-import fj.Unit;
-import fj.data.Validation;
 
 public interface FastaWriter<A extends ChemicalCompoundSequence<? extends ChemicalCompound>> {
 
@@ -27,18 +22,14 @@ public interface FastaWriter<A extends ChemicalCompoundSequence<? extends Chemic
         return new GenomeFastaWriter();
     }
 
-    public Validation<IOException, Unit> toOutput(final Fasta<A> fasta, final OutputStream outputStream);
+    public void toOutput(final Fasta<A> fasta, final OutputStream outputStream) throws IOException;
 
-    public default Validation<IOException, Unit> toFile(final Fasta<A> fasta, final File file) {
-        try {
-            return toOutput(fasta, new FileOutputStream(file));
-        } catch (final FileNotFoundException fnfe) {
-            return fail(new IOException(fnfe));
-        }
+    public default void toFile(final Fasta<A> fasta, final File file) throws IOException {
+        toOutput(fasta, new FileOutputStream(file));
     }
 
-    public default Validation<IOException, Unit> toPath(final Fasta<A> fasta, final Path path) {
-        return toFile(fasta, path.toFile());
+    public default void toPath(final Fasta<A> fasta, final Path path) throws IOException {
+        toFile(fasta, path.toFile());
     }
 
 }

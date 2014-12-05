@@ -15,7 +15,7 @@ public final class IdentifierAdapter extends XmlAdapter<Integer, Identifier> {
 
     @Override
     public Integer marshal(final Identifier id) throws Exception {
-        return id.getValue().toNull();
+        return id.isEmpty() ? null : id.get();
     }
 
 }

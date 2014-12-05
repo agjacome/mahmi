@@ -9,11 +9,9 @@ import static fj.data.Option.none;
 import static fj.data.Option.some;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 import fj.data.Option;
 
-@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Identifier {
 
@@ -30,6 +28,17 @@ public final class Identifier {
 
     public static Identifier of(final int value) {
         return new Identifier(some(value));
+    }
+
+    public boolean isEmpty() {
+        return value.isNone();
+    }
+
+    public int get() throws IllegalStateException {
+        if (isEmpty())
+            throw new IllegalStateException("get() on empty Identifier");
+        else
+            return value.some();
     }
 
     @Override

@@ -8,7 +8,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.fasta.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.fasta.GenomeFasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
 import fj.Monoid;
-import fj.data.Option;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 final class GenomeFastaReader extends AbstractFastaReader<DNASequence> implements FastaReader<DNASequence> {
@@ -24,7 +23,7 @@ final class GenomeFastaReader extends AbstractFastaReader<DNASequence> implement
     }
 
     @Override
-    protected Option<DNASequence> getSequenceFromString(final String str) {
+    protected DNASequence getSequenceFromString(final String str) {
         return DNASequence.fromString(str);
     }
 

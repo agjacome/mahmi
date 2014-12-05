@@ -1,25 +1,24 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
+import java.util.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
-import fj.Unit;
 import fj.data.Option;
-import fj.data.Validation;
 
 public interface DAO<A> {
 
-    // FIXME: use Sets instead of Iterables
     // FIXME: in insertAll check for already inserted entities, and do not insert them (but do return them)
 
-    public Validation<DAOException, Option<A>> get(final Identifier id);
+    public Option<A> get(final Identifier id) throws DAOException;
 
-    public Validation<DAOException, Iterable<A>> getAll(final int start, final int count);
+    public Set<A> getAll(final int start, final int count) throws DAOException;
 
-    public Validation<DAOException, A> insert(final A entity);
+    public A insert(final A entity) throws DAOException;
 
-    public Validation<DAOException, Iterable<A>> insertAll(final Iterable<A> entities);
+    public Set<A> insertAll(final Set<A> entities) throws DAOException;
 
-    public Validation<DAOException, Unit> delete(final Identifier id);
+    public void delete(final Identifier id) throws DAOException;
 
-    public Validation<DAOException, Unit> update(final A entity);
+    public void update(final A entity) throws DAOException;
 
 }

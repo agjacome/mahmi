@@ -8,7 +8,7 @@ public final class AminoAcidSequenceAdapter extends XmlAdapter<String, AminoAcid
 
     @Override
     public AminoAcidSequence unmarshal(final String str) throws Exception {
-        return AminoAcidSequence.fromString(str).valueE("Invalid aminoacid sequence: " + str);
+        return AminoAcidSequence.fromString(str);
     }
 
     @Override

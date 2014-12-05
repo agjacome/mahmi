@@ -8,7 +8,7 @@ public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleobase> {
 
     @Override
     public Nucleobase unmarshal(final Character code) throws Exception {
-        return Nucleobase.fromCode(code).valueE("Invalid nucleobase code: " + String.valueOf(code));
+        return Nucleobase.fromCode(code);
     }
 
     @Override

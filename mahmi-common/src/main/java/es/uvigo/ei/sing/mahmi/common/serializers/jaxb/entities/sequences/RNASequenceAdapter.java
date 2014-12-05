@@ -8,7 +8,7 @@ public final class RNASequenceAdapter extends XmlAdapter<String, RNASequence> {
 
     @Override
     public RNASequence unmarshal(final String str) throws Exception {
-        return RNASequence.fromString(str).valueE("Invalid RNA nucleobase sequence: " + str);
+        return RNASequence.fromString(str);
     }
 
     @Override

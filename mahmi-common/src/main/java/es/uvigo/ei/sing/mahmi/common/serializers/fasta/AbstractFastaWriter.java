@@ -1,8 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
-import static fj.Unit.unit;
-import static fj.data.Validation.fail;
-import static fj.data.Validation.success;
 import static java.lang.Math.min;
 import static java.lang.System.lineSeparator;
 
@@ -19,14 +16,12 @@ import es.uvigo.ei.sing.mahmi.common.entities.compounds.ChemicalCompound;
 import es.uvigo.ei.sing.mahmi.common.entities.fasta.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
-import fj.Unit;
-import fj.data.Validation;
 
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 abstract class AbstractFastaWriter<A extends ChemicalCompoundSequence<? extends ChemicalCompound>> implements FastaWriter<A> {
 
     @Override
-    public Validation<IOException, Unit> toOutput(final Fasta<A> fasta, final OutputStream outputStream) {
+    public void toOutput(final Fasta<A> fasta, final OutputStream outputStream) throws IOException{
         // FIXME: quite ugly code, try to clean up a bit.
         try (final Writer writer = new OutputStreamWriter(outputStream)) {
 
@@ -49,11 +44,6 @@ abstract class AbstractFastaWriter<A extends ChemicalCompoundSequence<? extends 
 
                 writer.flush();
             }
-
-            return success(unit());
-
-        } catch (final IOException ioe) {
-            return fail(ioe);
         }
     }
 

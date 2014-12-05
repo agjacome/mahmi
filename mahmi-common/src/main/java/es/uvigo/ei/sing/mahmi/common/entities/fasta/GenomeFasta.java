@@ -23,8 +23,4 @@ public final class GenomeFasta extends Fasta<DNASequence> {
         return new GenomeFasta(sequences);
     }
 
-    public static GenomeFasta toGenomeFasta(final Fasta<DNASequence> fasta) {
-        return (GenomeFasta) fasta;
-    }
-
 }

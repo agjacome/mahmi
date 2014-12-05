@@ -1,11 +1,12 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static fj.Unit.unit;
-import static fj.data.Stream.iterableStream;
+import static jersey.repackaged.com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.Set;
 
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
@@ -14,43 +15,13 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import fj.F;
-import fj.F2;
-import fj.Unit;
 import fj.control.db.DB;
-import fj.data.List;
 import fj.data.Option;
-import fj.data.Validation;
 
 public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements ProteinsDAO {
 
-    private final F<Integer, DB<Option<Protein>>> getProtein = id -> sql(
-        "SELECT * FROM proteins WHERE protein_id = ?", id
-    ).bind(query).bind(get).map(List::toOption);
-
-    private final F<String, DB<Option<Protein>>> getProteinBySHA = sha -> sql(
-        "SELECT * FROM peptides WHERE protein_hash = ?", sha
-    ).bind(query).bind(get).map(List::toOption);
-
-    private final F2<Integer, Integer, DB<Iterable<Protein>>> getProteins = (count, start) -> sql(
-        "SELECT * FROM proteins LIMIT ? OFFSET ?", count, start
-    ).bind(query).bind(get).map(List::toCollection);
-
-    private final F2<String, String, DB<Integer>> insertProtein = (sha, seq) -> sql(
-        "INSERT IGNORE INTO proteins (protein_hash, protein_sequence) VALUES (?, ?)", sha, seq
-    ).bind(update).bind(getKey);
-
-    private final F<Integer, DB<Unit>> deleteProtein = id -> sql(
-        "DELETE FROM proteins WHERE protein_id = ?", id
-    ).bind(update).map(r -> unit());
-
-    private final F<Integer, F2<String, String, DB<Unit>>> updateProtein = id -> (sha, seq) -> sql(
-        "UPDATE proteins SET protein_hash = ?, protein_sequence = ? WHERE protein_id = ?", sha, seq
-    ).bind(integer(3, id)).bind(update).map(r -> unit());
-
-
     private MySQLProteinsDAO(final ConnectionPool pool) {
-        super(pool, pool.getConnector());
+        super(pool);
     }
 
     public static ProteinsDAO mysqlProteinsDAO(final ConnectionPool pool) {
@@ -59,55 +30,88 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
 
 
     @Override
-    public Validation<DAOException, Option<Protein>> get(final Identifier id) {
-        return withIdentifier(getProtein, id).bind(this::read);
+    public Option<Protein> get(final Identifier id) throws DAOException {
+        val sql = sql("SELECT * FROM proteins WHERE protein_id = ? LIMIT 1", id)
+                 .bind(query).bind(get);
+
+        return read(sql).toOption();
     }
 
     @Override
-    public Validation<DAOException, Option<Protein>> getBySequence(final AminoAcidSequence seq) {
-        return read(getProteinBySHA.f(seq.toSHA1().asHexString()));
+    public Option<Protein> getBySequence(final AminoAcidSequence sequence) throws DAOException {
+        val sha = sequence.toSHA1().asHexString();
+        val sql = sql("SELECT * FROM proteins WHERE protein_hash = ? LIMIT 1", sha)
+                 .bind(query).bind(get);
+
+        return read(sql).toOption();
     }
 
     @Override
-    public Validation<DAOException, Iterable<Protein>> getAll(final int start, final int count) {
-        return read(withPagination(getProteins, count, start));
+    public Set<Protein> getAll(final int start, final int count) throws DAOException {
+        val sql = sql("SELECT * FROM proteins LIMIT ? OFFSET ?", count, start)
+                 .bind(query).bind(get);
+
+        return newLinkedHashSet(read(sql).toCollection());
     }
 
     @Override
-    public Validation<DAOException, Protein> insert(final Protein protein) {
-        return write(withProtein(insertProtein, protein)).map(protein::withId);
+    public Protein insert(final Protein protein) throws DAOException {
+        val sql = getOrPrepareInsert(protein);
+
+        return write(sql);
     }
 
     @Override
-    public Validation<DAOException, Iterable<Protein>> insertAll(final Iterable<Protein> proteins) {
-        val inserts = iterableStream(proteins).map(
-            p -> withProtein(insertProtein, p).map(p::withId)
-        );
+    public Set<Protein> insertAll(final Set<Protein> proteins) throws DAOException {
+        val sqlBuffer = new LinkedList<DB<Protein>>();
+        for (val protein : proteins) {
+            sqlBuffer.add(getOrPrepareInsert(protein));
+        }
 
-        return write(sequence(inserts));
+        return newLinkedHashSet(write(sequence(sqlBuffer)));
     }
 
     @Override
-    public Validation<DAOException, Unit> delete(final Identifier id) {
-        return withIdentifier(deleteProtein, id).bind(this::write);
+    public void delete(final Identifier id) throws DAOException {
+        val sql = sql("DELETE FROM proteins WHERE protein_id = ?", id).bind(update);
+
+        write(sql);
     }
 
     @Override
-    public Validation<DAOException, Unit> update(final Protein protein) {
-        return withIdentifier(updateProtein, protein.getId()).map(
-            proteinF -> withProtein(proteinF, protein)
-        ).bind(this::write);
+    public void update(final Protein protein) throws DAOException {
+        val id  = protein.getId();
+        val seq = protein.getSequence().toString();
+        val sha = protein.getSequence().toSHA1().asHexString();
+
+        val sql = sql("UPDATE proteins SET protein_hash = ?, protein_sequence = ? WHERE protein_id = ?", sha, seq)
+                 .bind(identifier(3, id))
+                 .bind(update);
+
+        write(sql);
     }
+
 
     @Override
-    protected Protein createEntity(final ResultSet resultSet) throws SQLException {
-        return protein(parseInt(resultSet, "protein_id"), parseAAS(resultSet, "protein_sequence"));
+    protected Protein createEntity(final ResultSet results) throws SQLException {
+        val id  = parseInt(results, "protein_id");
+        val seq = parseAAS(results, "protein_sequence");
+
+        return protein(id, seq);
     }
 
 
-    private <A> A withProtein(final F2<String, String, A> f, final Protein protein) {
-        val aas = protein.getSequence();
-        return f.f(aas.toSHA1().asHexString(), aas.toString());
+    private DB<Protein> getOrPrepareInsert(final Protein protein) throws DAOException {
+        val seq = protein.getSequence();
+        val sha = seq.toSHA1().asHexString();
+
+        val maybeInserted = getBySequence(seq).map(DB::unit);
+        val prepareInsert = sql(
+            "INSERT INTO proteins (protein_hash, protein_sequence) VALUES (?, ?)",
+            sha, seq.toString()
+        ).bind(update).bind(getKey).map(protein::withId);
+
+        return maybeInserted.orSome(prepareInsert);
     }
 
 }

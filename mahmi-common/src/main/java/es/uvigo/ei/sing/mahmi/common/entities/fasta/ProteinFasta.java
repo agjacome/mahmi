@@ -23,8 +23,4 @@ public class ProteinFasta extends Fasta<AminoAcidSequence> {
         return new ProteinFasta(sequences);
     }
 
-    public static ProteinFasta toProteinFasta(final Fasta<AminoAcidSequence> fasta) {
-        return (ProteinFasta) fasta;
-    }
-
 }

@@ -6,13 +6,11 @@ import static fj.Monoid.monoid;
 import static fj.data.List.asString;
 import static fj.data.List.iterableList;
 import lombok.Getter;
-import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
 import fj.Equal;
 import fj.Hash;
 import fj.Monoid;
 import fj.data.List;
-import fj.data.Option;
 
 @Getter
 public final class AminoAcidSequence implements ChemicalCompoundSequence<AminoAcid> {
@@ -31,9 +29,8 @@ public final class AminoAcidSequence implements ChemicalCompoundSequence<AminoAc
         return new AminoAcidSequence(iterableList(seq));
     }
 
-    public static Option<AminoAcidSequence> fromString(final String str) {
-        val list = List.fromString(str).map(AminoAcid::fromCode);
-        return Option.sequence(list).map(AminoAcidSequence::fromIterable);
+    public static AminoAcidSequence fromString(final String str) {
+        return fromIterable(List.fromString(str).map(AminoAcid::fromCode).toCollection());
     }
 
     public static Monoid<AminoAcidSequence> getMonoid() {

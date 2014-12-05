@@ -8,7 +8,7 @@ public final class DNASequenceAdapter extends XmlAdapter<String, DNASequence> {
 
     @Override
     public DNASequence unmarshal(final String str) throws Exception {
-        return DNASequence.fromString(str).valueE("Invalid DNA nucleobase sequence: " + str);
+        return DNASequence.fromString(str);
     }
 
     @Override

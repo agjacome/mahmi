@@ -2,20 +2,23 @@ package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metaGenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IOStreamsExtensionMethods.pipeToInput;
-import static fj.Function.curry;
 import static fj.Unit.unit;
+import static jersey.repackaged.com.google.common.collect.Sets.newLinkedHashSet;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.fasta.GenomeFasta;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
@@ -23,61 +26,15 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import fj.F;
-import fj.F2;
 import fj.Unit;
 import fj.control.db.DB;
-import fj.data.List;
-import fj.data.List.Buffer;
 import fj.data.Option;
-import fj.data.Validation;
 
+@Slf4j
 public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> implements MetaGenomesDAO {
 
-    // FIXME: this is quite a mess. Needs serious refactoring.
-
-    private final F<Integer, DB<Option<MetaGenome>>> getMetaGenome = id -> sql(
-        "SELECT * FROM metagenomes NATURAL JOIN projects WHERE metagenome_id = ?", id
-    ).bind(query).bind(get).map(List::toOption);
-
-    private final F2<Integer, Integer, DB<Iterable<MetaGenome>>> getMetaGenomes = (count, start) -> sql(
-        "SELECT * FROM metagenomes NATURAL JOIN projects LIMIT ? OFFSET ?", count, start
-    ).bind(query).bind(get).map(List::toCollection);
-
-    private final F<Integer, F2<Integer, Integer, DB<Iterable<Identifier>>>> getByProject =
-        pid -> (count, start) ->  sql(
-            "SELECT metagenome_id FROM metagenomes NATURAL JOIN projects WHERE project_id = ? LIMIT ? OFFSET ?",
-            pid, count, start
-        ).bind(query).bind(this::getId);
-
-    private final F<Integer, F2<Integer, Integer, DB<Iterable<Identifier>>>> getByProtein =
-        pid -> (count, start) -> sql(
-            "SELECT metagenome_id FROM metagenome_proteins WHERE protein_id = ? LIMIT ? OFFSET ?",
-            pid, count, start
-        ).bind(query).bind(this::getId);
-
-    private final F<Integer, F<InputStream, DB<Integer>>> insertMetaGenome = pid -> fasta -> sql(
-        "INSERT INTO metagenomes (project_id, metagenome_fasta) VALUES (?, ?)", pid
-    ).bind(blob(2, fasta)).bind(update).bind(getKey);
-
-    private final F<Integer, DB<Unit>> deleteMetaGenome = id -> sql(
-        "DELETE FROM metagenomes WHERE metagenome_id = ?", id
-    ).bind(update).map(r -> unit());
-
-    private final F<Integer, F<InputStream, DB<Unit>>> updateMetaGenome = id -> fasta -> prepare(
-        "UPDATE metagenomes SET metagenome_fasta = ? WHERE metagenome_id = ?"
-    ).bind(blob(1, fasta)).bind(integer(2, id)).bind(update).map(r -> unit());
-
-    private final F<Integer, F<Integer, F<Long, DB<Unit>>>> addProtein = mid -> pid -> count -> sql(
-        "INSERT INTO metagenome_proteins (metagenome_id, protein_id, counter) VALUES (?, ?, ?)", mid, pid
-    ).bind(longinteger(3, count)).bind(update).map(r -> unit());
-
-    private final F<Integer, F<Integer, DB<Unit>>> deleteProtein = mid -> pid -> sql(
-        "DELETE FROM metagenome_proteins WHERE metagenome_id = ? AND protein_id = ?", mid, pid
-    ).bind(update).map(r -> unit());
-
-
     private MySQLMetaGenomesDAO(final ConnectionPool pool) {
-        super(pool, pool.getConnector());
+        super(pool);
     }
 
     public static MySQLMetaGenomesDAO mysqlMetaGenomesDAO(final ConnectionPool pool) {
@@ -86,164 +43,171 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
 
 
     @Override
-    public Validation<DAOException, Option<MetaGenome>> get(final Identifier id) {
-        return withIdentifier(getMetaGenome, id).bind(this::read);
+    public Option<MetaGenome> get(final Identifier id) throws DAOException {
+        val sql = sql("SELECT * FROM metagenomes NATURAL JOIN projects WHERE metagenomes_id = ? LIMIT 1", id)
+                 .bind(query).bind(get);
+
+        return read(sql).toOption();
     }
 
     @Override
-    public Validation<DAOException, Iterable<MetaGenome>> getAll(final int start, final int count) {
-        return read(withPagination(getMetaGenomes, count, start));
+    public Set<MetaGenome> getAll(final int start, final int count) throws DAOException {
+        val sql = sql("SELECT * FROM metagenomes NATURAL JOIN projects LIMIT ? OFFSET ?", count, start)
+                 .bind(query).bind(get);
+
+        return newLinkedHashSet(read(sql).toCollection());
     }
 
     @Override
-    public Validation<DAOException, Iterable<Identifier>> getIdsByProjectId(
-        final Identifier projectId, final int start, final int count
-    ) {
-        return withIdentifier(getByProject, projectId).map(f -> withPagination(f, count, start)).bind(this::read);
+    public Set<Identifier> getIdsByProjectId(final Identifier project, final int start, final int count) throws DAOException {
+        val sql = sql(
+            "SELECT metagenome_id FROM metagenomes NATURAL JOIN projects WHERE project_id = ? LIMIT ? OFFSET ?", project
+        ).bind(integer(2, count)).bind(integer(3, start)).bind(query).bind(idSet);
+
+        return read(sql);
     }
 
     @Override
-    public Validation<DAOException, Iterable<Identifier>> getIdsByProteinId(
-        final Identifier proteinId, final int start, final int count
-    ) {
-        return withIdentifier(getByProtein, proteinId).map(f -> withPagination(f, count, start)).bind(this::read);
+    public Set<Identifier> getIdsByProteinId(final Identifier protein, final int start, final int count) throws DAOException {
+        val sql = sql(
+            "SELECT metagenome_id FROM metagenome_proteins WHERE protein_id = ? LIMIT ? OFFSET ?", protein
+        ).bind(integer(2, count)).bind(integer(3, start)).bind(query).bind(idSet);
+
+        return read(sql);
     }
 
     @Override
-    public Validation<DAOException, MetaGenome> insert(final MetaGenome metaGenome) {
-        return withMetaGenome(insertMetaGenome, metaGenome).bind(this::write).map(metaGenome::withId);
+    public MetaGenome insert(final MetaGenome metaGenome) throws DAOException {
+        val sql = prepareInsert(metaGenome);
+
+        return write(sql);
     }
 
     @Override
-    public Validation<DAOException, Iterable<MetaGenome>> insertAll(final Iterable<MetaGenome> metaGenomes) {
-        // FIXME: fucking ugly shit in here. Try to accumulate over
-        // Validation<DAOException, DB<MetaGenome>> instead of constructing
-        // a Buffer<DB<MetaGenome>>. There probably is an even better way.
-
-        val buffer = Buffer.<DB<MetaGenome>>empty();
-
-        for (final MetaGenome metaGenome : metaGenomes) {
-            val mgValidation = withMetaGenome(
-                insertMetaGenome, metaGenome
-            ).map(db -> db.map(metaGenome::withId));
-
-            if (mgValidation.isFail())
-                return mgValidation.map(db -> List.nil());
-            else
-                mgValidation.map(buffer::snoc);
+    public Set<MetaGenome> insertAll(final Set<MetaGenome> metaGenomes) throws DAOException {
+        val sqlBuffer = new LinkedList<DB<MetaGenome>>();
+        for (val metaGenome : metaGenomes) {
+            sqlBuffer.add(prepareInsert(metaGenome));
         }
 
-        return write(sequence(buffer.toCollection()));
+        return newLinkedHashSet(write(sequence(sqlBuffer)));
     }
 
     @Override
-    public Validation<DAOException, Unit> delete(final Identifier id) {
-        return withIdentifier(deleteMetaGenome, id).bind(this::write);
+    public void delete(final Identifier id) throws DAOException {
+        val sql = sql("DELETE FROM metagenomes WHERE metagenome_id = ?", id).bind(update);
+
+        write(sql);
     }
 
     @Override
-    public Validation<DAOException, Unit> update(final MetaGenome metaGenome) {
-        return withIdentifier(updateMetaGenome, metaGenome.getId()).bind(
-            fastaF -> withFasta(fastaF, metaGenome.getGenomeFasta())
-        ).bind(this::write);
+    public void update(final MetaGenome metaGenome) throws DAOException {
+        val sql = prepare("UPDATE metagenomes SET metagenome_fasta = ? WHERE metagenome_id = ?")
+                 .bind(fasta(1, FastaWriter.forDNA(), metaGenome.getGenomeFasta()))
+                 .bind(identifier(2, metaGenome.getId()))
+                 .bind(update);
+
+        write(sql);
     }
 
     @Override
-    public Validation<DAOException, Unit> addProteinToMetaGenome(
-        final Identifier metaGenomeId, final Identifier proteinId, final long counter
-    ) {
-        return withIdentifier(addProtein, metaGenomeId).bind(
-            proteinIdF -> withIdentifier(proteinIdF, proteinId)
-        ).map(counterF -> counterF.f(counter)).bind(this::write);
+    public void addProteinToMetaGenome(final Identifier metaGenome, final Identifier protein, final long counter) throws DAOException {
+        val sql = prepareProteinInsert(metaGenome, protein, counter);
+
+        write(sql);
     }
 
     @Override
-    public Validation<DAOException, Unit> addAllProteinsToMetaGenome(
-        final Identifier metaGenomeId, final Map<Identifier, Long> proteinCounters
-    ) {
-        // FIXME: fucking ugly shit in here. Try to accumulate over
-        // Validation<DAOException, DB<Unit>> instead of constructing a
-        // Buffer<DB<Unit>>. There probably is an even better way.
+    public void addAllProteinsToMetaGenome(final Identifier metaGenome, final Map<Identifier, Long> proteins) throws DAOException {
+        val sqlBuffer = new LinkedList<DB<Unit>>();
+        for (val entry : proteins.entrySet()) {
+            val protein = entry.getKey();
+            val counter = entry.getValue();
 
-        val buffer = Buffer.<DB<Unit>>empty();
-        val mgV    = withIdentifier(addProtein, metaGenomeId);
-
-        for (final Entry<Identifier, Long> entry : proteinCounters.entrySet()) {
-            val addValidation = mgV.bind(
-                pidF -> withIdentifier(pidF, entry.getKey())
-            ).map(ctrF -> ctrF.f(entry.getValue()));
-
-            if (addValidation.isFail())
-                return addValidation.map(db -> unit());
-            else
-                addValidation.map(buffer::snoc);
+            val sql = prepareProteinInsert(metaGenome, protein, counter);
+            sqlBuffer.add(sql);
         }
 
-        return write(sequence(buffer.toCollection())).map(i -> unit());
+        write(sequence(sqlBuffer));
     }
 
     @Override
-    public Validation<DAOException, Unit> deleteProteinFromMetaGenome(
-        final Identifier metaGenomeId, final Identifier proteinId
-    ) {
-        return withIdentifier(deleteProtein, metaGenomeId).bind(
-            pidF -> withIdentifier(pidF, proteinId)
-        ).bind(this::write);
+    public void deleteProteinFromMetaGenome(final Identifier metaGenome, final Identifier protein) throws DAOException {
+        val sql = sql(
+            "DELETE FROM metagenome_proteins WHERE metagenome_id = ? AND protein_id = ?", metaGenome, protein
+        ).bind(update);
+
+        write(sql);
     }
 
     @Override
     protected MetaGenome createEntity(final ResultSet results) throws SQLException {
-        val project = project(
-            parseInt(results, "project_id"),
-            parseString(results, "project_name"),
-            parseString(results, "project_repository")
-        );
+        val id      = parseInt(results, "metagenome_id");
+        val project = parseProject(results);
+        val fasta   = parseFasta(results, "metagenome_fasta");
 
-        return metaGenome(
-            parseInt(results, "metagenome_id"), project, parseFasta(results, "metagenome_fasta")
-        );
+        return metaGenome(id, project, fasta);
     }
 
 
-    private <A> Validation<DAOException, A> withMetaGenome(
-        final F<Integer, F<InputStream, A>> f, final MetaGenome metaGenome
-    ) {
-        return withIdentifier(f, metaGenome.getProject().getId()).bind(
-            fastaF -> withFasta(fastaF, metaGenome.getGenomeFasta())
-        );
+    private DB<MetaGenome> prepareInsert(final MetaGenome metaGenome) throws DAOException {
+        val project = metaGenome.getProject().getId();
+        val fasta   = metaGenome.getGenomeFasta();
+
+        return sql("INSERT INTO metagenomes (project_id, metagenome_fasta) VALUES (?, ?)", project)
+               .bind(fasta(2, FastaWriter.forDNA(), fasta))
+               .bind(update).bind(getKey).map(metaGenome::withId);
     }
 
-    private <A> Validation<DAOException, A> withFasta(final F<InputStream, A> f, final GenomeFasta fasta) {
-        val writer    = FastaWriter.forDNA();
-        val validated = pipeToInput(curry(writer::toOutput).f(fasta)).map(f);
+    private DB<Unit> prepareProteinInsert(final Identifier metaGenome, final Identifier protein, final long counter) throws DAOException {
+        val exists = sql(
+            "SELECT COUNT(*) FROM metagenome_proteins WHERE protein_id = ? AND metagenome_id = ? LIMIT 1",
+            protein, metaGenome
+        ).bind(query).bind(exists);
 
-        return validated.f().map(DAOException::withCause);
+        val insert = sql(
+            "INSERT INTO metagenome_proteins (metagenome_id, protein_id, counter) VALUES(?, ?, ?)",
+            protein, metaGenome
+        ).bind(longInt(3, counter)).bind(update).map(r -> unit());
+
+        val nothing = DB.unit(unit());
+
+        return exists.bind(alreadyInserted -> alreadyInserted ? nothing : insert);
+    }
+
+    private Project parseProject(final ResultSet results) throws SQLException {
+        val id   = parseInt(results, "project_id");
+        val name = parseString(results, "project_name");
+        val repo = parseString(results, "project_repository");
+
+        return project(id, name, repo);
     }
 
     private GenomeFasta parseFasta(final ResultSet results, final String columnName) throws SQLException {
-        // FIXME: ugly
-        val reader = FastaReader.forDNA();
-        val fastaV = reader.fromInput(results.getBlob(columnName).getBinaryStream());
+        try {
+            val reader = FastaReader.forDNA();
+            val fasta  = reader.fromInput(results.getBlob(columnName).getBinaryStream());
 
-        if (fastaV.isSuccess())
-            return GenomeFasta.of(fastaV.success().getSequences());
-        else
-            throw new SQLException("Could not parse DNA-Fasta at " + columnName, fastaV.fail());
+            return (GenomeFasta) fasta;
+        } catch (final IOException ioe) {
+            log.error("Error while parsing MetaGenome Fasta from DB", ioe);
+            throw new SQLException(ioe);
+        }
     }
 
-    private DB<Iterable<Identifier>> getId(final ResultSet resultSet) {
-        return new DB<Iterable<Identifier>>() {
-            @Override
-            public Iterable<Identifier> run(final Connection c) throws SQLException {
-                try (final ResultSet result = resultSet) {
-                    val buffer = Buffer.<Identifier>empty();
-                    while (result.next()) {
-                        buffer.snoc(Identifier.of(parseInt(result, "metagenome_id")));
-                    }
-                    return buffer.toList();
+    private final F<ResultSet, DB<Set<Identifier>>> idSet = resultSet -> new DB<Set<Identifier>>() {
+        @Override
+        public Set<Identifier> run(final Connection c) throws SQLException {
+            try (final ResultSet result = resultSet) {
+                val buffer = new LinkedHashSet<Identifier>();
+                while (result.next()) {
+                    val id = Identifier.of(parseInt(result, "metagenome_id"));
+                    buffer.add(id);
                 }
+
+                return buffer;
             }
-        };
-    }
+        }
+    };
 
 }

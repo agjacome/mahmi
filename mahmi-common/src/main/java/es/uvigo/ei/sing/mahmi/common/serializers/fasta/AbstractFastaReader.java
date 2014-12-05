@@ -1,8 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
-import static fj.data.Validation.fail;
-import static fj.data.Validation.success;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +16,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.compounds.ChemicalCompound;
 import es.uvigo.ei.sing.mahmi.common.entities.fasta.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence;
 import fj.Monoid;
-import fj.data.Option;
-import fj.data.Validation;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,12 +24,8 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
     private final Monoid<A> sequenceMonoid = getSequenceMonoid();
 
     @Override
-    public Validation<IOException, Fasta<A>> fromInput(final InputStream inputStream) {
+    public Fasta<A> fromInput(final InputStream inputStream) throws IOException {
         // FIXME: quite ugly code here, try to clean up a bit.
-        // Also, it can be easy parallelized: operations over parsedSequence
-        // are fully associative (meaning it doesn't really matter in what
-        // order we parse the file: no LinkedHashMap required). Think
-        // algebraically.
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
             val parsedSequences  = new LinkedHashMap<A, Integer>();
@@ -55,10 +46,7 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
             addSequenceToMap(parsedSequences, previousSequence);
             log.info("Parsed {} sequences from Fasta of {} lines", parsedSequences.size(), lineCounter.get());
 
-            return success(getFastaFromMap(parsedSequences));
-
-        } catch (final IOException ioe) {
-            return fail(ioe);
+            return getFastaFromMap(parsedSequences);
         }
     }
 
@@ -74,19 +62,18 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
     }
 
     private A parseSequenceLine(final String line, final int lineNumber) throws IOException {
-        val sequence = getSequenceFromString(line);
-
-        if (sequence.isNone()) {
-            throw new IOException(String.format(
-                "Could not parse line %d as sequence: %s", lineNumber, line
-            ));
-        } else return sequence.some();
+        try {
+            return getSequenceFromString(line);
+        } catch (final Exception e) {
+            log.error("Could not parse line {0} ase sequence: {1}", lineNumber, line);
+            throw new IOException(e);
+        }
     }
 
     protected abstract Monoid<A> getSequenceMonoid();
 
     protected abstract Fasta<A> getFastaFromMap(final Map<A, Integer> map);
 
-    protected abstract Option<A> getSequenceFromString(final String str);
+    protected abstract A getSequenceFromString(final String str);
 
 }
