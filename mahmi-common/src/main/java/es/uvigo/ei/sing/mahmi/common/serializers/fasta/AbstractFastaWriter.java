@@ -25,7 +25,7 @@ abstract class AbstractFastaWriter<A extends ChemicalCompoundSequence<? extends 
         // FIXME: quite ugly code, try to clean up a bit.
         try (final Writer writer = new OutputStreamWriter(outputStream)) {
 
-            for (final Entry<A, Integer> entry : fasta.getSequences().entrySet()) {
+            for (final Entry<A, Long> entry : fasta.getSequences().entrySet()) {
                 val sequence = entry.getKey();
                 val counter  = entry.getValue();
 

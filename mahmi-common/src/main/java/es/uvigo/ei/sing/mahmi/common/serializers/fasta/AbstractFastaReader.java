@@ -28,7 +28,7 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
         // FIXME: quite ugly code here, try to clean up a bit.
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
-            val parsedSequences  = new LinkedHashMap<A, Integer>();
+            val parsedSequences  = new LinkedHashMap<A, Long>();
             val lineCounter      = new AtomicInteger(0);
 
             String line;
@@ -50,9 +50,9 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
         }
     }
 
-    private A addSequenceToMap(final Map<A, Integer> sequences, final A sequence) {
+    private A addSequenceToMap(final Map<A, Long> sequences, final A sequence) {
         if (!sequence.isEmpty())
-            sequences.put(sequence, sequences.getOrDefault(sequence, 0) + 1);
+            sequences.put(sequence, sequences.getOrDefault(sequence, 0L) + 1L);
 
         return sequenceMonoid.zero();
     }
@@ -72,7 +72,7 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
 
     protected abstract Monoid<A> getSequenceMonoid();
 
-    protected abstract Fasta<A> getFastaFromMap(final Map<A, Integer> map);
+    protected abstract Fasta<A> getFastaFromMap(final Map<A, Long> map);
 
     protected abstract A getSequenceFromString(final String str);
 

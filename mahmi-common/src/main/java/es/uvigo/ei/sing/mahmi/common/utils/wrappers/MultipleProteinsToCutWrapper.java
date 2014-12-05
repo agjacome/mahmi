@@ -20,7 +20,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor(staticName = "wrapProteinsToCut")
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "cutProteins") @XmlAccessorType(XmlAccessType.FIELD)
 public final class MultipleProteinsToCutWrapper {
 
     // Gawd, this sucks too much already

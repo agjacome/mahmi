@@ -138,7 +138,7 @@ public abstract class MySQLAbstractDAO<A> {
         return statement -> new DB<PreparedStatement>() {
             @Override
             public PreparedStatement run(final Connection c) throws SQLException {
-                // so exceptions, such try, wow
+                // FIXME: so exceptions, such try, wow
                 try {
                     val input = pipeToInput(os -> {
                         try {

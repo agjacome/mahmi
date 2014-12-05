@@ -14,6 +14,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class Fasta<A extends ChemicalCompoundSequence<? extends ChemicalCompound>> {
 
-    protected final Map<A, Integer> sequences;
+    protected final Map<A, Long> sequences;
 
 }

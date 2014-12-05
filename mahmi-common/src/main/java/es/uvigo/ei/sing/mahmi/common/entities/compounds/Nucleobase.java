@@ -3,7 +3,6 @@ package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.mapKeys;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.setToIdentityMap;
 import static java.lang.Character.toLowerCase;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.EnumSet.allOf;
 
 import java.util.Map;
@@ -22,8 +21,8 @@ public enum Nucleobase implements ChemicalCompound {
 
     N("Unknown"  , 'N');
 
-    public static final Map<Character, Nucleobase> codeMapper =
-        unmodifiableMap(mapKeys(setToIdentityMap(allOf(Nucleobase.class)), aa -> toLowerCase(aa.code)));
+    private static final Map<Character, Nucleobase> codeMapper =
+        mapKeys(setToIdentityMap(allOf(Nucleobase.class)), aa -> toLowerCase(aa.code));
 
     private final char   code;
     private final String fullName;
@@ -34,7 +33,7 @@ public enum Nucleobase implements ChemicalCompound {
     }
 
     public static Nucleobase fromCode(final char code) {
-        return codeMapper.getOrDefault(code, N);
+        return codeMapper.getOrDefault(toLowerCase(code), N);
     }
 
     @Override

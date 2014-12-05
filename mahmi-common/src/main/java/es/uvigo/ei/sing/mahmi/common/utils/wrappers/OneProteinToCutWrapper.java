@@ -22,7 +22,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 @ToString
 @EqualsAndHashCode
 @AllArgsConstructor(staticName = "wrapProteinToCut")
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "cutProtein") @XmlAccessorType(XmlAccessType.FIELD)
 public final class OneProteinToCutWrapper {
 
     // Required because Java sucks, and Jersey sucks, and JAXB sucks

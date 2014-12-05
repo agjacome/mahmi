@@ -18,7 +18,7 @@ final class ProteinFastaReader extends AbstractFastaReader<AminoAcidSequence> im
     }
 
     @Override
-    protected Fasta<AminoAcidSequence> getFastaFromMap(final Map<AminoAcidSequence, Integer> map) {
+    protected Fasta<AminoAcidSequence> getFastaFromMap(final Map<AminoAcidSequence, Long> map) {
         return ProteinFasta.of(map);
     }
 

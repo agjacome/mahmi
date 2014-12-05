@@ -4,7 +4,6 @@ import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensio
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.setToIdentityMap;
 import static fj.data.vector.V.v;
 import static java.lang.Character.toLowerCase;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.EnumSet.allOf;
 
 import java.util.Map;
@@ -45,8 +44,8 @@ public enum AminoAcid implements ChemicalCompound {
 
     XAA("Unknown"                     , 'X' , v('X', 'A', 'A'));
 
-    public static final Map<Character, AminoAcid> codeMapper =
-        unmodifiableMap(mapKeys(setToIdentityMap(allOf(AminoAcid.class)), aa -> toLowerCase(aa.code)));
+    private static final Map<Character, AminoAcid> codeMapper =
+        mapKeys(setToIdentityMap(allOf(AminoAcid.class)), aa -> toLowerCase(aa.code));
 
     private final char          code;
     private final V3<Character> shortName;
@@ -59,7 +58,7 @@ public enum AminoAcid implements ChemicalCompound {
     }
 
     public static AminoAcid fromCode(final char code) {
-        return codeMapper.getOrDefault(code, XAA);
+        return codeMapper.getOrDefault(toLowerCase(code), XAA);
     }
 
     @Override

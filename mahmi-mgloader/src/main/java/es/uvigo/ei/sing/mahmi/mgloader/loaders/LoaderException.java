@@ -1,6 +1,6 @@
 package es.uvigo.ei.sing.mahmi.mgloader.loaders;
 
-public final class LoaderException extends RuntimeException {
+public final class LoaderException extends Exception {
 
     private static final long serialVersionUID = 1L;
 

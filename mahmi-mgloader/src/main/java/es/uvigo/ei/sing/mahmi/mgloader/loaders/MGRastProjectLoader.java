@@ -27,7 +27,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import fj.P2;
 import fj.data.List;
-import fj.data.Validation;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,37 +42,41 @@ public final class MGRastProjectLoader implements ProjectLoader {
 
 
     @Override
-    public Stream<Validation<IOException, P2<GenomeFasta, ProteinFasta>>> loadProject(final Path projectPath) {
-        return findFastaFiles(projectPath).toCollection().stream().map(
-            paths -> getFastas(paths._1(), paths._2())
-        );
+    public Stream<P2<GenomeFasta, ProteinFasta>> loadProject(final Path projectPath) throws LoaderException {
+        // FIXME: much ugly, so ioexceptions, awesome
+        try {
+
+            return findFastaFiles(projectPath).toCollection().stream().map(paths -> {
+                val genomePath  = paths._1();
+                val proteinPath = paths._2();
+
+                try {
+                    return getFastas(genomePath, proteinPath);
+                } catch (final IOException ioe) {
+                    throw new RuntimeException(ioe);
+                }
+            });
+
+        } catch (final RuntimeException rte) {
+            if (rte.getCause() instanceof IOException)
+                throw LoaderException.withCause(rte.getCause());
+
+            throw rte;
+        }
     }
 
 
-    private Validation<IOException, P2<GenomeFasta, ProteinFasta>> getFastas(
-        final Path genomePath, final Path proteinPath
-    ) {
+    private P2<GenomeFasta, ProteinFasta> getFastas(final Path genomePath, final Path proteinPath) throws IOException {
         log.info("Reading genome fasta file {} and protein fasta file {}", genomePath, proteinPath);
-        return getFasta(genomeReader,  genomePath).bind(
-            gs -> getFasta(proteinReader, proteinPath).map(
-                ps -> p(gs, ps).split(this::toGenomeFasta, this::toProteinFasta)
-            )
-        );
+        val genomes  = (GenomeFasta)  getFasta(genomeReader, genomePath);
+        val proteins = (ProteinFasta) getFasta(proteinReader, proteinPath);
+
+        return p(genomes, proteins);
     }
 
-    private <A extends ChemicalCompoundSequence<?>> Validation<IOException, Fasta<A>> getFasta(
-        final FastaReader<A> reader, final Path file
-    ) {
+    private <A extends ChemicalCompoundSequence<?>> Fasta<A> getFasta(final FastaReader<A> reader, final Path file) throws IOException {
         log.info("Reading Fasta file {}", file);
         return reader.fromPath(file);
-    }
-
-    private GenomeFasta toGenomeFasta(final Fasta<DNASequence> fasta) {
-        return GenomeFasta.of(fasta.getSequences());
-    }
-
-    private ProteinFasta toProteinFasta(final Fasta<AminoAcidSequence> fasta) {
-        return ProteinFasta.of(fasta.getSequences());
     }
 
     private List<P2<Path, Path>> findFastaFiles(final Path projectPath) {
@@ -100,8 +103,10 @@ public final class MGRastProjectLoader implements ProjectLoader {
 
             if (file.isDirectory())
                 buffer.addAll(findFiles(path, filePattern));
-            else if (filePattern.matches(path.getFileName()))
+            else if (filePattern.matches(path.getFileName())) {
+                log.debug("Found file {}", path);
                 buffer.add(path);
+            }
         }
 
         return buffer;

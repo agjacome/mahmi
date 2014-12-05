@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(staticName = "serverLauncher")
 public final class ServiceServerLauncher {
 
-    // FIXME: block execution in a proper way (not by waiting on stdin)
+    // FIXME: block execution (or not) in a proper way (not by waiting on stdin)
     public void launch(final ServiceServer server) {
         try (final ServiceServer srv = server.start()) {
             stdinReadLine().run();

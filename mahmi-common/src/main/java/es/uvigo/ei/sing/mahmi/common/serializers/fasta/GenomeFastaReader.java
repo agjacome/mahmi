@@ -18,7 +18,7 @@ final class GenomeFastaReader extends AbstractFastaReader<DNASequence> implement
     }
 
     @Override
-    protected Fasta<DNASequence> getFastaFromMap(final Map<DNASequence, Integer> map) {
+    protected Fasta<DNASequence> getFastaFromMap(final Map<DNASequence, Long> map) {
         return GenomeFasta.of(map);
     }
 

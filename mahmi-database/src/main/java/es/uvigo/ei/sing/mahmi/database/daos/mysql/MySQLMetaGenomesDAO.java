@@ -167,7 +167,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
 
         val insert = sql(
             "INSERT INTO metagenome_proteins (metagenome_id, protein_id, counter) VALUES(?, ?, ?)",
-            protein, metaGenome
+            metaGenome, protein
         ).bind(longInt(3, counter)).bind(update).map(r -> unit());
 
         val nothing = DB.unit(unit());
