@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.mgloader.loaders;
+package es.uvigo.ei.sing.mahmi.loader.loaders;
 
 import static fj.P.p;
 import static fj.data.List.iterableList;
@@ -43,26 +43,16 @@ public final class MGRastProjectLoader implements ProjectLoader {
 
     @Override
     public Stream<P2<GenomeFasta, ProteinFasta>> loadProject(final Path projectPath) throws LoaderException {
-        // FIXME: much ugly, so ioexceptions, awesome
-        try {
+        return findFastaFiles(projectPath).toCollection().stream().map(paths -> {
+            val genomePath  = paths._1();
+            val proteinPath = paths._2();
 
-            return findFastaFiles(projectPath).toCollection().stream().map(paths -> {
-                val genomePath  = paths._1();
-                val proteinPath = paths._2();
-
-                try {
-                    return getFastas(genomePath, proteinPath);
-                } catch (final IOException ioe) {
-                    throw new RuntimeException(ioe);
-                }
-            });
-
-        } catch (final RuntimeException rte) {
-            if (rte.getCause() instanceof IOException)
-                throw LoaderException.withCause(rte.getCause());
-
-            throw rte;
-        }
+            try {
+                return getFastas(genomePath, proteinPath);
+            } catch (final IOException ioe) {
+                throw LoaderException.withCause(ioe);
+            }
+        });
     }
 
 

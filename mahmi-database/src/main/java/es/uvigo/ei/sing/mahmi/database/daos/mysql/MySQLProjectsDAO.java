@@ -38,7 +38,7 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
 
     @Override
     public Set<Project> getAll(final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM enzymes LIMIT ? OFFSET ?", count, start)
+        val sql = sql("SELECT * FROM projects LIMIT ? OFFSET ?", count, start)
                  .bind(query).bind(get);
 
         return newLinkedHashSet(read(sql).toCollection());

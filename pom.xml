@@ -16,7 +16,7 @@
         <module>mahmi-controller</module>
         <module>mahmi-cutter</module>
         <module>mahmi-database</module>
-        <module>mahmi-mgloader</module>
+        <module>mahmi-loader</module>
         <module>mahmi-locator</module>
     </modules>
 

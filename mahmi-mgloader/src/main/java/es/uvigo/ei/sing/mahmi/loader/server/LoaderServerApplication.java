@@ -1,11 +1,11 @@
-package es.uvigo.ei.sing.mahmi.mgloader.server;
+package es.uvigo.ei.sing.mahmi.loader.server;
 
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLMetaGenomesDAO.mysqlMetaGenomesDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlProjectsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
-import static es.uvigo.ei.sing.mahmi.mgloader.loaders.MGRastProjectLoader.mgRastProjectLoader;
-import static es.uvigo.ei.sing.mahmi.mgloader.loaders.ProjectLoaderController.projectLoaderCtrl;
-import static es.uvigo.ei.sing.mahmi.mgloader.service.LoaderService.loaderService;
+import static es.uvigo.ei.sing.mahmi.loader.loaders.MGRastProjectLoader.mgRastProjectLoader;
+import static es.uvigo.ei.sing.mahmi.loader.loaders.ProjectLoaderController.projectLoaderCtrl;
+import static es.uvigo.ei.sing.mahmi.loader.service.LoaderService.loaderService;
 
 import java.util.Set;
 

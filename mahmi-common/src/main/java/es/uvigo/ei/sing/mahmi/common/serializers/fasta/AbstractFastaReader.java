@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,7 +28,7 @@ abstract class AbstractFastaReader<A extends ChemicalCompoundSequence<? extends 
         // FIXME: quite ugly code here, try to clean up a bit.
         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
 
-            val parsedSequences  = new LinkedHashMap<A, Long>();
+            val parsedSequences  = new HashMap<A, Long>();
             val lineCounter      = new AtomicInteger(0);
 
             String line;

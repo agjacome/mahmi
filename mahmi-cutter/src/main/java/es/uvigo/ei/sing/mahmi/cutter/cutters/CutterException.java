@@ -1,6 +1,6 @@
 package es.uvigo.ei.sing.mahmi.cutter.cutters;
 
-public final class CutterException extends Exception {
+public final class CutterException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

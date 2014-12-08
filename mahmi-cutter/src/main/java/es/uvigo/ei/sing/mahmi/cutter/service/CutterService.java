@@ -18,8 +18,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
-import es.uvigo.ei.sing.mahmi.common.utils.wrappers.MultipleProteinsToCutWrapper;
-import es.uvigo.ei.sing.mahmi.common.utils.wrappers.OneProteinToCutWrapper;
+import es.uvigo.ei.sing.mahmi.common.utils.wrappers.CutProteinsWrapper;
 import es.uvigo.ei.sing.mahmi.cutter.cutters.CutterException;
 import es.uvigo.ei.sing.mahmi.cutter.cutters.ProteinCutterController;
 
@@ -29,6 +28,8 @@ import es.uvigo.ei.sing.mahmi.cutter.cutters.ProteinCutterController;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CutterService {
 
+    // FIXME: run async, what to return??
+
     private final ProteinCutterController cutterCtrl;
 
     public static CutterService cutterService(final ProteinCutterController cutterCtrl) {
@@ -36,34 +37,14 @@ public final class CutterService {
     }
 
     @POST
-    public Response cut(
-        final OneProteinToCutWrapper wrapper
-    ) {
-        val protein = wrapper.getProtein();
-        val enzymes = wrapper.getEnzymes();
-        val minSize = wrapper.getMinSize();
-        val maxSize = wrapper.getMaxSize();
-
-        try {
-            val digestions = cutterCtrl.cutProtein(protein, enzymes, minSize, maxSize);
-            return success(digestions);
-        } catch (final CutterException ce) {
-            return fail(ce);
-        }
-    }
-
-    @POST
-    @Path("/all")
-    public Response cutAll(
-        final MultipleProteinsToCutWrapper wrapper
-    ) {
+    public Response cut(final CutProteinsWrapper wrapper) {
         val proteins = wrapper.getProteins();
         val enzymes  = wrapper.getEnzymes();
         val minSize  = wrapper.getMinSize();
         val maxSize  = wrapper.getMaxSize();
 
         try {
-            val digestions = cutterCtrl.cutAllProteins(proteins, enzymes, minSize, maxSize);
+            val digestions = cutterCtrl.cutProteins(proteins, enzymes, minSize, maxSize);
             return success(digestions);
         } catch (final CutterException ce) {
             return fail(ce);

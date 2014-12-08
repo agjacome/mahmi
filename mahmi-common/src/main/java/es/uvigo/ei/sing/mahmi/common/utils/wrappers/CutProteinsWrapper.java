@@ -19,9 +19,9 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 @Getter
 @ToString
 @EqualsAndHashCode
-@AllArgsConstructor(staticName = "wrapProteinsToCut")
+@AllArgsConstructor(staticName = "cutProteins")
 @XmlRootElement(name = "cutProteins") @XmlAccessorType(XmlAccessType.FIELD)
-public final class MultipleProteinsToCutWrapper {
+public final class CutProteinsWrapper {
 
     // Gawd, this sucks too much already
 
@@ -31,7 +31,7 @@ public final class MultipleProteinsToCutWrapper {
     private final int          maxSize;
 
     @VisibleForJAXB
-    public MultipleProteinsToCutWrapper() {
+    public CutProteinsWrapper() {
         this(emptySet(), emptySet(), 0, Integer.MAX_VALUE);
     }
 

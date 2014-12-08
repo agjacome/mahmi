@@ -1,6 +1,6 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
-public final class DAOException extends Exception {
+public final class DAOException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

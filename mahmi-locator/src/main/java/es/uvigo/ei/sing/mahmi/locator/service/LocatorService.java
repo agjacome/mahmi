@@ -33,10 +33,17 @@ public final class LocatorService {
     @GET
     public Response getCutter(@QueryParam("name") final String serviceName) {
         switch (serviceName.toLowerCase()) {
-            case "loader" : return status(OK).entity(getLoader()).build();
-            case "cutter" : return status(OK).entity(getCutter()).build();
-            default       : return status(BAD_REQUEST).build();
+            case "controller" : return status(OK).entity(getController()).build();
+            case "loader"     : return status(OK).entity(getLoader()).build();
+            case "cutter"     : return status(OK).entity(getCutter()).build();
+            default           : return status(BAD_REQUEST).build();
         }
+    }
+
+    @GET
+    @Path("/controller")
+    public Location getController() {
+        return location("MAHMI controller service", config.getControllerURI());
     }
 
     @GET

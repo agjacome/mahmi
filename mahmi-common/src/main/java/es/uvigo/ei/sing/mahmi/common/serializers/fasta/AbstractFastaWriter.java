@@ -22,7 +22,7 @@ abstract class AbstractFastaWriter<A extends ChemicalCompoundSequence<? extends 
 
     @Override
     public void toOutput(final Fasta<A> fasta, final OutputStream outputStream) throws IOException{
-        // FIXME: quite ugly code, try to clean up a bit.
+        // FIXME: quite ugly code here, try to clean up a bit.
         try (final Writer writer = new OutputStreamWriter(outputStream)) {
 
             for (final Entry<A, Long> entry : fasta.getSequences().entrySet()) {

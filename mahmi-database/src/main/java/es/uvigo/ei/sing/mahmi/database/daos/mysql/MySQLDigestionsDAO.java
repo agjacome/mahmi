@@ -19,6 +19,7 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import fj.control.db.DB;
+import fj.data.List;
 import fj.data.Option;
 
 public class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implements DigestionsDAO {
@@ -142,13 +143,17 @@ public class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implements D
         val protein = digestion.getProtein().getId();
         val peptide = digestion.getPeptide().getId();
 
-        val maybeInserted = get(enzyme, protein, peptide).map(DB::unit);
-        val prepareInsert = sql(
+        val exists = sql(
+            "SELECT * FROM " + tables + " WHERE enzyme_id = ? AND protein_id = ? AND peptide_id = ? LIMIT 1",
+            enzyme, protein, peptide
+        ).bind(query).bind(get).map(List::toOption);
+
+        val insert = sql(
             "INSERT INTO digestions (enzyme_id, protein_id, peptide_id, counter) VALUES (?, ?, ?, ?)",
             enzyme, protein, peptide
         ).bind(longInt(4, digestion.getCounter())).bind(update).bind(getKey).map(digestion::withId);
 
-        return maybeInserted.orSome(prepareInsert);
+        return exists.bind(opt -> opt.map(DB::unit).orSome(insert));
     }
 
 }

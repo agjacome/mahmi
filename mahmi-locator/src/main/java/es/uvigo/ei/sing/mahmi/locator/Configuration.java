@@ -24,6 +24,10 @@ public final class Configuration {
         return build(config.getConfig("locator"));
     }
 
+    public URI getControllerURI() {
+        return build(config.getConfig("controller"));
+    }
+
     public URI getLoaderURI() {
         return build(config.getConfig("loader"));
     }

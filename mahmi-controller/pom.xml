@@ -16,10 +16,15 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!-- mahmi-common -->
+        <!-- mahmi-common and mahmi-database -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mahmi.common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.database</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

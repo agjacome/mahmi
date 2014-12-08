@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.mgloader.loaders;
+package es.uvigo.ei.sing.mahmi.loader.loaders;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;

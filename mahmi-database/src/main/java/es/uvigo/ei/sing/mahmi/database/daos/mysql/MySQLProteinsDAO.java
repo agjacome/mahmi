@@ -16,6 +16,7 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import fj.control.db.DB;
+import fj.data.List;
 import fj.data.Option;
 
 public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements ProteinsDAO {
@@ -105,13 +106,16 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         val seq = protein.getSequence();
         val sha = seq.toSHA1().asHexString();
 
-        val maybeInserted = getBySequence(seq).map(DB::unit);
-        val prepareInsert = sql(
+        val exists = sql(
+            "SELECT * FROM proteins WHERE protein_hash = ? LIMIT 1", sha
+        ).bind(query).bind(get).map(List::toOption);
+
+        val insert = sql(
             "INSERT INTO proteins (protein_hash, protein_sequence) VALUES (?, ?)",
             sha, seq.toString()
         ).bind(update).bind(getKey).map(protein::withId);
 
-        return maybeInserted.orSome(prepareInsert);
+        return exists.bind(opt -> opt.map(DB::unit).orSome(insert));
     }
 
 }

@@ -35,7 +35,7 @@ public final class Identifier {
     }
 
     public int get() throws IllegalStateException {
-        if (isEmpty())
+        if (isEmpty() || value.exists(i -> i < 0))
             throw new IllegalStateException("get() on empty Identifier");
         else
             return value.some();

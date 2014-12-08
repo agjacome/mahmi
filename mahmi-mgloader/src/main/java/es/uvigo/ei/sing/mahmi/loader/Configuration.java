@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.mgloader;
+package es.uvigo.ei.sing.mahmi.loader;
 
 import static javax.ws.rs.core.UriBuilder.fromUri;
 

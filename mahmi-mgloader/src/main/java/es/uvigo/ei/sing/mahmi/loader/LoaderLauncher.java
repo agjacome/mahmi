@@ -1,8 +1,8 @@
-package es.uvigo.ei.sing.mahmi.mgloader;
+package es.uvigo.ei.sing.mahmi.loader;
 
 import static es.uvigo.ei.sing.mahmi.database.connection.HikariConnectionPool.hikariCP;
-import static es.uvigo.ei.sing.mahmi.mgloader.Configuration.configuration;
-import static es.uvigo.ei.sing.mahmi.mgloader.server.LoaderServer.loaderServer;
+import static es.uvigo.ei.sing.mahmi.loader.Configuration.configuration;
+import static es.uvigo.ei.sing.mahmi.loader.server.LoaderServer.loaderServer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;

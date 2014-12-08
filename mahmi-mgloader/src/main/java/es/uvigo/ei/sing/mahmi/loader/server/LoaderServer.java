@@ -1,6 +1,6 @@
-package es.uvigo.ei.sing.mahmi.mgloader.server;
+package es.uvigo.ei.sing.mahmi.loader.server;
 
-import static es.uvigo.ei.sing.mahmi.mgloader.server.LoaderServerApplication.loaderApplication;
+import static es.uvigo.ei.sing.mahmi.loader.server.LoaderServerApplication.loaderApplication;
 import static javax.ws.rs.client.ClientBuilder.newClient;
 
 import java.net.URI;
@@ -13,7 +13,7 @@ import es.uvigo.ei.sing.mahmi.common.services.GrizzlyServer;
 import es.uvigo.ei.sing.mahmi.common.services.ServiceServer;
 import es.uvigo.ei.sing.mahmi.common.utils.Location;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
-import es.uvigo.ei.sing.mahmi.mgloader.Configuration;
+import es.uvigo.ei.sing.mahmi.loader.Configuration;
 
 @Getter
 public final class LoaderServer {

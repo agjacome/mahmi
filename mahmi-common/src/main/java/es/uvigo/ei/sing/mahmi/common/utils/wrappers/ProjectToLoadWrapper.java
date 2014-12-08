@@ -11,17 +11,21 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
 @Getter
 @ToString
 @EqualsAndHashCode
-@AllArgsConstructor(staticName = "wrapProjectToLoad")
+@AllArgsConstructor(staticName = "loadProject")
 @XmlRootElement(name = "loadProject") @XmlAccessorType(XmlAccessType.FIELD)
 public class ProjectToLoadWrapper {
+
+    // Required because Java sucks, and JAXB sucks and Jersey sucks
 
     private final Project project;
     private final String  path;
 
+    @VisibleForJAXB
     public ProjectToLoadWrapper() {
         this(project("", ""), "/tmp");
     }

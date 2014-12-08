@@ -37,15 +37,7 @@ public final class ProteinCutterController {
         return new ProteinCutterController(cutter, peptidesDAO, digestionsDAO);
     }
 
-
-    public Set<Digestion> cutProtein(
-        final Protein protein, final Set<Enzyme> enzymes, final int minSize, final int maxSize
-    ) throws CutterException {
-        val digestions = cutter.cutProtein(protein, enzymes, minSize, maxSize);
-        return insertDigestionsWithPeptides(digestions);
-    }
-
-    public Set<Digestion> cutAllProteins(
+    public Set<Digestion> cutProteins(
         final Set<Protein> proteins, final Set<Enzyme> enzymes, final int minSize, final int maxSize
     ) throws CutterException {
         val digestions = cutter.cutAllProteins(proteins, enzymes, minSize, maxSize);
@@ -54,11 +46,11 @@ public final class ProteinCutterController {
 
 
     private Set<Digestion> insertDigestionsWithPeptides(final Set<Digestion> digestions) throws CutterException {
-        val oldPeptides = digestions.parallelStream().map(Digestion::getPeptide).collect(toSet());
-        val newPeptides = insertPeptides(oldPeptides);
+        Set<Peptide> peptides = digestions.parallelStream().map(Digestion::getPeptide).collect(toSet());
+                     peptides = insertPeptides(peptides);
 
-        val newDigestions = setDigestionsPeptides(digestions, newPeptides);
-        return insertDigestions(newDigestions);
+        val ds = setDigestionsPeptides(digestions, peptides);
+        return insertDigestions(ds);
     }
 
     private Set<Peptide> insertPeptides(final Set<Peptide> peptides) throws CutterException {

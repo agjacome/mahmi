@@ -7,8 +7,6 @@ import fj.data.Option;
 
 public interface DAO<A> {
 
-    // FIXME: in insertAll check for already inserted entities, and do not insert them (but do return them)
-
     public Option<A> get(final Identifier id) throws DAOException;
 
     public Set<A> getAll(final int start, final int count) throws DAOException;

@@ -1,8 +1,9 @@
-package es.uvigo.ei.sing.mahmi.mgloader.loaders;
+package es.uvigo.ei.sing.mahmi.loader.loaders;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metaGenome;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.mapKeys;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionsExtensionMethods.setToIdentityMap;
+import static java.util.concurrent.CompletableFuture.runAsync;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -47,40 +48,32 @@ public final class ProjectLoaderController {
         val insertedProject = insertProject(project);
 
         loadProjectFiles(insertedProject, projectPath);
+
         return insertedProject;
     }
 
 
     private void loadProjectFiles(final Project project, final Path path) throws LoaderException {
-        // FIXME: very exceptions, such clean, wow
-        try {
-            log.info("Loading Fasta files of {} from {}", project, path);
-            loader.loadProject(path).forEach(paths -> {
-                try {
-                    insertProjectFastas(project, paths);
-                } catch (final LoaderException lee) {
-                    throw new RuntimeException(lee);
-                }
-            });
-        } catch (final RuntimeException rte) {
-            if (rte.getCause() instanceof LoaderException)
-                throw (LoaderException) rte.getCause();
-            throw rte;
-        }
+        runAsync(() -> {
+            log.info("Start :: Loading Fasta files of {} from {}", project, path);
+            loader.loadProject(path).forEach(paths -> insertProjectFastas(project, paths));
+            log.info("Finish :: Loading Fasta files of {} from {}", project, path);
+        });
     }
 
     private void insertProjectFastas(final Project project, final P2<GenomeFasta, ProteinFasta> fastas) throws LoaderException {
         log.info("Inserting Fastas of {} into database", project);
-        val oldMetaGenome = metaGenome(project, fastas._1());
-        val newMetaGenome = insertMetaGenome(oldMetaGenome);
+        MetaGenome metaGenome = metaGenome(project, fastas._1());
+                   metaGenome = insertMetaGenome(metaGenome);
 
-        insertProteinFasta(newMetaGenome, fastas._2());
+        insertProteinFasta(metaGenome, fastas._2());
     }
 
     private void insertProteinFasta(final MetaGenome metaGenome, final ProteinFasta proteinFasta) throws LoaderException {
-        val oldProteins = mapKeys(proteinFasta.getSequences(), Protein::protein);
-        val newProteins = insertProteins(oldProteins.keySet());
-        val frequencies = mapKeys(oldProteins, setToIdentityMap(newProteins)::get);
+        Map<Protein, Long> frequencies = mapKeys(proteinFasta.getSequences(), Protein::protein);
+        val proteins = insertProteins(frequencies.keySet());
+
+        frequencies = mapKeys(frequencies, setToIdentityMap(proteins)::get);
         addProteinsToMetaGenome(metaGenome, frequencies);
     }
 

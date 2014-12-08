@@ -11,8 +11,8 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>mahmi.mgloader</artifactId>
-    <name>MAHMI - MetaGenome Loader</name>
+    <artifactId>mahmi.loader</artifactId>
+    <name>MAHMI - MetaGenome Project Loader</name>
     <packaging>jar</packaging>
 
     <dependencies>

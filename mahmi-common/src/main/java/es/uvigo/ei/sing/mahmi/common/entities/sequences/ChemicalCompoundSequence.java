@@ -31,8 +31,6 @@ public interface ChemicalCompoundSequence<A extends ChemicalCompound> extends It
     }
 
     public default SHA1 toSHA1() {
-        // FIXME: this implies that subclasses MUST override toString!
-        // force that override or check for it in some way!!
         return SHA1.of(toString());
     }
 

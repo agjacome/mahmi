@@ -15,6 +15,7 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
 import fj.control.db.DB;
+import fj.data.List;
 import fj.data.Option;
 
 public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements EnzymesDAO {
@@ -96,12 +97,12 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
     private DB<Enzyme> getOrPrepareInsert(final Enzyme enzyme) throws DAOException {
         val name = enzyme.getName();
 
-        val maybeInserted = getByName(name).map(DB::unit);
-        val prepareInsert = sql(
-            "INSERT INTO enzymes (enzyme_name) VALUES (?)", name
-        ).bind(update).bind(getKey).map(enzyme::withId);
+        val exists = sql("SELECT * FROM enzymes WHERE enzyme_name = ? LIMIT 1", name)
+                    .bind(query).bind(get).map(List::toOption);
+        val insert = sql("INSERT INTO enzymes (enzyme_name) VALUES (?)", name)
+                    .bind(update).bind(getKey).map(enzyme::withId);
 
-        return maybeInserted.orSome(prepareInsert);
+        return exists.bind(opt -> opt.map(DB::unit).orSome(insert));
     }
 
 }

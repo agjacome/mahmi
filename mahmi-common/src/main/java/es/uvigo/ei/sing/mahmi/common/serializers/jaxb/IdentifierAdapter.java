@@ -10,12 +10,12 @@ public final class IdentifierAdapter extends XmlAdapter<Integer, Identifier> {
 
     @Override
     public Identifier unmarshal(final Integer id) throws Exception {
-        return isNull(id) ? Identifier.empty() : Identifier.of(id);
+        return isNull(id) || id < 0 ? Identifier.empty() : Identifier.of(id);
     }
 
     @Override
     public Integer marshal(final Identifier id) throws Exception {
-        return id.isEmpty() ? null : id.get();
+        return id.isEmpty() ? -1 : id.get();
     }
 
 }
