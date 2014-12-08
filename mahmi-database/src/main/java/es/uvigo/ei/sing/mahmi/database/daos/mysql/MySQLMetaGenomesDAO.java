@@ -44,7 +44,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
 
     @Override
     public Option<MetaGenome> get(final Identifier id) throws DAOException {
-        val sql = sql("SELECT * FROM metagenomes NATURAL JOIN projects WHERE metagenomes_id = ? LIMIT 1", id)
+        val sql = sql("SELECT * FROM metagenomes NATURAL JOIN projects WHERE metagenome_id = ? LIMIT 1", id)
                  .bind(query).bind(get);
 
         return read(sql).toOption();

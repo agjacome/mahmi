@@ -1,6 +1,6 @@
 <configuration scan="true" scanPeriod="30 seconds">
 
-    <property name="LOG_FILE" value="../logs/mahmi-cutter" />
+    <property name="LOG_FILE" value="../logs/mahmi-controller" />
 
     <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.err</target>
