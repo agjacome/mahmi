@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import jersey.repackaged.com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import fj.F;
@@ -26,17 +27,17 @@ public final class CollectionsExtensionMethods {
     }
 
     public static <A> Map<A, A> setToIdentityMap(final Set<A> as) {
-        return as.parallelStream().collect(toMap(identity(), identity()));
+        return Maps.asMap(as, a -> a);
     }
 
     public static <A, B, C> Map<C, B> mapKeys(final Map<A, B> map, final F<A, C> mapper) {
-        return map.entrySet().parallelStream().map(
+        return map.entrySet().stream().map(
             entry -> p(mapper.f(entry.getKey()), entry.getValue())
         ).collect(toMap(P2::_1, P2::_2));
     }
 
     public static <A, B, C> Map<A, C> mapValues(final Map<A, B> map, final F<B, C> mapper) {
-        return map.entrySet().parallelStream().map(
+        return map.entrySet().stream().map(
             entry -> p(entry.getKey(), mapper.f(entry.getValue()))
         ).collect(toMap(P2::_1, P2::_2));
     }

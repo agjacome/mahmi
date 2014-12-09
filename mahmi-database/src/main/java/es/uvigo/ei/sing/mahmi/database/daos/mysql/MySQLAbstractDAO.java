@@ -233,7 +233,7 @@ public abstract class MySQLAbstractDAO<A> {
     }
 
     protected final AminoAcidSequence parseAAS(final ResultSet results, final String column) throws SQLException {
-        return AminoAcidSequence.fromString(parseString(results, column));
+        return AminoAcidSequence.fromString(results.getString(column));
     }
 
     protected abstract A createEntity(final ResultSet resultSet) throws SQLException;

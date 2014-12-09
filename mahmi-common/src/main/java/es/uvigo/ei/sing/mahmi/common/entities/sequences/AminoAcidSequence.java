@@ -30,7 +30,7 @@ public final class AminoAcidSequence implements ChemicalCompoundSequence<AminoAc
     }
 
     public static AminoAcidSequence fromString(final String str) {
-        return fromIterable(List.fromString(str).map(AminoAcid::fromCode).toCollection());
+        return new AminoAcidSequence(List.fromString(str).map(AminoAcid::fromCode));
     }
 
     public static Monoid<AminoAcidSequence> getMonoid() {
