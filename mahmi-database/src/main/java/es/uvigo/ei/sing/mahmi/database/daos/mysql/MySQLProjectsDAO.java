@@ -1,101 +1,122 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static jersey.repackaged.com.google.common.collect.Sets.newLinkedHashSet;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.Collection;
 
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import fj.control.db.DB;
-import fj.data.Option;
 
 public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements ProjectsDAO {
 
-    private MySQLProjectsDAO(final ConnectionPool pool) {
-        super(pool);
+    private MySQLProjectsDAO(final ConnectionPool connectionPool) {
+        super(connectionPool);
     }
 
-    public static MySQLProjectsDAO mysqlProjectsDAO(final ConnectionPool pool) {
-        return new MySQLProjectsDAO(pool);
+    public static ProjectsDAO mysqlProjectsDAO(
+        final ConnectionPool connectionPool
+    ) {
+        return new MySQLProjectsDAO(connectionPool);
     }
 
 
     @Override
-    public Option<Project> get(final Identifier id) throws DAOException {
-        val sql = sql("SELECT * FROM projects WHERE project_id = ? LIMIT 1", id)
-                 .bind(query).bind(get);
+    public Collection<Project> getByName(
+        final String name, final int start, final int count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT * FROM projects WHERE project_name = ? ORDER BY project_id LIMIT ? OFFSET ?",
+            name
+        ).bind(integer(2, count)).bind(integer(3, start));
 
-        return read(sql).toOption();
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toCollection();
     }
 
     @Override
-    public Set<Project> getAll(final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM projects LIMIT ? OFFSET ?", count, start)
-                 .bind(query).bind(get);
+    public Collection<Project> getByRepository(
+        final String repo, final int start, final int count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT * FROM projects WHERE project_repository = ? ORDER BY project_id LIMIT ? OFFSET ?",
+            repo
+        ).bind(integer(2, count)).bind(integer(3, start));
 
-        return newLinkedHashSet(read(sql).toCollection());
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toCollection();
     }
 
-    @Override
-    public Project insert(final Project project) throws DAOException {
-        val sql = prepareInsert(project);
-
-        return write(sql);
-    }
 
     @Override
-    public Set<Project> insertAll(final Set<Project> projects) throws DAOException {
-        val sqlBuffer = new LinkedList<DB<Project>>();
-        for (val project : projects) {
-            sqlBuffer.add(prepareInsert(project));
-        }
-
-        return newLinkedHashSet(write(sequence(sqlBuffer)));
-    }
-
-    @Override
-    public void delete(final Identifier id) throws DAOException {
-        val sql = sql("DELETE FROM projects WHERE project_id = ?", id).bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    public void update(final Project project) throws DAOException {
-        val name = project.getName();
-        val repo = project.getRepository();
-
-        val sql = sql("UPDATE projects SET project_name = ?, project_repository = ? WHERE project_id = ?", name, repo)
-                 .bind(identifier(3, project.getId()))
-                 .bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    protected Project createEntity(final ResultSet results) throws SQLException {
-        val id   = parseInt(results, "project_id");
+    protected Project parse(final ResultSet results) throws SQLException {
+        val id   = parseIdentifier(results, "project_id");
         val name = parseString(results, "project_name");
         val repo = parseString(results, "project_repository");
 
         return project(id, name, repo);
     }
 
-
-    private DB<Project> prepareInsert(final Project project) throws DAOException {
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Project project) {
         val name = project.getName();
         val repo = project.getRepository();
 
-        return sql("INSERT INTO projects (project_name, project_repository) VALUES (?, ?)", name, repo)
-               .bind(update).bind(getKey).map(project::withId);
+        return sql(
+            "SELECT * FROM projects WHERE project_name = ? AND project_repository = ? LIMIT 1",
+            name, repo
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Identifier id) {
+        return sql("SELECT * FROM projects WHERE project_id = ? LIMIT 1", id);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareSelect(
+        final int limit, final int offset
+    ) {
+        return sql(
+            "SELECT * FROM projects ORDER BY project_id LIMIT ? OFFSET ?",
+            limit, offset
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareInsert(final Project project) {
+        val name = project.getName();
+        val repo = project.getRepository();
+
+        return sql(
+            "INSERT INTO projects (project_name, project_repository) VALUES (?, ?)",
+            name, repo
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareDelete(final Identifier id) {
+        return sql("DELETE FROM projects WHERE project_id = ?", id);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareUpdate(final Project project) {
+        val id   = project.getId();
+        val name = project.getName();
+        val repo = project.getRepository();
+
+        return sql(
+            "UPDATE projects SET project_name = ?, project_repository = ? WHRE project_id = ?",
+            name, repo
+        ).bind(identifier(3, id));
     }
 
 }

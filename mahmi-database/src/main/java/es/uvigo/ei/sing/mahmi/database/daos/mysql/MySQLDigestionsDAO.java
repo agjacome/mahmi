@@ -4,31 +4,31 @@ import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
 import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
 import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static jersey.repackaged.com.google.common.collect.Sets.newLinkedHashSet;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.Collection;
 
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
-import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
+import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import fj.control.db.DB;
-import fj.data.List;
 import fj.data.Option;
 
-public class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implements DigestionsDAO {
+public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implements DigestionsDAO {
 
-    private static final String tables = "digestions NATURAL JOIN peptides NATURAL JOIN proteins NATURAL JOIN enzymes";
+    private static final String TABLES = "digestions NATURAL JOIN peptides NATURAL JOIN proteins NATURAL JOIN enzymes";
 
-
-    private MySQLDigestionsDAO(final ConnectionPool pool) {
-        super(pool);
+    private MySQLDigestionsDAO(final ConnectionPool connectionPool) {
+        super(connectionPool);
     }
 
     public static DigestionsDAO mysqlDigestionsDAO(final ConnectionPool pool) {
@@ -37,123 +37,146 @@ public class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implements D
 
 
     @Override
-    public Option<Digestion> get(final Identifier id) throws DAOException {
-        val sql = sql("SELECT * FROM " + tables + " WHERE digestion_id = ? LIMIT 1", id)
-                 .bind(query).bind(get);
+    public Option<Digestion> get(
+        final Enzyme enzyme, final Protein protein, final Peptide peptide
+    ) throws DAOException {
+        val digestion = digestion(protein, peptide, enzyme);
+        val statement = prepareSelect(digestion).bind(query).bind(get);
 
-        return read(sql).toOption();
+        return read(statement).toOption();
+    }
+
+
+    @Override
+    public Collection<Digestion> getByEnzyme(
+        final Enzyme enzyme, final int start, final int count
+    ) throws DAOException {
+        return getByForeignIdentifier(
+            "enzyme_id", enzyme.getId(), start, count
+        );
     }
 
     @Override
-    public Option<Digestion> get(final Identifier enzyme, final Identifier protein, final Identifier peptide) throws DAOException {
-        val sql = sql(
-            "SELECT * FROM " + tables + " WHERE enzyme_id = ? AND protein_id = ? AND peptide_id = ? LIMIT 1",
-            enzyme, protein, peptide
-        ).bind(query).bind(get);
-
-        return read(sql).toOption();
+    public Collection<Digestion> getByProtein(
+        final Protein protein, final int start, final int count
+    ) throws DAOException {
+        return getByForeignIdentifier(
+            "protein_id", protein.getId(), start, count
+        );
     }
 
     @Override
-    public Set<Digestion> getAll(final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM " + tables + " LIMIT ? OFFSET ?", count, start)
-                 .bind(query).bind(get);
-
-        return new LinkedHashSet<>(read(sql).toCollection());
+    public Collection<Digestion> getByPeptide(
+        final Peptide peptide, final int start, final int count
+    ) throws DAOException {
+        return getByForeignIdentifier(
+            "peptide_id", peptide.getId(), start, count
+        );
     }
 
-    @Override
-    public Set<Digestion> getByEnzymeId(final Identifier enzyme, final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM " + tables + " WHERE enzyme_id = ? LIMIT ? OFFSET ?", enzyme)
-                 .bind(integer(2, count))
-                 .bind(integer(3, start))
-                 .bind(query).bind(get);
-
-        return new LinkedHashSet<>(read(sql).toCollection());
-    }
 
     @Override
-    public Set<Digestion> getByProteinId(final Identifier protein, final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM " + tables + " WHERE protein_id = ? LIMIT ? OFFSET ?", protein)
-                 .bind(integer(2, count))
-                 .bind(integer(3, start))
-                 .bind(query).bind(get);
-
-        return new LinkedHashSet<>(read(sql).toCollection());
-    }
-
-    @Override
-    public Set<Digestion> getByPeptideId(final Identifier peptide, final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM " + tables + " WHERE peptide_id = ? LIMIT ? OFFSET ?", peptide)
-                 .bind(integer(2, count))
-                 .bind(integer(3, start))
-                 .bind(query).bind(get);
-
-        return new LinkedHashSet<>(read(sql).toCollection());
-    }
-
-    @Override
-    public Digestion insert(final Digestion digestion) throws DAOException {
-        val sql = getOrPrepareInsert(digestion);
-
-        return write(sql);
-    }
-
-    @Override
-    public Set<Digestion> insertAll(final Set<Digestion> digestions) throws DAOException {
-        val sqlBuffer = new LinkedList<DB<Digestion>>();
-        for (val digestion : digestions) {
-            sqlBuffer.add(getOrPrepareInsert(digestion));
-        }
-
-        return newLinkedHashSet(write(sequence(sqlBuffer)));
-    }
-
-    @Override
-    public void delete(final Identifier id) throws DAOException {
-        val sql = sql("DELETE FROM digestions WHERE digestion_id = ?", id).bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    public void update(final Digestion digestion) throws DAOException {
-        val sql = prepare("UPDATE digestions SET counter = ? WHERE digestion_id = ?")
-               .bind(longInt(1, digestion.getCounter()))
-               .bind(identifier(2, digestion.getId()))
-               .bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    protected Digestion createEntity(final ResultSet results) throws SQLException {
-        val id      = parseInt(results, "digestion_id");
-        val protein = protein(parseInt(results, "protein_id"), parseAAS(results, "protein_sequence"));
-        val peptide = peptide(parseInt(results, "peptide_id"), parseAAS(results, "peptide_sequence"));
-        val enzyme  = enzyme(parseInt(results, "enzyme_id"), parseString(results, "enzyme_name"));
-        val counter = parseLong(results, "digestion_counter");
+    protected Digestion parse(final ResultSet results) throws SQLException {
+        val id      = parseIdentifier(results, "digestion_id");
+        val protein = parseProtein(results);
+        val peptide = parsePeptide(results);
+        val enzyme  = parseEnzyme(results);
+        val counter = parseLong(results, "counter");
 
         return digestion(id, protein, peptide, enzyme, counter);
     }
 
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Digestion digestion) {
+        val proteinId = digestion.getProtein().getId();
+        val peptideId = digestion.getPeptide().getId();
+        val enzymeId  = digestion.getEnzyme().getId();
 
-    private DB<Digestion> getOrPrepareInsert(final Digestion digestion) throws DAOException {
-        val enzyme  = digestion.getEnzyme().getId();
+        return sql(
+            "SELECT * FROM " + TABLES + " WHERE protein_id = ? AND peptide_id = ? AND enzyme_id = ? LIMIT 1",
+            proteinId, peptideId, enzymeId
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Identifier id) {
+        return sql(
+            "SELECT * FROM " + TABLES + " WHERE digestion_id = ? LIMIT 1", id
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final int limit, final int offset) {
+        return sql(
+            "SELECT * FROM " + TABLES + " ORDER BY digestion_id LIMIT ? OFFSET ?",
+            limit, offset
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareInsert(final Digestion digestion) {
         val protein = digestion.getProtein().getId();
         val peptide = digestion.getPeptide().getId();
+        val enzyme  = digestion.getEnzyme().getId();
+        val counter = digestion.getCounter();
 
-        val exists = sql(
-            "SELECT * FROM " + tables + " WHERE enzyme_id = ? AND protein_id = ? AND peptide_id = ? LIMIT 1",
-            enzyme, protein, peptide
-        ).bind(query).bind(get).map(List::toOption);
+        return sql(
+            "INSERT INTO digestions (protein_id, peptide_id, enzyme_id, counter) VALUES (?, ?, ?, ?)",
+            protein, peptide, enzyme
+        ).bind(longInt(4, counter));
+    }
 
-        val insert = sql(
-            "INSERT INTO digestions (enzyme_id, protein_id, peptide_id, counter) VALUES (?, ?, ?, ?)",
-            enzyme, protein, peptide
-        ).bind(longInt(4, digestion.getCounter())).bind(update).bind(getKey).map(digestion::withId);
+    @Override
+    protected DB<PreparedStatement> prepareDelete(final Identifier id) {
+        return sql("DELETE FROM digestions WHERE digestion_id = ?", id);
+    }
 
-        return exists.bind(opt -> opt.map(DB::unit).orSome(insert));
+    @Override
+    protected DB<PreparedStatement> prepareUpdate(final Digestion entity) {
+        val id      = entity.getId();
+        val counter = entity.getCounter();
+
+        return prepare(
+            "UPDATE digestions SET counter = ? WHERE digestion_id = ?"
+        ).bind(longInt(1, counter)).bind(identifier(2, id));
+    }
+
+
+    private Enzyme parseEnzyme(final ResultSet results) throws SQLException {
+        return enzyme(
+            parseIdentifier(results, "enzyme_id"),
+            parseString(results, "enzyme_name")
+        );
+    }
+
+    private Peptide parsePeptide(final ResultSet results) throws SQLException {
+        return peptide(
+            parseIdentifier(results, "peptide_id"),
+            parseAASequence(results, "peptide_sequence")
+        );
+    }
+
+    private Protein parseProtein(final ResultSet results) throws SQLException {
+        return protein(
+            parseIdentifier(results, "protein_id"),
+            parseAASequence(results, "protein_sequence")
+        );
+    }
+
+    private Collection<Digestion> getByForeignIdentifier(
+        final String     columnName,
+        final Identifier id,
+        final int        start,
+        final int        count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT * FROM " + TABLES + " WHERE " + columnName + " = ? ORDER BY digestion_id LIMIT ? OFFSET ?",
+            id
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(get);
+
+        return read(statement).toCollection();
     }
 
 }

@@ -1,55 +1,39 @@
 package es.uvigo.ei.sing.mahmi.common.entities;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static fj.P.p;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
-import es.uvigo.ei.sing.mahmi.common.entities.fasta.GenomeFasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
-import fj.P3;
 
-@Getter
-@ToString
+@ToString(exclude = "fasta")
 @EqualsAndHashCode(exclude = "id")
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(staticName = "metagenome")
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-public final class MetaGenome {
+@Data public final class MetaGenome implements Entity<MetaGenome> {
 
-    private final Identifier  id;
-    private final Project     project;
-    private final GenomeFasta genomeFasta;
+    private Identifier id;
+    private Project    project;
 
-    @VisibleForJAXB
-    public MetaGenome() {
-        this(Identifier.empty(), project("", ""), GenomeFasta.empty());
+    @XmlTransient
+    private Fasta<DNASequence> fasta;
+
+    @VisibleForJAXB public MetaGenome() {
+        this(new Identifier(), new Project(), Fasta.empty());
     }
 
-    public static MetaGenome metaGenome(
-        final Project project, final GenomeFasta fasta
+    public static MetaGenome metagenome(
+        final Project project, final Fasta<DNASequence> fasta
     ) {
-        return new MetaGenome(Identifier.empty(), project, fasta);
-    }
-
-    public static MetaGenome metaGenome(
-        final int id, final Project project, final GenomeFasta fasta
-    ) {
-        return metaGenome(project, fasta).withId(id);
-    }
-
-    public MetaGenome withId(final int id) {
-        return new MetaGenome(Identifier.of(id), project, genomeFasta);
-    }
-
-    public P3<Identifier, Project, GenomeFasta> toProduct() {
-        return p(id, project, genomeFasta);
+        return metagenome(Identifier.empty(), project, fasta);
     }
 
 }

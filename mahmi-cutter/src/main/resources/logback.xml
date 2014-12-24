@@ -6,7 +6,7 @@
         <target>System.err</target>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>WARN</level>
+            <level>ERROR</level>
         </filter>
 
         <encoder>
@@ -20,11 +20,11 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>${LOG_FILE}.%i.log.zip</fileNamePattern>
             <minIndex>1</minIndex>
-            <maxIndex>3</maxIndex>
+            <maxIndex>20</maxIndex>
         </rollingPolicy>
 
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-          <maxFileSize>5MB</maxFileSize>
+          <maxFileSize>15MB</maxFileSize>
         </triggeringPolicy>
 
         <encoder>
@@ -32,7 +32,7 @@
         </encoder>
     </appender>
 
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="FILE"   />
         <appender-ref ref="STDERR" />
     </root>

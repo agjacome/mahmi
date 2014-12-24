@@ -1,27 +1,29 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
-import java.util.Set;
+import java.util.Collection;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
-import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
+import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import fj.data.Option;
 
 public interface DigestionsDAO extends DAO<Digestion> {
 
     public Option<Digestion> get(
-        final Identifier enzymeId, final Identifier proteinId, final Identifier peptideId
+        final Enzyme enzyme, final Protein protein, final Peptide peptide
     ) throws DAOException;
 
-    public Set<Digestion> getByEnzymeId(
-        final Identifier enzymeId, final int start, final int count
+    public Collection<Digestion> getByEnzyme(
+        final Enzyme enzyme, final int start, final int count
     ) throws DAOException;
 
-    public Set<Digestion> getByProteinId(
-        final Identifier proteinId, final int start, final int count
+    public Collection<Digestion> getByProtein(
+        final Protein protein, final int start, final int count
     ) throws DAOException;
 
-    public Set<Digestion> getByPeptideId(
-        final Identifier peptideId, final int start, final int count
+    public Collection<Digestion> getByPeptide(
+        final Peptide peptide, final int start, final int count
     ) throws DAOException;
 
 }

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import lombok.val;
 import fj.control.db.Connector;
 
 public interface ConnectionPool {
@@ -12,7 +13,12 @@ public interface ConnectionPool {
     public DataSource getDataSource();
 
     public default Connection getConnection() throws SQLException {
-        return getDataSource().getConnection();
+        val connection = getDataSource().getConnection();
+
+        connection.setAutoCommit(false);
+        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
+        return connection;
     }
 
     public default Connector getConnector() {

@@ -7,7 +7,7 @@ import lombok.val;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ArrayExtensionMethods {
 
-    public static Byte[ ] boxedArray(final byte[ ] array) {
+    public static Byte[ ] boxed(final byte[ ] array) {
         val result = new Byte[array.length];
         for (int i = 0; i < array.length; ++i)
             result[i] = array[i];
@@ -15,7 +15,7 @@ public final class ArrayExtensionMethods {
         return result;
     }
 
-    public static Integer[ ] boxedArray(final int[ ] array) {
+    public static Integer[ ] boxed(final int[ ] array) {
         val result = new Integer[array.length];
         for (int i = 0; i < array.length; ++i)
             result[i] = array[i];
@@ -23,7 +23,7 @@ public final class ArrayExtensionMethods {
         return result;
     }
 
-    public static byte[ ] primitiveArray(final Byte[] array) {
+    public static byte[ ] primitive(final Byte[] array) {
         val result = new byte[array.length];
         for (int i = 0; i < array.length; ++i)
             result[i] = array[i];
@@ -31,7 +31,7 @@ public final class ArrayExtensionMethods {
         return result;
     }
 
-    public static int[ ] primitiveArray(final Integer[] array) {
+    public static int[ ] primitive(final Integer[] array) {
         val result = new int[array.length];
         for (int i = 0; i < array.length; ++i)
             result[i] = array[i];

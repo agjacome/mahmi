@@ -24,7 +24,9 @@ public final class DAOException extends RuntimeException {
         return new DAOException(cause);
     }
 
-    public static DAOException withMessageAndCause(final String message, final Throwable cause) {
+    public static DAOException withMessageAndCause(
+        final String message, final Throwable cause
+    ) {
         return new DAOException(message, cause);
     }
 

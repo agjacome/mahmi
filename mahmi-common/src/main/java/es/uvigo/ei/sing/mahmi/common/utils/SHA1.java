@@ -2,26 +2,17 @@ package es.uvigo.ei.sing.mahmi.common.utils;
 
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 import static org.apache.commons.codec.digest.DigestUtils.sha1;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import fj.data.Option;
 
-@Getter
-@EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-public final class SHA1 {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Value public final class SHA1 {
 
     private final byte[ ] hash;
 
@@ -43,11 +34,6 @@ public final class SHA1 {
 
     public String asHexString() {
         return encodeHexString(hash);
-    }
-
-    @Override
-    public String toString() {
-        return asHexString();
     }
 
 }

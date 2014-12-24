@@ -1,34 +1,53 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Consumer;
 
-import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
+import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Project;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import fj.data.Option;
 
 public interface MetaGenomesDAO extends DAO<MetaGenome> {
 
-    // TODO: must be refined, maybe not all these operations should be
-    // resposibility of MetaGenomesDAO
-
-    public Set<Identifier> getIdsByProjectId(
-        final Identifier projectId, final int start, final int count
+    public Option<MetaGenome> getWithFasta(
+        final Identifier id
     ) throws DAOException;
 
-    public Set<Identifier> getIdsByProteinId(
-        final Identifier proteinId, final int start, final int count
+    public int countByProject(final Project project);
+
+    public Collection<MetaGenome> getByProject(
+        final Project project, final int start, final int count
     ) throws DAOException;
 
-    public void addProteinToMetaGenome(
-        final Identifier metaGenomeId, final Identifier proteinId, final long counter
+    public Collection<MetaGenome> getByProtein(
+        final Protein protein, final int start, final int count
     ) throws DAOException;
 
-    public void addAllProteinsToMetaGenome(
-        final Identifier metaGenomeId, final Map<Identifier, Long> proteinCounters
+    public void addProtein(
+        final MetaGenome metaGenome, final Protein protein, final long counter
     ) throws DAOException;
 
-    public void deleteProteinFromMetaGenome(
-        final Identifier metaGenomeId, final Identifier proteinId
+    public void addProteins(
+        final MetaGenome metaGenome, final Map<Protein, Long> proteins
     ) throws DAOException;
+
+    public void removeProtein(
+        final MetaGenome metaGenome, final Protein protein
+    ) throws DAOException;
+
+    public default void forEachMetaGenomeOf(
+        final Project project, final Consumer<Collection<MetaGenome>> consumer
+    ) throws DAOException {
+        val pageSize = 3;
+        val numPages = countByProject(project);
+
+        for (int pageNum = 0; pageNum < numPages; pageNum += pageSize) {
+            consumer.accept(getByProject(project, pageNum, pageSize));
+        }
+    }
 
 }

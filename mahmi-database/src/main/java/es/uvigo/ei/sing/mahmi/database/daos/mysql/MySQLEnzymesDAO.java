@@ -1,108 +1,89 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
-import static jersey.repackaged.com.google.common.collect.Sets.newLinkedHashSet;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.Set;
 
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
-import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
 import fj.control.db.DB;
-import fj.data.List;
 import fj.data.Option;
 
 public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements EnzymesDAO {
 
-    private MySQLEnzymesDAO(final ConnectionPool pool) {
-        super(pool);
+    private MySQLEnzymesDAO(final ConnectionPool connectionPool) {
+        super(connectionPool);
     }
 
-    public static MySQLEnzymesDAO mysqlEnzymesDAO(final ConnectionPool pool) {
-        return new MySQLEnzymesDAO(pool);
+    public static EnzymesDAO mysqlEnzymesDAO(
+        final ConnectionPool connectionPool
+    ) {
+        return new MySQLEnzymesDAO(connectionPool);
     }
 
-
-    @Override
-    public Option<Enzyme> get(final Identifier id) throws DAOException {
-        val sql = sql("SELECT * FROM enzymes WHERE enzyme_id = ? LIMIT 1", id)
-                 .bind(query).bind(get);
-
-        return read(sql).toOption();
-    }
 
     @Override
     public Option<Enzyme> getByName(final String name) throws DAOException {
-        val sql = sql("SELECT * FROM enzymes WHERE enzyme_name = ? LIMIT 1", name)
-                 .bind(query).bind(get);
-
+        val sql = prepareSelect(enzyme(name)).bind(query).bind(get);
         return read(sql).toOption();
     }
 
-    @Override
-    public Set<Enzyme> getAll(final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM enzymes LIMIT ? OFFSET ?", count, start)
-                 .bind(query).bind(get);
-
-        return newLinkedHashSet(read(sql).toCollection());
-    }
 
     @Override
-    public Enzyme insert(final Enzyme enzyme) throws DAOException {
-        val sql = getOrPrepareInsert(enzyme);
-
-        return write(sql);
-    }
-
-    @Override
-    public Set<Enzyme> insertAll(final Set<Enzyme> enzymes) throws DAOException {
-        val sqlBuffer = new LinkedList<DB<Enzyme>>();
-        for (val enzyme : enzymes) {
-            sqlBuffer.add(getOrPrepareInsert(enzyme));
-        }
-
-        return newLinkedHashSet(write(sequence(sqlBuffer)));
-    }
-
-    @Override
-    public void delete(final Identifier id) throws DAOException {
-        val sql = sql("DELETE FROM enzymes WHERE enzyme_id = ?", id).bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    public void update(final Enzyme enzyme) throws DAOException {
-        val sql = sql("UPDATE enzymes SET enzyme_name = ? WHERE enzyme_id = ?", enzyme.getName())
-                 .bind(identifier(2, enzyme.getId()))
-                 .bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    protected Enzyme createEntity(final ResultSet results) throws SQLException {
-        val id   = parseInt(results, "enzyme_id");
+    protected Enzyme parse(final ResultSet results) throws SQLException {
+        val id   = parseIdentifier(results, "enzyme_id");
         val name = parseString(results, "enzyme_name");
 
         return enzyme(id, name);
     }
 
-    private DB<Enzyme> getOrPrepareInsert(final Enzyme enzyme) throws DAOException {
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Enzyme enzyme) {
+        val name = enzyme.getName();
+        return sql("SELECT * FROM enzymes WHERE enzyme_name = ? LIMIT 1", name);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Identifier id) {
+        return sql("SELECT * FROM enzymes WHERE enzyme_id = ? LIMIT 1", id);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareSelect(
+        final int limit, final int offset
+    ) {
+        return sql(
+            "SELECT * FROM enzymes ORDER BY enzyme_id LIMIT ? OFFSET ?",
+            limit, offset
+        );
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareInsert(final Enzyme enzyme) {
+        val name = enzyme.getName();
+        return sql("INSERT INTO enzmyes (enzyme_name) VALUES (?)", name);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareDelete(final Identifier id) {
+        return sql("DELETE FROM enzymes WHERE enzyme_id = ?", id);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareUpdate(final Enzyme enzyme) {
+        val id   = enzyme.getId();
         val name = enzyme.getName();
 
-        val exists = sql("SELECT * FROM enzymes WHERE enzyme_name = ? LIMIT 1", name)
-                    .bind(query).bind(get).map(List::toOption);
-        val insert = sql("INSERT INTO enzymes (enzyme_name) VALUES (?)", name)
-                    .bind(update).bind(getKey).map(enzyme::withId);
-
-        return exists.bind(opt -> opt.map(DB::unit).orSome(insert));
+        return sql(
+            "UPDATE enzymes SET enzyme_name = ? WHERE enzyme_id = ?", name
+        ).bind(identifier(2, id));
     }
 
 }

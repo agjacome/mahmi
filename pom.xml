@@ -13,11 +13,10 @@
 
     <modules>
         <module>mahmi-common</module>
-        <module>mahmi-controller</module>
         <module>mahmi-cutter</module>
         <module>mahmi-database</module>
+        <module>mahmi-http</module>
         <module>mahmi-loader</module>
-        <module>mahmi-locator</module>
     </modules>
 
     <properties>

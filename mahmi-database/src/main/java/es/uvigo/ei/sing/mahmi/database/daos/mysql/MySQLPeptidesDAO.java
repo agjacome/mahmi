@@ -1,121 +1,123 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
-import static jersey.repackaged.com.google.common.collect.Sets.newLinkedHashSet;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.Collection;
 
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.Identifier;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import fj.control.db.DB;
-import fj.data.List;
 import fj.data.Option;
 
 public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements PeptidesDAO {
 
-    private MySQLPeptidesDAO(final ConnectionPool pool) {
-        super(pool);
+    private MySQLPeptidesDAO(final ConnectionPool connectionPool) {
+        super(connectionPool);
     }
 
-    public static PeptidesDAO mysqlPeptidesDAO(final ConnectionPool pool) {
-        return new MySQLPeptidesDAO(pool);
+    public static PeptidesDAO mysqlPeptidesDAO(
+        final ConnectionPool connectionPool
+    ) {
+        return new MySQLPeptidesDAO(connectionPool);
     }
 
 
     @Override
-    public Option<Peptide> get(final Identifier id) throws DAOException {
-        val sql = sql("SELECT * FROM peptides WHERE peptide_id = ? LIMIT 1", id)
-                 .bind(query).bind(get);
-
+    public Option<Peptide> getBySequence(
+        final AminoAcidSequence sequence
+    ) throws DAOException {
+        val sql = prepareSelect(peptide(sequence)).bind(query).bind(get);
         return read(sql).toOption();
     }
 
     @Override
-    public Option<Peptide> getBySequence(final AminoAcidSequence sequence) throws DAOException {
-        val sha = sequence.toSHA1().asHexString();
-        val sql = sql("SELECT * FROM peptides WHERE peptide_hash = ? LIMIT 1", sha)
-                 .bind(query).bind(get);
+    public Collection<Peptide> getByProtein(
+        final Protein protein, final int start, final int count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT peptide_id, peptide_sequence "   +
+            "FROM peptides NATURAL JOIN digestions " +
+            "WHERE protein_id = ?"                   +
+            "ORDER BY peptide_id LIMIT ? OFFSET ?",
+            protein.getId()
+        ).bind(integer(2, count)).bind(integer(3, start));
 
-        return read(sql).toOption();
-    }
-
-    @Override
-    public Set<Peptide> getAll(final int start, final int count) throws DAOException {
-        val sql = sql("SELECT * FROM peptides LIMIT ? OFFSET ?", count, start)
-                 .bind(query).bind(get);
-
-        return newLinkedHashSet(read(sql).toCollection());
-    }
-
-    @Override
-    public Peptide insert(final Peptide peptide) throws DAOException {
-        val sql = getOrPrepareInsert(peptide);
-
-        return write(sql);
-    }
-
-    @Override
-    public Set<Peptide> insertAll(final Set<Peptide> peptides) throws DAOException {
-        val sqlBuffer = new LinkedList<DB<Peptide>>();
-        for (val peptide : peptides) {
-            sqlBuffer.add(getOrPrepareInsert(peptide));
-        }
-
-        return newLinkedHashSet(write(sequence(sqlBuffer)));
-    }
-
-    @Override
-    public void delete(final Identifier id) throws DAOException {
-        val sql = sql("DELETE FROM peptides WHERE peptide_id = ?", id).bind(update);
-
-        write(sql);
-    }
-
-    @Override
-    public void update(final Peptide peptide) throws DAOException {
-        val id  = peptide.getId();
-        val seq = peptide.getSequence().toString();
-        val sha = peptide.getSequence().toSHA1().asHexString();
-
-        val sql = sql("UPDATE peptides SET peptide_hash = ?, peptide_sequence = ? WHERE peptide_id = ?", sha, seq)
-                 .bind(identifier(3, id))
-                 .bind(update);
-
-        write(sql);
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toCollection();
     }
 
 
     @Override
-    protected Peptide createEntity(final ResultSet results) throws SQLException {
-        val id  = parseInt(results, "peptide_id");
-        val seq = parseAAS(results, "peptide_sequence");
+    protected Peptide parse(final ResultSet results) throws SQLException {
+        val id  = parseIdentifier(results, "peptide_id");
+        val seq = parseAASequence(results, "peptide_sequence");
 
         return peptide(id, seq);
     }
 
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Peptide peptide) {
+        val sha = peptide.getSHA1().asHexString();
+        return sql(
+            "SELECT peptide_id, peptide_sequence FROM peptides WHERE peptide_hash = ? LIMIT 1",
+            sha
+        );
+    }
 
-    private DB<Peptide> getOrPrepareInsert(final Peptide peptide) throws DAOException {
-        val seq = peptide.getSequence();
-        val sha = seq.toSHA1().asHexString();
+    @Override
+    protected DB<PreparedStatement> prepareSelect(final Identifier id) {
+        return sql(
+            "SELECT peptide_id, peptide_sequence FROM peptides WHERE peptide_id = ? LIMIT 1",
+            id
+        );
+    }
 
-        val exists = sql(
-            "SELECT * FROM peptides WHERE peptide_hash = ? LIMIT 1", sha
-        ).bind(query).bind(get).map(List::toOption);
+    @Override
+    protected DB<PreparedStatement> prepareSelect(
+        final int limit, final int offset
+    ) {
+        return sql(
+            "SELECT peptide_id, peptide_sequence FROM peptides ORDER BY peptide_id LIMIT ? OFFSET ?",
+            limit, offset
+        );
+    }
 
-        val insert = sql(
+    @Override
+    protected DB<PreparedStatement> prepareInsert(final Peptide peptide) {
+        val seq = peptide.getSequence().toString();
+        val sha = peptide.getSHA1().asHexString();
+
+        return sql(
             "INSERT INTO peptides (peptide_hash, peptide_sequence) VALUES (?, ?)",
-            sha, seq.toString()
-        ).bind(update).bind(getKey).map(peptide::withId);
+            sha, seq
+        );
+    }
 
-        return exists.bind(opt -> opt.map(DB::unit).orSome(insert));
+    @Override
+    protected DB<PreparedStatement> prepareDelete(final Identifier id) {
+        return sql("DELETE FROM peptides WHERE peptide_id = ?", id);
+    }
+
+    @Override
+    protected DB<PreparedStatement> prepareUpdate(final Peptide peptide) {
+      val id  = peptide.getId();
+      val seq = peptide.getSequence().toString();
+      val sha = peptide.getSHA1().asHexString();
+
+      return sql(
+          "UPDATE peptides SET peptide_hash = ?, peptide_sequence = ? WHERE peptide_id = ?",
+          sha, seq
+      ).bind(identifier(3, id));
     }
 
 }

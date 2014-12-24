@@ -1,0 +1,60 @@
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>es.uvigo.ei.sing</groupId>
+        <artifactId>mahmi</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <artifactId>mahmi.http</artifactId>
+    <name>MAHMI - HTTP API</name>
+    <packaging>jar</packaging>
+    <dependencies>
+        <!-- mahmi dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.database</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.loader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.cutter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- service-related dependencies -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>2.13</version>
+        </dependency>
+        <!--<dependency> -->
+        <!--<groupId>org.glassfish.jersey.test-framework.providers</groupId> -->
+        <!--<artifactId>jersey-test-framework-provider-grizzly2</artifactId> -->
+        <!--<version>2.13</version> -->
+        <!--<scope>test</scope> -->
+        <!--</dependency> -->
+    </dependencies>
+</project>
