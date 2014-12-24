@@ -17,9 +17,6 @@ public final class DNASequence extends ChemicalCompoundSequence<Nucleobase> {
 
     private DNASequence(final List<Nucleobase> sequence) {
         super(sequence);
-
-        if (!isValid(sequence))
-            throw new IllegalArgumentException("Invalid DNA sequence given.");
     }
 
     public static DNASequence empty() {
@@ -27,7 +24,11 @@ public final class DNASequence extends ChemicalCompoundSequence<Nucleobase> {
     }
 
     public static DNASequence fromIterable(final Iterable<Nucleobase> seq) {
-        return new DNASequence(iterableList(seq));
+        val sequence = iterableList(seq);
+        if (isValid(sequence))
+            return new DNASequence(sequence);
+        else
+            throw new IllegalArgumentException("Invalid DNA sequence given.");
     }
 
     public static DNASequence fromString(final String str) {
