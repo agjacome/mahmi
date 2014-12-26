@@ -39,15 +39,12 @@ public interface MetaGenomesDAO extends DAO<MetaGenome> {
         final MetaGenome metaGenome, final Protein protein
     ) throws DAOException;
 
+    // FIXME: there can be memory-related problems with the following method
     public default void forEachMetaGenomeOf(
-        final Project project, final Consumer<Collection<MetaGenome>> consumer
-    ) throws DAOException {
-        val pageSize = 3;
-        val numPages = countByProject(project);
-
-        for (int pageNum = 0; pageNum < numPages; pageNum += pageSize) {
-            consumer.accept(getByProject(project, pageNum, pageSize));
-        }
+        final Project project, final Consumer<MetaGenome> effect
+    ) {
+        val numMetaGenomes = countByProject(project);
+        getByProject(project, 0, numMetaGenomes).forEach(effect);
     }
 
 }

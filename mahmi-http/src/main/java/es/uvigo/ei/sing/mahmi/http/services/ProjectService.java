@@ -1,7 +1,7 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
 import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.ACCEPTED;
+import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
@@ -111,7 +111,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
                 return null;
             });
 
-            return status(ACCEPTED).entity(created).build();
+            return status(CREATED).entity(created).build();
 
         } catch (final Exception e) {
             log.error("Error while loading project", e);

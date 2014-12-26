@@ -1,11 +1,13 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.setToMap;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequenceFutures;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -41,44 +43,51 @@ public final class ProteinCutterController {
         final Collection<Enzyme> enzymes,
         final Predicate<Integer> sizeFilter
     ) {
+        return runAsync(() -> {
+            log.info("Cutting proteins of {} with {}", project, enzymes);
 
-        return runAsync(() -> metaGenomesDAO.forEachMetaGenomeOf(
-            project, mgs -> cutMetaGenomesProteins(mgs, enzymes, sizeFilter)
-        ));
-    }
+            metaGenomesDAO.forEachMetaGenomeOf(project, mg -> {
+                val future = cutMetaGenomeProteins(mg, enzymes, sizeFilter);
+                future.join();
+            });
 
+            log.info("Finished cutting proteins of {}", project);
+        });
+     }
 
-    private void cutMetaGenomesProteins(
-        final Collection<MetaGenome> metaGenomes,
-        final Collection<Enzyme>     enzymes,
-        final Predicate<Integer>     sizeFilter
-    ) {
-        metaGenomes.forEach(metaGenome ->
-            cutMetaGenomeProteins(metaGenome, enzymes, sizeFilter)
-        );
-    }
-
-    private void cutMetaGenomeProteins(
+    public CompletableFuture<Void> cutMetaGenomeProteins(
         final MetaGenome         metaGenome,
         final Collection<Enzyme> enzymes,
         final Predicate<Integer> sizeFilter
     ) {
-        proteinsDAO.forEachProteinOf(metaGenome, proteins ->
-            cutProteins(proteins, enzymes, sizeFilter)
-        );
+        return runAsync(() -> {
+            log.info("Cutting proteins of {} with {}", metaGenome, enzymes);
+
+            val futures = new LinkedList<CompletableFuture<Void>>();
+            proteinsDAO.forEachProteinOf(metaGenome, proteins -> {
+                val future = cutProteins(proteins, enzymes, sizeFilter);
+                futures.add(future);
+            });
+
+            sequenceFutures(futures).thenRun(
+                () -> log.info("Finished cutting proteins of {}", metaGenome)
+            );
+        });
     }
 
-    private void cutProteins(
+    public CompletableFuture<Void> cutProteins(
         final Collection<Protein> proteins,
         final Collection<Enzyme>  enzymes,
         final Predicate<Integer>  sizeFilter
     ) {
-        log.info("Cutting {} proteins with {} enzymes", proteins.size(), enzymes.size());
+        return runAsync(() -> {
+            log.info("Digesting {} proteins", proteins.size());
 
-        val cuts = cutter.cutProteins(proteins, enzymes, sizeFilter);
-        insertCuts(cuts);
+            val cuts = cutter.cutProteins(proteins, enzymes, sizeFilter);
+            insertCuts(cuts);
 
-        System.gc();
+            System.gc();
+        });
     }
 
     private void insertCuts(final Set<Digestion> digestions) {
