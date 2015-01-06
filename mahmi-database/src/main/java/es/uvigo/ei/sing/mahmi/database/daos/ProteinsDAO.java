@@ -25,7 +25,7 @@ public interface ProteinsDAO extends DAO<Protein> {
         final MetaGenome                    metaGenome,
         final Consumer<Collection<Protein>> consumer
     ) throws DAOException {
-        val pageSize = 2500; // TODO: configurable pageSize
+        val pageSize = 250; // TODO: configurable pageSize
         val numPages = countByMetaGenome(metaGenome);
 
         for (int pageNum = 0; pageNum < numPages; pageNum += pageSize) {

@@ -131,7 +131,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
         log.error("MySQL InnoDB deadlock. Retrying in 200ms.");
 
         try {
-            Thread.currentThread().wait(200L);
+            Thread.sleep(200L);
         } catch (final InterruptedException ie) {
             log.error("Error while waiting to retry: {}", ie.getMessage());
             throw DAOException.withCause(ie);

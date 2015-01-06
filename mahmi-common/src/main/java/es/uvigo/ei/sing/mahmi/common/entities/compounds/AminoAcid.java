@@ -65,7 +65,7 @@ public enum AminoAcid implements ChemicalCompound {
     public static AminoAcid fromCode(final char code) {
         return requireNonNull(
             codeMapper.get(toUpperCase(code)),
-            new IllegalArgumentException("Invalid AminoAcid code: " + code)
+            () -> new IllegalArgumentException("Invalid AminoAcid code: " + code)
         );
     }
 

@@ -37,7 +37,7 @@ public enum Nucleobase implements ChemicalCompound {
     public static Nucleobase fromCode(final char code) {
         return requireNonNull(
             codeMapper.get(toUpperCase(code)),
-            new IllegalArgumentException("Invalid Nucleobase code: " + code)
+            () -> new IllegalArgumentException("Invalid Nucleobase code: " + code)
         );
     }
 
