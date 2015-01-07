@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.Entity;
+import es.uvigo.ei.sing.mahmi.common.utils.Count;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAO;
@@ -32,10 +33,17 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
     protected final ConnectionPool connectionPool;
 
     protected final F<ResultSet, DB<List<A>>> get = getWith(this::parse);
-
+    protected final F<ResultSet, DB<List<Count>>> count = getWith(this::parseCount);
+    
     @Override
     public Option<A> get(final Identifier id) throws DAOException {
         val sql = prepareSelect(id).bind(query).bind(get);
+        return read(sql).toOption();
+    }
+    
+    @Override
+    public Option<Count> getCount() throws DAOException {
+        val sql = prepareCount().bind(query).bind(count);
         return read(sql).toOption();
     }
 
@@ -88,11 +96,16 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
 
         return exists.bind(a -> a.option(insert, DB::unit));
     }
-
+    
+    protected Count parseCount(final ResultSet results) throws SQLException {
+        return new Count(parseInt(results, "count"));
+    }
 
     protected abstract A parse(final ResultSet resultSet) throws SQLException;
 
     protected abstract DB<PreparedStatement> prepareSelect(final A entity);
+    
+    protected abstract DB<PreparedStatement> prepareCount();
 
     protected abstract DB<PreparedStatement> prepareSelect(final Identifier id);
 

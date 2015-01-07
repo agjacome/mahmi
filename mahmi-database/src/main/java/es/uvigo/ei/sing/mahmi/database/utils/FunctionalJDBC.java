@@ -205,7 +205,7 @@ public final class FunctionalJDBC {
             statement.executeUpdate();
             return statement.getGeneratedKeys();
         });
-
+        
     public static <A> F<ResultSet, DB<List<A>>> getWith(
         final TryCatch1<ResultSet, A, SQLException> parser
     ) {

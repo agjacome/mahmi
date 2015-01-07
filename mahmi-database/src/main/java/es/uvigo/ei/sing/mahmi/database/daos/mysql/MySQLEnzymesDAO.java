@@ -35,7 +35,6 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
         return read(sql).toOption();
     }
 
-
     @Override
     protected Enzyme parse(final ResultSet results) throws SQLException {
         val id   = parseIdentifier(results, "enzyme_id");
@@ -63,6 +62,12 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
             "SELECT * FROM enzymes ORDER BY enzyme_id LIMIT ? OFFSET ?",
             limit, offset
         );
+    }
+        
+    @Override
+    public DB<PreparedStatement> prepareCount() {
+    	return sql(
+                "SELECT COUNT(*) AS count FROM enzymes LIMIT ",1);
     }
 
     @Override

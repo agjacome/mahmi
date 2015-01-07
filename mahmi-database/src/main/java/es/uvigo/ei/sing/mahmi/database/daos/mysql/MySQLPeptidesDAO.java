@@ -56,7 +56,6 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         return read(statement).toCollection();
     }
 
-
     @Override
     protected Peptide parse(final ResultSet results) throws SQLException {
         val id  = parseIdentifier(results, "peptide_id");
@@ -90,6 +89,12 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
             "SELECT peptide_id, peptide_sequence FROM peptides ORDER BY peptide_id LIMIT ? OFFSET ?",
             limit, offset
         );
+    }
+    
+    @Override
+    public DB<PreparedStatement> prepareCount() {
+    	return sql(
+                "SELECT COUNT(*) AS count FROM peptides LIMIT ",1);
     }
 
     @Override

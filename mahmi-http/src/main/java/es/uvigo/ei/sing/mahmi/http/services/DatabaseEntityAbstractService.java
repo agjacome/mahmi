@@ -36,6 +36,14 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
             status(NOT_FOUND)
         );
     }
+    
+    protected final Response buildGetCount(){
+    	return respond(
+    			() -> dao.getCount(),
+                status(OK)::entity,
+                status(NOT_FOUND)
+            );
+    }
 
     protected final Response buildGetAll(final int page, final int size) {
         return respond(
@@ -100,7 +108,7 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
         final ResponseBuilder       noneResponse
     ) {
         return respond(optSupplier, op -> op.option(noneResponse, someMapper));
-    }
+    }  
 
     protected abstract GenericEntity<List<A>> toGenericEntity(
         final Collection<A> entities

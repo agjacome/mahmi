@@ -102,6 +102,12 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
             limit, offset
         );
     }
+    
+    @Override
+    public DB<PreparedStatement> prepareCount() {
+    	return sql(
+                "SELECT COUNT(*) AS count FROM proteins LIMIT ",1);
+    }
 
     @Override
     protected DB<PreparedStatement> prepareInsert(final Protein protein) {
