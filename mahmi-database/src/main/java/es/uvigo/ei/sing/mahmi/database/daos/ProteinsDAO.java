@@ -14,12 +14,28 @@ public interface ProteinsDAO extends DAO<Protein> {
     public Option<Protein> getBySequence(
         final AminoAcidSequence sequence
     ) throws DAOException;
+    
+    public Collection<Protein> getByProjectId(
+            final int projectId, final int start, final int count
+      ) throws DAOException;
+    
+    public Collection<Protein> getByProjectName(
+            final String projectName, final int start, final int count
+      ) throws DAOException;
+    
+    public Collection<Protein> getByProjectRepository(
+            final String projectRepository, final int start, final int count
+      ) throws DAOException;
 
     public int countByMetaGenome(final MetaGenome mg);
 
     public Collection<Protein> getByMetaGenome(
         final MetaGenome mg, final int start, final int count
     ) throws DAOException;
+    
+    public Collection<Protein> getByMetaGenomeId(
+            final int metagenomeId, final int start, final int count
+        ) throws DAOException;
 
     public default void forEachProteinOf(
         final MetaGenome                    metaGenome,

@@ -67,7 +67,7 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
     @Override
     public DB<PreparedStatement> prepareCount() {
     	return sql(
-                "SELECT COUNT(*) AS count FROM enzymes LIMIT ",1);
+                "SELECT COUNT(*) AS count FROM enzymes LIMIT ?",1);
     }
 
     @Override

@@ -83,6 +83,54 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
+    
+    @Override
+    public Collection<MetaGenome> getByProjectId(
+        final int projectId, final int start, final int count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT metagenome_id, project_id, project_name, project_repository " +
+            "FROM metagenomes NATURAL JOIN projects " +
+            "WHERE project_id = ? " +
+            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
+            projectId
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toCollection();
+    }
+    
+    @Override
+    public Collection<MetaGenome> getByProjectName(
+        final String projectName, final int start, final int count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT metagenome_id, project_id, project_name, project_repository " +
+            "FROM metagenomes NATURAL JOIN projects " +
+            "WHERE project_name = ? " +
+            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
+            projectName
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toCollection();
+    }
+    
+    @Override
+    public Collection<MetaGenome> getByProjectRepository(
+        final String projectRepository, final int start, final int count
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT metagenome_id, project_id, project_name, project_repository " +
+            "FROM metagenomes NATURAL JOIN projects " +
+            "WHERE project_repository = ? " +
+            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
+            projectRepository
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toCollection();
+    }
 
     @Override
     public Collection<MetaGenome> getByProtein(
@@ -179,7 +227,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     @Override
     public DB<PreparedStatement> prepareCount() {
     	return sql(
-                "SELECT COUNT(*) AS count FROM metagenomes LIMIT ",1);
+                "SELECT COUNT(*) AS count FROM metagenomes LIMIT ?",1);
     }
 
     @Override

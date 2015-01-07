@@ -22,6 +22,18 @@ public interface MetaGenomesDAO extends DAO<MetaGenome> {
     public Collection<MetaGenome> getByProject(
         final Project project, final int start, final int count
     ) throws DAOException;
+    
+    public Collection<MetaGenome> getByProjectId(
+            final int projectId, final int start, final int count
+      ) throws DAOException;
+    
+    public Collection<MetaGenome> getByProjectName(
+            final String projectName, final int start, final int count
+      ) throws DAOException;
+    
+    public Collection<MetaGenome> getByProjectRepository(
+            final String projectRepository, final int start, final int count
+      ) throws DAOException; 
 
     public Collection<MetaGenome> getByProtein(
         final Protein protein, final int start, final int count
