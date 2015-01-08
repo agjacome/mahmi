@@ -54,7 +54,7 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     protected Project parse(final ResultSet results) throws SQLException {
         val id   = parseIdentifier(results, "project_id");
@@ -74,11 +74,10 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
             name, repo
         );
     }
-    
+
     @Override
     public DB<PreparedStatement> prepareCount() {
-    	return sql(
-                "SELECT COUNT(*) AS count FROM projects LIMIT ?",1);
+    	return prepare("SELECT COUNT(project_id) FROM projects");
     }
 
     @Override

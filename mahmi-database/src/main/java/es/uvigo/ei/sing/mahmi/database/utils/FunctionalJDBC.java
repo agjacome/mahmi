@@ -205,7 +205,7 @@ public final class FunctionalJDBC {
             statement.executeUpdate();
             return statement.getGeneratedKeys();
         });
-        
+
     public static <A> F<ResultSet, DB<List<A>>> getWith(
         final TryCatch1<ResultSet, A, SQLException> parser
     ) {
@@ -226,6 +226,13 @@ public final class FunctionalJDBC {
                      throw error("SQL Update did not generate any key.");
                  else
                      return Identifier.of(result.getInt(1));
+            }
+        });
+
+    public static F<ResultSet, DB<Long>> count =
+        resultSet -> db(connection -> {
+            try (final ResultSet result = resultSet) {
+                return result.next() ? result.getLong(1) : 0L;
             }
         });
 

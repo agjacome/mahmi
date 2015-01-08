@@ -63,11 +63,10 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
             limit, offset
         );
     }
-        
+
     @Override
     public DB<PreparedStatement> prepareCount() {
-    	return sql(
-                "SELECT COUNT(*) AS count FROM enzymes LIMIT ?",1);
+        return prepare("SELECT COUNT(enzyme_id) FROM enzymes");
     }
 
     @Override

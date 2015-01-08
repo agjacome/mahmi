@@ -112,11 +112,10 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
             limit, offset
         );
     }
-        
+
     @Override
     public DB<PreparedStatement> prepareCount() {
-    	return sql(
-                "SELECT COUNT(*) AS count FROM digestions LIMIT ?",1);
+        return prepare("SELECT COUNT(digestion_id) FROM digestions");
     }
 
     @Override

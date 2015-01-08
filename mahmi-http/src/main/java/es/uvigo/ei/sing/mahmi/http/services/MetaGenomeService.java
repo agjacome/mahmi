@@ -46,46 +46,50 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     public Response get(@PathParam("id") final int id) {
         return buildGet(Identifier.of(id));
     }
-    
+
     @GET
     @Path("/projectId/{id}")
     public Response getProjectId(
-    		@PathParam("id") final int projectId,
-    		@QueryParam("page") @DefaultValue( "1") final int page,
-            @QueryParam("size") @DefaultValue("50") final int size) {
+        @PathParam("id") final int projectId,
+        @QueryParam("page") @DefaultValue( "1") final int page,
+        @QueryParam("size") @DefaultValue("50") final int size
+    ) {
         return respond(
-                () -> dao.getByProjectId(projectId, (page - 1) * size, size),
-                as -> status(OK).entity(toGenericEntity(as))
-            );
+            ()  -> dao.getByProjectId(projectId, (page - 1) * size, size),
+            mgs -> status(OK).entity(toGenericEntity(mgs))
+        );
     }
-    
+
     @GET
     @Path("/projectName/{name}")
     public Response getProjectName(
-    		@PathParam("name") final String projectName,
-    		@QueryParam("page") @DefaultValue( "1") final int page,
-            @QueryParam("size") @DefaultValue("50") final int size) {
-    	return respond(
-                () -> dao.getByProjectName(projectName, (page - 1) * size, size),
-                as -> status(OK).entity(toGenericEntity(as))
-            );
+        @PathParam("name") final String projectName,
+        @QueryParam("page") @DefaultValue( "1") final int page,
+        @QueryParam("size") @DefaultValue("50") final int size
+    ) {
+        return respond(
+            () -> dao.getByProjectName(projectName, (page - 1) * size, size),
+            mgs -> status(OK).entity(toGenericEntity(mgs))
+        );
     }
-    
+
     @GET
     @Path("/projectRepository/{repository}")
-    public Response getProjectRepository(@PathParam("repository") final String projectRepository,
-    		@QueryParam("page") @DefaultValue( "1") final int page,
-            @QueryParam("size") @DefaultValue("50") final int size) {
-    	return respond(
-                () -> dao.getByProjectRepository(projectRepository, (page - 1) * size, size),
-                as -> status(OK).entity(toGenericEntity(as))
-            );
+    public Response getProjectRepository(
+        @PathParam("repository") final String repo,
+        @QueryParam("page") @DefaultValue( "1") final int page,
+        @QueryParam("size") @DefaultValue("50") final int size
+    ) {
+        return respond(
+            ()  -> dao.getByProjectRepository(repo, (page - 1) * size, size),
+            mgs -> status(OK).entity(toGenericEntity(mgs))
+        );
     }
-    
+
     @GET
     @Path("/count")
-    public Response getCount() {
-        return buildGetCount();
+    public Response count() {
+        return buildCount();
     }
 
     @GET

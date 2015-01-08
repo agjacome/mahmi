@@ -55,7 +55,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Peptide> getByProteinId(
         final int proteinId, final int start, final int count
@@ -71,7 +71,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Peptide> getByEnzymeId(
         final int enzymeId, final int start, final int count
@@ -87,8 +87,8 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
-    
+
+
     @Override
     public Collection<Peptide> getByMetaGenomeId(
         final int metagenomeID, final int start, final int count
@@ -104,7 +104,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Peptide> getByProjectId(
         final int projectId, final int start, final int count
@@ -120,7 +120,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Peptide> getByProjectName(
         final String projectName, final int start, final int count
@@ -136,7 +136,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Peptide> getByProjectRepository(
         final String projectRepository, final int start, final int count
@@ -187,11 +187,10 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
             limit, offset
         );
     }
-    
+
     @Override
     public DB<PreparedStatement> prepareCount() {
-    	return sql(
-                "SELECT COUNT(*) AS count FROM peptides LIMIT ?",1);
+        return prepare("SELECT COUNT(peptide_id) FROM peptides");
     }
 
     @Override

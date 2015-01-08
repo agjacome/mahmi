@@ -1,5 +1,6 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.http.wrappers.LongIntegerWrapper.longWrapper;
 import static fj.Unit.unit;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.*;
@@ -36,13 +37,12 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
             status(NOT_FOUND)
         );
     }
-    
-    protected final Response buildGetCount(){
-    	return respond(
-    			() -> dao.getCount(),
-                status(OK)::entity,
-                status(NOT_FOUND)
-            );
+
+    protected final Response buildCount(){
+        return respond(
+            () -> longWrapper(dao.count()),
+            status(OK)::entity
+        );
     }
 
     protected final Response buildGetAll(final int page, final int size) {
@@ -108,7 +108,7 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
         final ResponseBuilder       noneResponse
     ) {
         return respond(optSupplier, op -> op.option(noneResponse, someMapper));
-    }  
+    }
 
     protected abstract GenericEntity<List<A>> toGenericEntity(
         final Collection<A> entities

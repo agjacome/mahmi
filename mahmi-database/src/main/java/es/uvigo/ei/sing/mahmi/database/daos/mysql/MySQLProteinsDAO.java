@@ -40,14 +40,14 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
     }
 
     @Override
-    public int countByMetaGenome(final MetaGenome mg) {
+    public long countByMetaGenome(final MetaGenome mg) {
         val sql = sql(
             "SELECT COUNT(protein_id) FROM metagenome_proteins WHERE metagenome_id = ?",
             mg.getId()
         );
 
-        val statement = sql.bind(query).bind(getWith(res -> res.getInt(1)));
-        return read(statement).head();
+        val statement = sql.bind(query).bind(count);
+        return read(statement);
     }
 
     @Override
@@ -65,23 +65,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
-    @Override
-    public Collection<Protein> getByMetaGenomeId(
-        final int metagenomeID, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT protein_id, protein_sequence "            +
-            "FROM proteins NATURAL JOIN metagenome_proteins " +
-            "WHERE metagenome_id = ? "                        +
-            "ORDER BY protein_id LIMIT ? OFFSET ?",
-            metagenomeID
-        ).bind(integer(2, count)).bind(integer(3, start));
 
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-    
     @Override
     public Collection<Protein> getByProjectId(
         final int projectId, final int start, final int count
@@ -97,7 +81,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Protein> getByProjectName(
         final String projectName, final int start, final int count
@@ -113,7 +97,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-    
+
     @Override
     public Collection<Protein> getByProjectRepository(
         final String projectRepository, final int start, final int count
@@ -166,11 +150,10 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
             limit, offset
         );
     }
-    
+
     @Override
     public DB<PreparedStatement> prepareCount() {
-    	return sql(
-                "SELECT COUNT(*) AS count FROM proteins LIMIT ?",1);
+        return prepare("SELECT COUNT(protein_id) FROM proteins");
     }
 
     @Override
