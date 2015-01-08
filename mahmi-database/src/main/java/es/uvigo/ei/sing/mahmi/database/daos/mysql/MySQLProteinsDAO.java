@@ -90,7 +90,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
             "SELECT protein_id, protein_sequence " +
             "FROM proteins NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
             "WHERE project_id = ? " +
-            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
+            "ORDER BY protein_id LIMIT ? OFFSET ?",
             projectId
         ).bind(integer(2, count)).bind(integer(3, start));
 
@@ -106,7 +106,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
     		"SELECT protein_id, protein_sequence " +
             "FROM proteins NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
             "WHERE project_name = ? " +
-            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
+            "ORDER BY protein_id LIMIT ? OFFSET ?",
             projectName
         ).bind(integer(2, count)).bind(integer(3, start));
 
@@ -122,7 +122,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
     		"SELECT protein_id, protein_sequence " +
             "FROM proteins NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
             "WHERE project_repository = ? " +
-            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
+            "ORDER BY protein_id LIMIT ? OFFSET ?",
             projectRepository
         ).bind(integer(2, count)).bind(integer(3, start));
 
