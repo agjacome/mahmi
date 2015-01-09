@@ -67,53 +67,31 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
     }
 
     @Override
-    public Collection<Protein> getByProjectId(
-        final int projectId, final int start, final int count
-    ) throws DAOException {
+    public Collection<Protein> search(
+            final MetaGenome metagenome, 
+            final AminoAcidSequence sequence, 
+            final int start, 
+            final int count
+        ) throws DAOException {
         val sql = sql(
             "SELECT protein_id, protein_sequence " +
             "FROM proteins NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
-            "WHERE project_id = ? " +
+            "WHERE (? = 0 OR metagenome_id = ?) AND " +
+            "(? = 0 OR project_id = ?) AND " +
+            "(? = '' OR protein_sequence = ?) AND " +
+            "(? = '' OR project_name = ?) AND " +
+            "(? = '' OR project_repository = ?) " +
             "ORDER BY protein_id LIMIT ? OFFSET ?",
-            projectId
-        ).bind(integer(2, count)).bind(integer(3, start));
-
+            metagenome.getId(),  metagenome.getId(), 
+            metagenome.getProject().getId(), metagenome.getProject().getId()
+        ).bind(string(5, sequence.toString())).bind(string(6, sequence.toString()))
+        .bind(string(7, metagenome.getProject().getName())).bind(string(8, metagenome.getProject().getName()))
+        .bind(string(9, metagenome.getProject().getRepository())).bind(string(10, metagenome.getProject().getRepository()))
+        .bind(integer(11, count)).bind(integer(12, start));
+        
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<Protein> getByProjectName(
-        final String projectName, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-    		"SELECT protein_id, protein_sequence " +
-            "FROM proteins NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
-            "WHERE project_name = ? " +
-            "ORDER BY protein_id LIMIT ? OFFSET ?",
-            projectName
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<Protein> getByProjectRepository(
-        final String projectRepository, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-    		"SELECT protein_id, protein_sequence " +
-            "FROM proteins NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
-            "WHERE project_repository = ? " +
-            "ORDER BY protein_id LIMIT ? OFFSET ?",
-            projectRepository
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
+    } 
 
     @Override
     protected Protein parse(final ResultSet results) throws SQLException {

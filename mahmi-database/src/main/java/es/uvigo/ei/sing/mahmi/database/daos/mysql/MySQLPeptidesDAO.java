@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
@@ -56,98 +57,31 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         return read(statement).toCollection();
     }
 
-    @Override
-    public Collection<Peptide> getByProteinId(
-        final int proteinId, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT peptide_id, peptide_sequence "   +
-            "FROM peptides NATURAL JOIN digestions " +
-            "WHERE protein_id = ? "                   +
-            "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            proteinId
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
 
     @Override
-    public Collection<Peptide> getByEnzymeId(
-        final int enzymeId, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT peptide_id, peptide_sequence "   +
-            "FROM peptides NATURAL JOIN digestions " +
-            "WHERE enzyme_id = ? "                   +
-            "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            enzymeId
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-
-    @Override
-    public Collection<Peptide> getByMetaGenomeId(
-        final int metagenomeID, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT DISTINCT peptide_id, peptide_sequence "            +
-            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins " +
-            "WHERE metagenome_id = ? "                        +
-            "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            metagenomeID
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<Peptide> getByProjectId(
-        final int projectId, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-    		"SELECT DISTINCT peptide_id, peptide_sequence "            +
-            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
-            "WHERE project_id = ? "                        +
-            "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            projectId
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<Peptide> getByProjectName(
-        final String projectName, final int start, final int count
+    public Collection<Peptide> search(
+    		final Protein protein,
+        	final MetaGenome metagenome, 
+            final AminoAcidSequence sequence, 
+        	final int start, final int count
     ) throws DAOException {
     	val sql = sql(
     		"SELECT DISTINCT peptide_id, peptide_sequence "            +
             "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
-            "WHERE project_name = ? "                        +
+            "WHERE (? = 0 OR protein_id = ?) AND" +
+            "(? = 0 OR metagenome_id = ?) AND " +
+            "(? = 0 OR project_id = ?) AND " +
+            "(? = '' OR peptide_sequence = ?) AND " +
+            "(? = '' OR project_name = ?) AND " +
+            "(? = '' OR project_repository = ?) " +                        
             "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            projectName
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<Peptide> getByProjectRepository(
-        final String projectRepository, final int start, final int count
-    ) throws DAOException {
-    	val sql = sql(
-    		"SELECT DISTINCT peptide_id, peptide_sequence "            +
-            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
-            "WHERE project_repository = ? "                        +
-            "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            projectRepository
-        ).bind(integer(2, count)).bind(integer(3, start));
+            protein.getId(),  protein.getId(),
+            metagenome.getId(),  metagenome.getId(), 
+            metagenome.getProject().getId(), metagenome.getProject().getId()
+        ).bind(string(7, sequence.toString())).bind(string(8, sequence.toString()))
+        .bind(string(9, metagenome.getProject().getName())).bind(string(10, metagenome.getProject().getName()))
+        .bind(string(11, metagenome.getProject().getRepository())).bind(string(12, metagenome.getProject().getRepository()))
+        .bind(integer(13, count)).bind(integer(14, start));
 
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();

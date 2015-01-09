@@ -1,6 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.exceptions.PendingImplementationException.notYetImplemented;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.Response;
 
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 
@@ -48,40 +48,19 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     }
 
     @GET
-    @Path("/projectId/{id}")
-    public Response getProjectId(
-        @PathParam("id") final int projectId,
+    @Path("/search")
+    public Response search(
+    	@QueryParam("projectId") @DefaultValue("0") final int projectId,
+    	@QueryParam("projectName") @DefaultValue("") final String projectName,
+    	@QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            ()  -> dao.getByProjectId(projectId, (page - 1) * size, size),
-            mgs -> status(OK).entity(toGenericEntity(mgs))
-        );
-    }
-
-    @GET
-    @Path("/projectName/{name}")
-    public Response getProjectName(
-        @PathParam("name") final String projectName,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByProjectName(projectName, (page - 1) * size, size),
-            mgs -> status(OK).entity(toGenericEntity(mgs))
-        );
-    }
-
-    @GET
-    @Path("/projectRepository/{repository}")
-    public Response getProjectRepository(
-        @PathParam("repository") final String repo,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            ()  -> dao.getByProjectRepository(repo, (page - 1) * size, size),
+            ()  -> dao.search(Project.project(Identifier.of(projectId),
+            			      projectName,
+            			      projectRepo),
+            			      (page - 1) * size, size),
             mgs -> status(OK).entity(toGenericEntity(mgs))
         );
     }
@@ -124,18 +103,6 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     ) {
         val toUpdate = metaGenome.setId(Identifier.of(id));
         return buildUpdate(toUpdate);
-    }
-
-    @GET
-    @Path("/search")
-    public Response search(
-        @QueryParam("project") @DefaultValue("-1") final int projectId,
-        @QueryParam("protein") @DefaultValue("-1") final int proteinId,
-        @QueryParam("page")    @DefaultValue( "1") final int page,
-        @QueryParam("size")    @DefaultValue("50") final int size
-    ) {
-        // TODO: implement
-        throw notYetImplemented;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -25,20 +23,9 @@ public interface MetaGenomesDAO extends DAO<MetaGenome> {
         final Project project, final int start, final int count
     ) throws DAOException;
 
-    public default Collection<MetaGenome> getByProjectId(
-        final int id, final int start, final int count
-    ) throws DAOException {
-        val project = project(Identifier.of(id), "", "");
-        return getByProject(project, start, count);
-    }
-
-    public Collection<MetaGenome> getByProjectName(
-            final String projectName, final int start, final int count
-      ) throws DAOException;
-
-    public Collection<MetaGenome> getByProjectRepository(
-            final String projectRepository, final int start, final int count
-      ) throws DAOException;
+    public Collection<MetaGenome> search(
+            final Project project, final int start, final int count
+    ) throws DAOException;
 
     public Collection<MetaGenome> getByProtein(
         final Protein protein, final int start, final int count

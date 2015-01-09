@@ -30,26 +30,15 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
 
 
     @Override
-    public Collection<Project> getByName(
-        final String name, final int start, final int count
+    public Collection<Project> search(
+        final Project project, final int start, final int count
     ) throws DAOException {
         val sql = sql(
-            "SELECT * FROM projects WHERE project_name = ? ORDER BY project_id LIMIT ? OFFSET ?",
-            name
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<Project> getByRepository(
-        final String repo, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT * FROM projects WHERE project_repository = ? ORDER BY project_id LIMIT ? OFFSET ?",
-            repo
-        ).bind(integer(2, count)).bind(integer(3, start));
+            "SELECT * FROM projects WHERE "
+            + "(? = '' OR project_name = ?) AND (? = '' OR project_repository = ?) ORDER BY project_id LIMIT ? OFFSET ?",
+            project.getName(), project.getName(), 
+            project.getRepository(), project.getRepository()
+        ).bind(integer(5, count)).bind(integer(6, start));
 
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();

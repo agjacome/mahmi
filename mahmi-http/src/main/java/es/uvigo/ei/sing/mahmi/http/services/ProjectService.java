@@ -59,27 +59,15 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     }
 
     @GET
-    @Path("/name/{name}")
+    @Path("/search")
     public Response getName(
-        @PathParam("name") final String name,
-        @QueryParam("page") @DefaultValue( "1") final int page,
+    	@QueryParam("name") @DefaultValue("") final String name,
+    	@QueryParam("repo") @DefaultValue("") final String repo,
+        @QueryParam("page") @DefaultValue("1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            () -> dao.getByName(name, (page - 1) * size, size),
-            as -> status(OK).entity(toGenericEntity(as))
-        );
-    }
-
-    @GET
-    @Path("/repository/{repository}")
-    public Response getRepository(
-        @PathParam("repository") final String repository,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByRepository(repository, (page - 1) * size, size),
+            () -> dao.search(Project.project(Identifier.empty(),name,repo), (page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );
     }

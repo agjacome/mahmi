@@ -84,33 +84,24 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     }
 
     @Override
-    public Collection<MetaGenome> getByProjectName(
-        final String projectName, final int start, final int count
+    public Collection<MetaGenome> search(
+    		final Project project, final int start, final int count
     ) throws DAOException {
         val sql = sql(
             "SELECT metagenome_id, project_id, project_name, project_repository " +
             "FROM metagenomes NATURAL JOIN projects " +
-            "WHERE project_name = ? " +
+            "WHERE (? = 0 OR project_id = ?) AND " +
+            "(? = '' OR project_name = ?) AND " +
+            "(? = '' OR project_repository = ?) " +
             "ORDER BY metagenome_id LIMIT ? OFFSET ?",
-            projectName
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
-    }
-
-    @Override
-    public Collection<MetaGenome> getByProjectRepository(
-        final String projectRepository, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT metagenome_id, project_id, project_name, project_repository " +
-            "FROM metagenomes NATURAL JOIN projects " +
-            "WHERE project_repository = ? " +
-            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
-            projectRepository
-        ).bind(integer(2, count)).bind(integer(3, start));
-
+            project.getId(),project.getId()
+        ).bind(string(3,project.getName()))
+         .bind(string(4,project.getName()))
+         .bind(string(5,project.getRepository()))
+         .bind(string(6,project.getRepository()))
+         .bind(integer(7, count))
+         .bind(integer(8, start));
+        
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }

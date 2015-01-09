@@ -1,7 +1,6 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
 import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
@@ -24,8 +23,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.Project;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 
@@ -57,79 +60,25 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
     }
 
     @GET
-    @Path("/proteinId/{id}")
-    public Response getProteinId(
-        @PathParam("id") final int proteinId,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByProteinId(proteinId, (page - 1) * size, size),
-            ps -> status(OK).entity(toGenericEntity(ps))
-        );
-    }
-
-    @GET
-    @Path("/metagenomeId/{id}")
-    public Response getMetagenomeId(
-        @PathParam("id") final int metagenomeId,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByMetaGenomeId(metagenomeId, (page - 1) * size, size),
-            ps -> status(OK).entity(toGenericEntity(ps))
-        );
-    }
-
-    @GET
-    @Path("/projectId/{id}")
-    public Response getProjectId(
-        @PathParam("id") final int projectId,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByProjectId(projectId, (page - 1) * size, size),
-            as -> status(OK).entity(toGenericEntity(as))
-        );
-    }
-
-    @GET
-    @Path("/projectName/{name}")
-    public Response getProjectName(
-        @PathParam("name") final String projectName,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByProjectName(projectName, (page - 1) * size, size),
-            as -> status(OK).entity(toGenericEntity(as))
-        );
-    }
-
-    @GET
-    @Path("/projectRepository/{repository}")
-    public Response getProjectRepository(
-        @PathParam("repository") final String projectRepository,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.getByProjectRepository(projectRepository, (page - 1) * size, size),
-            as -> status(OK).entity(toGenericEntity(as))
-        );
-    }
-
-    @GET
-    @Path("/enzymeId/{enzyme}")
+    @Path("/search")
     public Response getEnzymeId(
-        @PathParam("enzyme") final int enzymeId,
+    	@QueryParam("proteinId") @DefaultValue("0") final int proteinId,
+        @QueryParam("metagenomeId") @DefaultValue("0") final int metagenomeId,
+    	@QueryParam("projectId") @DefaultValue("0") final int projectId,
+    	@QueryParam("projectName") @DefaultValue("") final String projectName,
+    	@QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
+    	@QueryParam("sequence") @DefaultValue("") final String sequence,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            () -> dao.getByEnzymeId(enzymeId, (page - 1) * size, size),
+            () -> dao.search(Protein.protein(Identifier.of(proteinId),
+            		AminoAcidSequence.empty()),
+            		MetaGenome.metagenome(Identifier.of(metagenomeId),
+            		Project.project(Identifier.of(projectId),projectName,projectRepo),
+            		Fasta.empty()),
+            		AminoAcidSequence.fromString(sequence),
+            		(page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );
     }
@@ -166,7 +115,7 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
         return buildUpdate(toUpdate);
     }
 
-    @GET
+    /*@GET
     @Path("/search")
     public Response search(@QueryParam("sequence") final String sequence) {
         return respond(
@@ -174,7 +123,7 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
             status(OK)::entity,
             status(NOT_FOUND)
         );
-    }
+    }*/
 
     @Override
     protected GenericEntity<List<Peptide>> toGenericEntity(
