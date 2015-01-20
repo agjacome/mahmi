@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
@@ -61,23 +62,25 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
 
     @GET
     @Path("/search")
-    public Response getEnzymeId(
+    public Response search(
     	@QueryParam("proteinId") @DefaultValue("0") final int proteinId,
         @QueryParam("metagenomeId") @DefaultValue("0") final int metagenomeId,
     	@QueryParam("projectId") @DefaultValue("0") final int projectId,
     	@QueryParam("projectName") @DefaultValue("") final String projectName,
     	@QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
     	@QueryParam("sequence") @DefaultValue("") final String sequence,
+    	@QueryParam("enzymeId") @DefaultValue("0") final Integer enzymeId,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
-        return respond(
+    	return respond(
             () -> dao.search(Protein.protein(Identifier.of(proteinId),
             		AminoAcidSequence.empty()),
             		MetaGenome.metagenome(Identifier.of(metagenomeId),
             		Project.project(Identifier.of(projectId),projectName,projectRepo),
             		Fasta.empty()),
             		AminoAcidSequence.fromString(sequence),
+            		Enzyme.enzyme(Identifier.of(enzymeId),""),
             		(page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );

@@ -1,8 +1,5 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -10,8 +7,6 @@ import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import fj.data.Option;
 
 public interface ProteinsDAO extends DAO<Protein> {

@@ -1,7 +1,12 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

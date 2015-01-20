@@ -1,7 +1,14 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseAASequence;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +16,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -63,21 +71,25 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
     		final Protein protein,
         	final MetaGenome metagenome, 
             final AminoAcidSequence sequence, 
+            final Enzyme enzyme,
         	final int start, final int count
-    ) throws DAOException {
+    ) throws DAOException { 	
+    	
     	val sql = sql(
     		"SELECT DISTINCT peptide_id, peptide_sequence "            +
             "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins NATURAL JOIN projects " +
             "WHERE (? = 0 OR protein_id = ?) AND" +
             "(? = 0 OR metagenome_id = ?) AND " +
             "(? = 0 OR project_id = ?) AND " +
+            "(? = 0 OR enzyme_id = ?) AND " +
             "(? = '' OR peptide_sequence = ?) AND " +
             "(? = '' OR project_name = ?) AND " +
             "(? = '' OR project_repository = ?) " +                        
             "ORDER BY peptide_id LIMIT ? OFFSET ?",
             protein.getId(),  protein.getId(),
             metagenome.getId(),  metagenome.getId(), 
-            metagenome.getProject().getId(), metagenome.getProject().getId()
+            metagenome.getProject().getId(), metagenome.getProject().getId(),
+            enzyme.getId(),enzyme.getId()
         ).bind(string(7, sequence.toString())).bind(string(8, sequence.toString()))
         .bind(string(9, metagenome.getProject().getName())).bind(string(10, metagenome.getProject().getName()))
         .bind(string(11, metagenome.getProject().getRepository())).bind(string(12, metagenome.getProject().getRepository()))
@@ -86,7 +98,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
     }
-
+    
     @Override
     protected Peptide parse(final ResultSet results) throws SQLException {
         val id  = parseIdentifier(results, "peptide_id");

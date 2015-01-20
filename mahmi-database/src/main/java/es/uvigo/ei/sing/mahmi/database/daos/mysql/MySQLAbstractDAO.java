@@ -1,7 +1,14 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.toCollection;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.count;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.getWith;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.key;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.runReadOnly;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.runReadWrite;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sequence;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.update;
 import static fj.data.List.iterableList;
 
 import java.sql.PreparedStatement;

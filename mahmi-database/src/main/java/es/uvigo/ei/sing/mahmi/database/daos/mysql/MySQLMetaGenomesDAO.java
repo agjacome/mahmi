@@ -2,7 +2,22 @@ package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.count;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.fasta;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.getWith;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.key;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.longInt;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseBlob;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sequence;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.update;
 import static fj.Bottom.error;
 
 import java.io.IOException;
