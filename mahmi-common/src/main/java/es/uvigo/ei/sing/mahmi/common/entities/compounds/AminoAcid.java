@@ -1,9 +1,10 @@
 package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.Validators.requireNonNull;
+import static es.uvigo.ei.sing.mahmi.common.utils.Contracts.require;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.enumToMap;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.transformKeys;
+import static fj.Function.identity;
 import static fj.data.vector.V.v;
-import static java.lang.Character.toUpperCase;
 
 import java.util.Map;
 
@@ -42,15 +43,20 @@ public enum AminoAcid implements ChemicalCompound {
     XLE("Leucine or isoleucine"      , 'J', v('X', 'L', 'E')),
     XAA("Unknown"                    , 'X', v('X', 'A', 'A'));
 
-    private static final Map<Character, AminoAcid> codeMapper = enumToMap(
-        AminoAcid.class, AminoAcid::getCode, a -> a
-    );
+
+    private static final Map<Character, AminoAcid> codes;
+
+    static {
+        // both lowercase and uppercase, plus '*' char codes
+        codes = enumToMap(AminoAcid.class, AminoAcid::getCode, identity());
+        codes.putAll(transformKeys(codes, Character::toLowerCase));
+        codes.put('*', XAA);
+    }
+
 
     private final char          code;
     private final V3<Character> shortName;
     private final String        fullName;
-
-    static { codeMapper.put('*', XAA); }
 
     private AminoAcid(
         final String        fullName,
@@ -63,10 +69,8 @@ public enum AminoAcid implements ChemicalCompound {
     }
 
     public static AminoAcid fromCode(final char code) {
-        return requireNonNull(
-            codeMapper.get(toUpperCase(code)),
-            () -> new IllegalArgumentException("Invalid AminoAcid code: " + code)
-        );
+        require(codes.containsKey(code), "Invalid aminoacid code %c", code);
+        return codes.get(code);
     }
 
 }

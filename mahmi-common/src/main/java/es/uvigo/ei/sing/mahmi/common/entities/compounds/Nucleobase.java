@@ -1,8 +1,9 @@
 package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.Validators.requireNonNull;
+import static es.uvigo.ei.sing.mahmi.common.utils.Contracts.require;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.enumToMap;
-import static java.lang.Character.toUpperCase;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.transformKeys;
+import static fj.Function.identity;
 
 import java.util.Map;
 
@@ -19,14 +20,19 @@ public enum Nucleobase implements ChemicalCompound {
     U("Uracil"  , 'U'),
     N("Unknown" , 'N');
 
-    private static final Map<Character, Nucleobase> codeMapper = enumToMap(
-        Nucleobase.class, Nucleobase::getCode, n -> n
-    );
+
+    private static final Map<Character, Nucleobase> codes;
+
+    static {
+        // both lowercase and uppercase char codes
+        codes = enumToMap(Nucleobase.class, Nucleobase::getCode, identity());
+        codes.putAll(transformKeys(codes, Character::toLowerCase));
+    }
+
 
     private final char            code;
     private final String          fullName;
     private final List<Character> shortName;
-
 
     private Nucleobase(final String fullName, final char code) {
         this.code      = code;
@@ -35,10 +41,8 @@ public enum Nucleobase implements ChemicalCompound {
     }
 
     public static Nucleobase fromCode(final char code) {
-        return requireNonNull(
-            codeMapper.get(toUpperCase(code)),
-            () -> new IllegalArgumentException("Invalid Nucleobase code: " + code)
-        );
+        require(codes.containsKey(code), "Invalid nucleobase code %c", code);
+        return codes.get(code);
     }
 
 }
