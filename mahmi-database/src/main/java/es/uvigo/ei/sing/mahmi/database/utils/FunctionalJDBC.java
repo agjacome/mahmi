@@ -24,12 +24,12 @@ import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import fj.F;
-import fj.TryCatch1;
 import fj.control.db.Connector;
 import fj.control.db.DB;
 import fj.control.db.DbState;
 import fj.data.List;
 import fj.data.List.Buffer;
+import fj.function.Try1;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FunctionalJDBC {
@@ -207,7 +207,7 @@ public final class FunctionalJDBC {
         });
 
     public static <A> F<ResultSet, DB<List<A>>> getWith(
-        final TryCatch1<ResultSet, A, SQLException> parser
+        final Try1<ResultSet, A, SQLException> parser
     ) {
         return resultSet -> db(connection -> {
             try (val results = resultSet) {

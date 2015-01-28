@@ -1,14 +1,7 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.toCollection;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.count;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.getWith;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.key;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.runReadOnly;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.runReadWrite;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sequence;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.update;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 import static fj.data.List.iterableList;
 
 import java.sql.PreparedStatement;
@@ -27,10 +20,10 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAO;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import fj.F;
-import fj.TryCatch0;
 import fj.control.db.DB;
 import fj.data.List;
 import fj.data.Option;
+import fj.function.Try0;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -122,7 +115,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
 
 
     private <B> B action(
-        final TryCatch0<B, SQLException> action
+        final Try0<B, SQLException> action
     ) throws DAOException {
         try {
             return action.f();
@@ -140,7 +133,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
     }
 
     private <B> B retryDeadlockedAction(
-        final TryCatch0<B, SQLException> action
+        final Try0<B, SQLException> action
     ) throws DAOException {
         log.error("MySQL InnoDB deadlock. Retrying in 200ms.");
 

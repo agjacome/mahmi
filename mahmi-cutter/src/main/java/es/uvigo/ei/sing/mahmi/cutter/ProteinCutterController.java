@@ -26,7 +26,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import fj.TryCatch0;
+import fj.function.Try0;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutterCtrl")
@@ -127,7 +127,7 @@ public final class ProteinCutterController {
         }).collect(toSet());
     }
 
-    private <A> A databaseAction(final TryCatch0<A, DAOException> f) {
+    private <A> A databaseAction(final Try0<A, DAOException> f) {
         try {
             return f.f();
         } catch (final DAOException daoe) {
