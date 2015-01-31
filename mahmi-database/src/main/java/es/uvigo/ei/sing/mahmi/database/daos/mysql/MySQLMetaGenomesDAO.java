@@ -31,7 +31,7 @@ import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -278,12 +278,12 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
         return project(id, name, repo);
     }
 
-    private Fasta<DNASequence> parseFasta(
+    private Fasta<NucleobaseSequence> parseFasta(
         final ResultSet results
     ) throws SQLException {
         try {
             val input = parseBlob(results, "metagenome_fasta");
-            return FastaReader.forDNA().fromInput(input);
+            return FastaReader.forNucleobase().fromInput(input);
         } catch (final IOException ioe) {
             throw new SQLException(ioe);
         }

@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import fj.P2;
@@ -28,7 +28,7 @@ import fj.P2;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MGRastProjectLoader implements ProjectLoader {
 
-    private static final FastaReader<DNASequence>       genomeReader  = FastaReader.forDNA();
+    private static final FastaReader<NucleobaseSequence>       genomeReader  = FastaReader.forNucleobase();
     private static final FastaReader<AminoAcidSequence> proteinReader = FastaReader.forAminoAcid();
 
     public static ProjectLoader mgRastLoader() {
@@ -36,7 +36,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     }
 
     @Override
-    public Stream<P2<Fasta<DNASequence>, Fasta<AminoAcidSequence>>> loadProject(
+    public Stream<P2<Fasta<NucleobaseSequence>, Fasta<AminoAcidSequence>>> loadProject(
         final Path projectPath
     ) {
         return findFastaFiles(projectPath).map(this::readFastas);
@@ -50,7 +50,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
         return combine(genomeFiles, proteinFiles).stream();
     }
 
-    private P2<Fasta<DNASequence>, Fasta<AminoAcidSequence>> readFastas(
+    private P2<Fasta<NucleobaseSequence>, Fasta<AminoAcidSequence>> readFastas(
         final P2<Path, Path> paths
     ) {
         log.info("Reading genome fasta file {} and protein fasta file {}", paths._1(), paths._2());
@@ -60,7 +60,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
         return p(genomes, proteins);
     }
 
-    private <A extends ChemicalCompoundSequence<?>> Fasta<A> readFasta(
+    private <A extends CompoundSequence<?>> Fasta<A> readFasta(
         final FastaReader<A> reader, final Path file
     ) {
         try {

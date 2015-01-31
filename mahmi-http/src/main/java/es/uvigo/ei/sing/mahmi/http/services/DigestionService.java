@@ -1,7 +1,7 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.exceptions.PendingImplementationException.notYetImplemented;
-import static es.uvigo.ei.sing.mahmi.cutter.utils.Comparators.between;
+import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.ACCEPTED;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;

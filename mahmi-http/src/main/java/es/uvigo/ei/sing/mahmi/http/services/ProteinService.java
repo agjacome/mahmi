@@ -23,17 +23,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
+import fj.data.Option;
 
 @Path("/protein")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
 public final class ProteinService extends DatabaseEntityAbstractService<Protein, ProteinsDAO> {
 
     private ProteinService(final ProteinsDAO dao) {
@@ -73,7 +77,7 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
             () -> dao.search(MetaGenome.metagenome(Identifier.of(metagenomeId),
             		Project.project(Identifier.of(projectId),projectName,projectRepo),
             		Fasta.empty()),
-            		AminoAcidSequence.fromString(sequence),
+            		AminoAcidSequence.fromString(sequence).orThrow(new IllegalArgumentException()),
             		(page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );

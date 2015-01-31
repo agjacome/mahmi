@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.mahmi.database.utils;
 
 import static es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter.fastaWriter;
 import static es.uvigo.ei.sing.mahmi.database.utils.IOExtensionMethods.pipeToInput;
+import static fj.P.lazy;
 import static fj.data.Array.array;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.text.MessageFormat.format;
@@ -17,11 +18,13 @@ import java.util.LinkedList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import fj.F;
 import fj.control.db.Connector;
@@ -29,9 +32,11 @@ import fj.control.db.DB;
 import fj.control.db.DbState;
 import fj.data.List;
 import fj.data.List.Buffer;
+import fj.data.Option;
 import fj.function.Try1;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
 public final class FunctionalJDBC {
 
     public static <A> A runReadOnly(
@@ -93,9 +98,11 @@ public final class FunctionalJDBC {
         final int index, final Identifier id
     ) {
         return statement -> db(connection -> {
-            val value = id.get(error("Empty identifier on {0}", index));
-            statement.setInt(index, value);
+            val value = id.getValue().orThrow(
+                lazy(u -> error("Empty Identifier on index {0}", index))
+            ).longValue();
 
+            statement.setLong(index, value);
             return statement;
         });
     }
@@ -109,7 +116,7 @@ public final class FunctionalJDBC {
         });
     }
 
-    public static <A extends ChemicalCompoundSequence<?>> F<PreparedStatement, DB<PreparedStatement>> fasta(
+    public static <A extends CompoundSequence<?>> F<PreparedStatement, DB<PreparedStatement>> fasta(
         final int index, final Fasta<A> fasta
     ) {
         final FastaWriter<A> writer = fastaWriter();
@@ -165,12 +172,10 @@ public final class FunctionalJDBC {
     public static AminoAcidSequence parseAASequence(
         final ResultSet results, final String column
     ) throws SQLException {
-        try {
-            val str = parseString(results, column);
-            return AminoAcidSequence.fromString(str);
-        } catch (final IllegalArgumentException iae) {
-            throw error(iae, "Invalid AminoAcid sequence at {0}", column);
-        }
+        val str = parseString(results, column);
+        return AminoAcidSequence.fromString(str).orThrow(
+            lazy(u -> error("Invalid AminoAcid sequence at {0}: {1}", column, str))
+        );
     }
 
     public static DB<PreparedStatement> sql(
@@ -256,12 +261,6 @@ public final class FunctionalJDBC {
         final String message, final Object ... args
     ) {
         return new SQLException(format(message, args));
-    }
-
-    private static SQLException error(
-        final Throwable cause, final String message, final Object ... args
-    ) {
-        return new SQLException(format(message, args), cause);
     }
 
     // TODO: Can be replaced with DB::db with a bit of work (the throw of

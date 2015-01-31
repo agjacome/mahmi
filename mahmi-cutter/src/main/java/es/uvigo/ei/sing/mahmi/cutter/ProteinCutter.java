@@ -3,7 +3,10 @@ package es.uvigo.ei.sing.mahmi.cutter;
 import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.frequencies;
 import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withCause;
+import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withMessage;
+import static fj.P.lazy;
 
+import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,6 +15,7 @@ import java.util.function.Predicate;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 
 import org.expasy.mzjava.proteomics.mol.digest.CleavageSiteMatcher;
@@ -23,9 +27,11 @@ import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutter")
+@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
 public final class ProteinCutter {
 
     public Set<Digestion> cutProtein(
@@ -127,13 +133,9 @@ public final class ProteinCutter {
         final org.expasy.mzjava.proteomics.mol.Peptide mzPeptide
     ) {
         val sequence = mzPeptide.toSymbolString();
-
-        try {
-            return AminoAcidSequence.fromString(sequence);
-        } catch (final IllegalArgumentException iae) {
-            log.error("Illegal sequence produced by MzJava: {}", sequence);
-            throw withCause(iae);
-        }
+        return AminoAcidSequence.fromString(sequence).orThrow(
+            lazy(u -> withMessage("Illegal aminoacid sequence produced by MZJava: " + sequence))
+        );
     }
 
 

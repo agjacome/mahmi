@@ -1,15 +1,7 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.count;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseAASequence;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,9 +68,9 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
 
     @Override
     public Collection<Protein> search(
-            final MetaGenome metagenome, 
-            final AminoAcidSequence sequence, 
-            final int start, 
+            final MetaGenome metagenome,
+            final AminoAcidSequence sequence,
+            final int start,
             final int count
         ) throws DAOException {
         val sql = sql(
@@ -90,16 +82,16 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
             "(? = '' OR project_name = ?) AND " +
             "(? = '' OR project_repository = ?) " +
             "ORDER BY protein_id LIMIT ? OFFSET ?",
-            metagenome.getId(),  metagenome.getId(), 
+            metagenome.getId(),  metagenome.getId(),
             metagenome.getProject().getId(), metagenome.getProject().getId()
         ).bind(string(5, sequence.toString())).bind(string(6, sequence.toString()))
         .bind(string(7, metagenome.getProject().getName())).bind(string(8, metagenome.getProject().getName()))
         .bind(string(9, metagenome.getProject().getRepository())).bind(string(10, metagenome.getProject().getRepository()))
         .bind(integer(11, count)).bind(integer(12, start));
-        
+
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
-    } 
+    }
 
     @Override
     protected Protein parse(final ResultSet results) throws SQLException {

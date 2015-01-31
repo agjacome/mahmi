@@ -1,7 +1,7 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.transformKeys;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.frequencies;
 import static fj.P.p;
 import static fj.Unit.unit;
 import static java.util.concurrent.CompletableFuture.runAsync;
@@ -21,8 +21,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
@@ -50,7 +50,7 @@ public final class ProjectLoaderController {
 
     public void loadFastas(
         final Project                  project,
-        final Fasta<DNASequence>       genomeFasta,
+        final Fasta<NucleobaseSequence>       genomeFasta,
         final Fasta<AminoAcidSequence> proteinFasta
     ) throws LoaderException {
         val metaGenome = insertMetaGenome(metagenome(project, genomeFasta));
@@ -72,7 +72,9 @@ public final class ProjectLoaderController {
     private void loadProteinFasta(
         final MetaGenome metaGenome, final Fasta<AminoAcidSequence> fasta
     ) {
-        val frequencies = transformKeys(fasta.getSequences(), Protein::protein);
+        val frequencies = frequencies(
+            fasta.getSequences().map(Protein::protein).toCollection()
+        );
 
         val proteins = insertProteins(frequencies.keySet()).stream().collect(
             toMap(protein -> protein, protein -> frequencies.get(protein))

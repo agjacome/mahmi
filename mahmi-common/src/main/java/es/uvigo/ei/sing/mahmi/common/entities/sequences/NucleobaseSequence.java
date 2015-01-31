@@ -27,4 +27,21 @@ public final class NucleobaseSequence implements CompoundSequence<Nucleobase> {
         return Option.sequence(seq).map(NucleobaseSequence::fromList);
     }
 
+    /**
+     * <p>
+     * Please, use <code>CompoundSequence.show</code> or create the String
+     * directly through
+     * <code>List.asString(aas.getResidues().map(Compound::getCode))</code>.
+     * </p>
+     *
+     * <p>
+     * <strong>Never ever again rely on toString.</strong>
+     * </p>
+     */
+    @Override
+    @Deprecated
+    public String toString() {
+        return show.showS(this);
+    }
+
 }
