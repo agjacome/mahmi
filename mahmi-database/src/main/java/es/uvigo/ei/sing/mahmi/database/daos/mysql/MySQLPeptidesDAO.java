@@ -90,10 +90,10 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
             metagenome.getId(),  metagenome.getId(), 
             metagenome.getProject().getId(), metagenome.getProject().getId(),
             enzyme.getId(),enzyme.getId()
-        ).bind(string(7, sequence.toString())).bind(string(8, sequence.toString()))
-        .bind(string(9, metagenome.getProject().getName())).bind(string(10, metagenome.getProject().getName()))
-        .bind(string(11, metagenome.getProject().getRepository())).bind(string(12, metagenome.getProject().getRepository()))
-        .bind(integer(13, count)).bind(integer(14, start));
+        ).bind(string(9, sequence.toString())).bind(string(10, sequence.toString()))
+        .bind(string(11, metagenome.getProject().getName())).bind(string(12, metagenome.getProject().getName()))
+        .bind(string(13, metagenome.getProject().getRepository())).bind(string(14, metagenome.getProject().getRepository()))
+        .bind(integer(15, count)).bind(integer(16, start));
 
         val statement = sql.bind(query).bind(get);
         return read(statement).toCollection();
