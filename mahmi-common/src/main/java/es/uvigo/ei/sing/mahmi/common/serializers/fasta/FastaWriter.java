@@ -1,7 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
-import static java.lang.Math.min;
-import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 
 import java.io.File;
@@ -10,16 +8,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Path;
-import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.ChemicalCompound;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.ChemicalCompoundSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 
 @AllArgsConstructor(staticName = "fastaWriter")
-public final class FastaWriter<A extends ChemicalCompoundSequence<? extends ChemicalCompound>> {
+public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
+
+    private static final int LINE_WIDTH = 80;
+
+    public static FastaWriter<AminoAcidSequence> forAminoAcid() {
+        return new FastaWriter<>();
+    }
+
+    public static FastaWriter<NucleobaseSequence> forNucleobase() {
+        return new FastaWriter<>();
+    }
 
     public void toFile(final Fasta<A> fasta, final File file) throws IOException {
         toOutput(fasta, new FileOutputStream(file));
@@ -34,27 +44,34 @@ public final class FastaWriter<A extends ChemicalCompoundSequence<? extends Chem
     ) throws IOException{
         try (val writer = new OutputStreamWriter(outputStream)) {
 
-            for (final Entry<A, Long> entry : fasta.getSequences().entrySet()) {
-                val sequence = entry.getKey();
-                val counter  = entry.getValue();
-
-                val sha = "> " + sequence.toSHA1().asHexString();
-                val seq = sequence.toString();
-
-                for (int i = 0; i < counter; ++i) {
-                    writer.append(sha).append(format(" | %d", i + 1))
-                          .append(lineSeparator());
-
-                    for (int j = 0; j < seq.length(); j += 60) {
-                        val line = seq.substring(i, min(i + 60, seq.length()));
-                        writer.append(line)
-                              .append(lineSeparator());
-                    }
-                }
+            for (final A sequence : fasta.getSequences()) {
+                writeHeader(writer, sequence);
+                writeSequence(writer, sequence);
             }
 
             writer.flush();
         }
+    }
+
+    private void writeHeader(
+        final OutputStreamWriter writer, final A sequence
+    ) throws IOException {
+        val sha = sequence.getSHA1().asHexString();
+        writer.append(">").append(sha).append(lineSeparator());
+    }
+
+    private void writeSequence(
+        final OutputStreamWriter writer, final A sequence
+    ) throws IOException {
+        val counter = new AtomicInteger();
+
+        for (val residue : sequence.getResidues()) {
+            writer.append(residue.getCode());
+            if (counter.incrementAndGet() % LINE_WIDTH == 0)
+                writer.append(lineSeparator());
+        }
+
+        writer.append(lineSeparator());
     }
 
 }

@@ -1,41 +1,30 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
 import static fj.Monoid.monoid;
-import static fj.data.List.iterableList;
-import lombok.Getter;
+import lombok.Value;
+import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
 import fj.Monoid;
 import fj.data.List;
+import fj.data.Option;
 
-@Getter
-public final class AminoAcidSequence extends ChemicalCompoundSequence<AminoAcid> {
+@Value(staticConstructor = "fromList")
+public final class AminoAcidSequence implements CompoundSequence<AminoAcid> {
 
-    public static Monoid<AminoAcidSequence> monoid = monoid(
-        a1 -> a2 -> new AminoAcidSequence(a1.sequence.append(a2.sequence)),
-        empty()
-    );
+    public static final Monoid<AminoAcidSequence> monoid =
+        monoid(a1 -> a2 -> fromList(a1.residues.append(a2.residues)), empty());
 
-
-    private AminoAcidSequence(final List<AminoAcid> sequence) {
-        super(sequence);
-    }
+    private final List<AminoAcid> residues;
 
     public static AminoAcidSequence empty() {
-        return new AminoAcidSequence(List.nil());
+        return fromList(List.nil());
     }
 
-    public static AminoAcidSequence fromIterable(
-        final Iterable<AminoAcid> sequence
-    ) {
-        return new AminoAcidSequence(iterableList(sequence));
-    }
-
-    public static AminoAcidSequence fromString(
+    public static Option<AminoAcidSequence> fromString(
         final String sequence
     ) {
-        return new AminoAcidSequence(
-            List.fromString(sequence).map(AminoAcid::fromCode)
-        );
+        val seq = List.fromString(sequence).map(AminoAcid::fromCode);
+        return Option.sequence(seq).map(AminoAcidSequence::fromList);
     }
 
 }

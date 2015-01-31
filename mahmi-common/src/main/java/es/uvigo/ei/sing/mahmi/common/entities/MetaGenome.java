@@ -9,8 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
@@ -24,14 +24,15 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
     private Project    project;
 
     @XmlTransient
-    private Fasta<DNASequence> fasta;
+    private Fasta<NucleobaseSequence> fasta;
 
-    @VisibleForJAXB public MetaGenome() {
+    @VisibleForJAXB
+    public MetaGenome() {
         this(new Identifier(), new Project(), Fasta.empty());
     }
 
     public static MetaGenome metagenome(
-        final Project project, final Fasta<DNASequence> fasta
+        final Project project, final Fasta<NucleobaseSequence> fasta
     ) {
         return metagenome(Identifier.empty(), project, fasta);
     }

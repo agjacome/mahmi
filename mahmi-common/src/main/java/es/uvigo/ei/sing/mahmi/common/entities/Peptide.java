@@ -29,7 +29,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
     }
 
     public SHA1 getSHA1() {
-        return sequence.toSHA1();
+        return sequence.getSHA1();
     }
 
 }

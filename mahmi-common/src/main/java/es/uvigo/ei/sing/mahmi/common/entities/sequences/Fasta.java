@@ -1,19 +1,31 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
-import static java.util.Collections.emptyMap;
-
-import java.util.Map;
-
+import static fj.Equal.streamEqual;
+import static fj.Hash.streamHash;
+import static fj.Show.streamShow;
 import lombok.Value;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.ChemicalCompound;
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
+import fj.Equal;
+import fj.Hash;
+import fj.Show;
+import fj.data.Stream;
 
 @Value(staticConstructor = "of")
-public final class Fasta<A extends ChemicalCompoundSequence<? extends ChemicalCompound>> {
+public final class Fasta<A extends CompoundSequence<? extends Compound>> {
 
-    private final Map<A, Long> sequences;
+    public static final Hash<Fasta<CompoundSequence<? extends Compound>>> hash =
+        streamHash(CompoundSequence.hash).comap(Fasta::getSequences);
 
-    public static <A extends ChemicalCompoundSequence<? extends ChemicalCompound>> Fasta<A> empty() {
-        return new Fasta<A>(emptyMap());
+    public static final Equal<Fasta<CompoundSequence<? extends Compound>>> equal =
+        streamEqual(CompoundSequence.equal).comap(Fasta::getSequences);
+
+    public static final Show<Fasta<CompoundSequence<? extends Compound>>> show =
+        streamShow(CompoundSequence.show).comap(Fasta::getSequences);
+
+    private final Stream<A> sequences;
+
+    public static <A extends CompoundSequence<? extends Compound>> Fasta<A> empty() {
+        return of(Stream.nil());
     }
 
 }
