@@ -70,12 +70,15 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `metagenome_proteins` ;
 
 CREATE TABLE IF NOT EXISTS `metagenome_proteins` (
+  `metagenome_proteins_id` INT NOT NULL AUTO_INCREMENT,
   `metagenome_id` INT NOT NULL,
   `protein_id` INT NOT NULL,
   `counter` INT NOT NULL,
-  PRIMARY KEY (`metagenome_id`, `protein_id`),
+  
+  PRIMARY KEY (`metagenome_proteins_id`),
   INDEX `fk_metagenomes_has_proteins_proteins1_idx` (`protein_id` ASC),
   INDEX `fk_metagenomes_has_proteins_metagenomes1_idx` (`metagenome_id` ASC),
+  UNIQUE INDEX `fks_UNIQUE` (`metagenome_id` ASC, `protein_id` ASC),
   CONSTRAINT `fk_metagenomes_has_proteins_metagenomes1`
     FOREIGN KEY (`metagenome_id`)
     REFERENCES `metagenomes` (`metagenome_id`)
