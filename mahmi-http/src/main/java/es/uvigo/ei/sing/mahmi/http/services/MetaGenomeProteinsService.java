@@ -26,7 +26,7 @@ import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
 
-@Path("/metagenomeProteins")
+@Path("/metagenomeproteins")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public final class MetaGenomeProteinsService extends DatabaseEntityAbstractService<MetaGenomeProteins, MetaGenomeProteinsDAO> {
@@ -98,9 +98,9 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
 
     @Override
     protected GenericEntity<List<MetaGenomeProteins>> toGenericEntity(
-        final Collection<MetaGenomeProteins> digestions
+        final Collection<MetaGenomeProteins> metagenomeproteins
     ) {
-        return new GenericEntity<List<MetaGenomeProteins>>(newArrayList(digestions)) { };
+        return new GenericEntity<List<MetaGenomeProteins>>(newArrayList(metagenomeproteins)) { };
     }
 
 }

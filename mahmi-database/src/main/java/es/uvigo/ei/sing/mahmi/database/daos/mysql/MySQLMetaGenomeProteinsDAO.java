@@ -1,7 +1,7 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins.metagenomeProteins;
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
@@ -27,8 +27,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.DNASequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
@@ -39,7 +39,7 @@ import fj.data.Option;
 
 public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenomeProteins> implements MetaGenomeProteinsDAO {
 
-    private static final String TABLES = "metagenome_proteins NATURAL JOIN metagenomes NATURAL JOIN proteins";
+    private static final String TABLES = "metagenome_proteins NATURAL JOIN projects NATURAL JOIN proteins";
 
     private MySQLMetaGenomeProteinsDAO(final ConnectionPool connectionPool) {
         super(connectionPool);
@@ -81,8 +81,8 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
 
     @Override
     protected MetaGenomeProteins parse(final ResultSet results) throws SQLException {
-        val id      = parseIdentifier(results, "metagenomeProteins_id");
-        val metagenome = parseMetaGenomeWithFasta(results);        
+        val id      = parseIdentifier(results, "metagenome_proteins_id");
+        val metagenome = parseMetaGenome(results);        
         val protein = parseProtein(results);
         val counter = parseLong(results, "counter");
 
@@ -110,7 +110,11 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     @Override
     protected DB<PreparedStatement> prepareSelect(final int limit, final int offset) {
         return sql(
-            "SELECT * FROM " + TABLES + " ORDER BY metagenome_proteins_id LIMIT ? OFFSET ?",
+            "SELECT metagenome_proteins_id,"
+            + " metagenome_id, project_id, project_name, project_repository,"
+            + " protein_id, protein_sequence,"
+            + " counter"
+            + " FROM " + TABLES + " ORDER BY metagenome_proteins_id LIMIT ? OFFSET ?",
             limit, offset
         );
     }
@@ -153,32 +157,12 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
 
         return metagenome(id, project, Fasta.empty());
     }
-    
-    private MetaGenome parseMetaGenomeWithFasta(
-            final ResultSet results
-        ) throws SQLException {
-            val metaGenome  = parseMetaGenome(results);
-            val genomeFasta = parseFasta(results);
-
-            return metaGenome.setFasta(genomeFasta);
-        }
-    
-    private Fasta<DNASequence> parseFasta(
-            final ResultSet results
-        ) throws SQLException {
-            try {
-                val input = parseBlob(results, "metagenome_fasta");
-                return FastaReader.forDNA().fromInput(input);
-            } catch (final IOException ioe) {
-                throw new SQLException(ioe);
-            }
-        }
 
     private Protein parseProtein(final ResultSet results) throws SQLException {
-        return protein(
-            parseIdentifier(results, "protein_id"),
-            parseAASequence(results, "protein_sequence")
-        );
+    	val id  = parseIdentifier(results, "protein_id");
+        val seq = parseAASequence(results, "protein_sequence");
+
+        return protein(id, seq);
     }
     
     private Project parseProject(final ResultSet results) throws SQLException {
