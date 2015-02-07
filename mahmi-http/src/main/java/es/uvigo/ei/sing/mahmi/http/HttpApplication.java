@@ -5,12 +5,14 @@ import static es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController.proteinCutte
 import static es.uvigo.ei.sing.mahmi.database.connection.HikariConnectionPool.hikariCP;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLDigestionsDAO.mysqlDigestionsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLEnzymesDAO.mysqlEnzymesDAO;
+import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLMetaGenomeProteinsDAO.mysqlMetaGenomeProteinsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLMetaGenomesDAO.mysqlMetaGenomesDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLPeptidesDAO.mysqlPeptidesDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlProjectsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
 import static es.uvigo.ei.sing.mahmi.http.services.DigestionService.digestionService;
 import static es.uvigo.ei.sing.mahmi.http.services.EnzymeService.enzymeService;
+import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeProteinsService.metaGenomeProteinsService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeService.metaGenomeService;
 import static es.uvigo.ei.sing.mahmi.http.services.PeptideService.peptideService;
 import static es.uvigo.ei.sing.mahmi.http.services.ProjectService.projectService;
@@ -40,12 +42,13 @@ public final class HttpApplication extends Application {
         // nuts enough to do it: use a dependency injection framework (but a
         // small and lightweight one, not fucking Spring).
 
-        val digestionsDAO  = mysqlDigestionsDAO(connectionPool);
-        val enzymesDAO     = mysqlEnzymesDAO(connectionPool);
-        val metaGenomesDAO = mysqlMetaGenomesDAO(connectionPool);
-        val peptidesDAO    = mysqlPeptidesDAO(connectionPool);
-        val projectsDAO    = mysqlProjectsDAO(connectionPool);
-        val proteinsDAO    = mysqlProteinsDAO(connectionPool);
+        val digestionsDAO         = mysqlDigestionsDAO(connectionPool);
+        val enzymesDAO            = mysqlEnzymesDAO(connectionPool);
+        val metaGenomesDAO        = mysqlMetaGenomesDAO(connectionPool);
+        val metaGenomeProteinsDAO = mysqlMetaGenomeProteinsDAO(connectionPool);
+        val peptidesDAO           = mysqlPeptidesDAO(connectionPool);
+        val projectsDAO           = mysqlProjectsDAO(connectionPool);
+        val proteinsDAO           = mysqlProteinsDAO(connectionPool);
 
         val loaderController = projectLoaderCtrl(
             mgRastLoader(),
@@ -66,6 +69,7 @@ public final class HttpApplication extends Application {
             digestionService(digestionsDAO, cutterController),
             enzymeService(enzymesDAO),
             metaGenomeService(metaGenomesDAO),
+            metaGenomeProteinsService(metaGenomeProteinsDAO),
             peptideService(peptidesDAO),
             projectService(projectsDAO, loaderController),
             proteinService(proteinsDAO)

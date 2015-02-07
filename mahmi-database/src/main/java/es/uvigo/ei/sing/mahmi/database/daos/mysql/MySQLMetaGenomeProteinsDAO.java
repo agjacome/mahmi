@@ -45,7 +45,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
         super(connectionPool);
     }
 
-    public static MetaGenomeProteinsDAO mysqlMetaGenomeProteinssDAO(final ConnectionPool pool) {
+    public static MetaGenomeProteinsDAO mysqlMetaGenomeProteinsDAO(final ConnectionPool pool) {
         return new MySQLMetaGenomeProteinsDAO(pool);
     }
 

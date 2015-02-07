@@ -37,7 +37,7 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
         super(dao);
     }
 
-    public static MetaGenomeProteinsService metagenomeProteinsService(
+    public static MetaGenomeProteinsService metaGenomeProteinsService(
         final MetaGenomeProteinsDAO dao
     ) {
         return new MetaGenomeProteinsService(dao);
