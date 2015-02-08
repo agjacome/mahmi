@@ -1,6 +1,7 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.exceptions.PendingImplementationException.notYetImplemented;
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
@@ -22,7 +23,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
+import es.uvigo.ei.sing.mahmi.common.entities.Project;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
 
@@ -86,14 +92,26 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
     @GET
     @Path("/search")
     public Response search(
-        @QueryParam("enzyme")  @DefaultValue("-1") final int enzymeId,
-        @QueryParam("protein") @DefaultValue("-1") final int proteinId,
-        @QueryParam("peptide") @DefaultValue("-1") final int peptideId,
+        @QueryParam("proteinID")  @DefaultValue("0") final int proteinId,
+        @QueryParam("proteinSeq")  @DefaultValue("") final String proteinSeq,
+        @QueryParam("metagenomeID") @DefaultValue("0") final int metagenomeId,
+        @QueryParam("projectID") @DefaultValue("0") final int projectId,
+        @QueryParam("projectName") @DefaultValue("") final String projectName,
+        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
-        // TODO: implement
-        throw notYetImplemented;
+    	return respond(
+                ()  -> dao.search(Protein.protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
+                				  MetaGenome.metagenome(Identifier.of(metagenomeId), 
+                						  		        Project.project(Identifier.of(projectId),
+                						  		                projectName,
+                						  		                projectRepo), 
+                							                    Fasta.empty()),
+                			      (page - 1) * size, 
+                			      size),
+                mgps -> status(OK).entity(toGenericEntity(mgps))
+            );
     }
 
     @Override

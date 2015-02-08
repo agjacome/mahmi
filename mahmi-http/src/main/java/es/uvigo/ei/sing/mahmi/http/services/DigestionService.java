@@ -97,9 +97,13 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     @GET
     @Path("/search")
     public Response search(
-        @QueryParam("enzyme")  @DefaultValue("-1") final int enzymeId,
-        @QueryParam("protein") @DefaultValue("-1") final int proteinId,
-        @QueryParam("peptide") @DefaultValue("-1") final int peptideId,
+    	@QueryParam("peptideID") @DefaultValue("0") final int peptideId,
+        @QueryParam("enzymeID")  @DefaultValue("0") final int enzymeId,
+        @QueryParam("proteinID") @DefaultValue("0") final int proteinId,
+        @QueryParam("metagenomeID") @DefaultValue("0") final int metagenomeId,
+        @QueryParam("projectID") @DefaultValue("0") final int projectId,
+        @QueryParam("projectName") @DefaultValue("") final String projectName,
+        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {

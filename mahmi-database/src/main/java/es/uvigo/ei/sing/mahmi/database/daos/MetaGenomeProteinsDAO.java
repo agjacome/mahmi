@@ -20,5 +20,10 @@ public interface MetaGenomeProteinsDAO extends DAO<MetaGenomeProteins> {
     public Collection<MetaGenomeProteins> getByMetaGenome(
             final MetaGenome mg, final int start, final int count
         ) throws DAOException;
+    
+    public Collection<MetaGenomeProteins> search(
+    		final Protein protein,final MetaGenome mg,
+    		final int start, final int count
+    ) throws DAOException;
 
 }
