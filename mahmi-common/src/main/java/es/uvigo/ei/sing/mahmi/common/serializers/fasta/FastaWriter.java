@@ -2,11 +2,12 @@ package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
 import static java.lang.System.lineSeparator;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,37 +32,43 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
         return new FastaWriter<>();
     }
 
-    public void toFile(final Fasta<A> fasta, final File file) throws IOException {
-        toOutput(fasta, new FileOutputStream(file));
-    }
-
-    public void toPath(final Fasta<A> fasta, final Path path) throws IOException {
-        toFile(fasta, path.toFile());
+    public void toPath(
+        final Fasta<A> fasta, final Path path
+    ) throws IOException {
+        toWriter(fasta, Files.newBufferedWriter(path));
     }
 
     public void toOutput(
         final Fasta<A> fasta, final OutputStream outputStream
     ) throws IOException{
-        try (val writer = new OutputStreamWriter(outputStream)) {
+        toWriter(fasta, new BufferedWriter(new OutputStreamWriter(
+            outputStream, StandardCharsets.UTF_8
+        )));
+    }
 
-            for (final A sequence : fasta.getSequences()) {
+    public void toWriter(
+        final Fasta<A> fasta, final BufferedWriter buffWriter
+    ) throws IOException {
+        try (val writer = buffWriter) {
+
+            for (final A sequence : fasta) {
                 writeHeader(writer, sequence);
                 writeSequence(writer, sequence);
+                writer.flush();
             }
 
-            writer.flush();
         }
     }
 
     private void writeHeader(
-        final OutputStreamWriter writer, final A sequence
+        final BufferedWriter writer, final A sequence
     ) throws IOException {
         val sha = sequence.getSHA1().asHexString();
         writer.append(">").append(sha).append(lineSeparator());
     }
 
     private void writeSequence(
-        final OutputStreamWriter writer, final A sequence
+        final BufferedWriter writer, final A sequence
     ) throws IOException {
         val counter = new AtomicInteger();
 

@@ -73,7 +73,7 @@ public final class ProjectLoaderController {
         final MetaGenome metaGenome, final Fasta<AminoAcidSequence> fasta
     ) {
         val frequencies = frequencies(
-            fasta.getSequences().map(Protein::protein).toCollection()
+            fasta.toStream().map(Protein::protein).toCollection()
         );
 
         val proteins = insertProteins(frequencies.keySet()).stream().collect(
