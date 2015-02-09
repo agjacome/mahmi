@@ -1,10 +1,10 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.exceptions.PendingImplementationException.notYetImplemented;
 import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.ACCEPTED;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
@@ -28,6 +28,13 @@ import javax.ws.rs.core.Response;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.Project;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
@@ -98,6 +105,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     @Path("/search")
     public Response search(
     	@QueryParam("peptideID") @DefaultValue("0") final int peptideId,
+        @QueryParam("peptideSeq") @DefaultValue("") final String peptideSeq,
         @QueryParam("enzymeID")  @DefaultValue("0") final int enzymeId,
         @QueryParam("proteinID") @DefaultValue("0") final int proteinId,
         @QueryParam("metagenomeID") @DefaultValue("0") final int metagenomeId,
@@ -107,8 +115,17 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
-        // TODO: implement
-        throw notYetImplemented;
+    	return respond(
+                () -> dao.search(Protein.protein(Identifier.of(proteinId),
+                		AminoAcidSequence.empty()),
+                		MetaGenome.metagenome(Identifier.of(metagenomeId),
+                		Project.project(Identifier.of(projectId),projectName,projectRepo),
+                		Fasta.empty()),
+                        Peptide.peptide(AminoAcidSequence.fromString(peptideSeq).some()),
+                		Enzyme.enzyme(Identifier.of(enzymeId),""),
+                		(page - 1) * size, size),
+                ds -> status(OK).entity(toGenericEntity(ds))
+            );
     }
 
     @POST

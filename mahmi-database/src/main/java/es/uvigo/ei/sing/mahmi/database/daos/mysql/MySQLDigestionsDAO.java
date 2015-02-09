@@ -14,6 +14,7 @@ import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,6 +24,7 @@ import java.util.Collection;
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -44,7 +46,44 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
         return new MySQLDigestionsDAO(pool);
     }
 
-
+    
+    @Override
+    public Collection<Digestion> search(
+            final Protein protein, final MetaGenome mg, final Peptide peptide,
+            final Enzyme enzyme, final int start, final int count
+        ) throws DAOException{
+    	val sql = sql(
+    			"select metagenome_proteins_id,"
+    		        + " metagenome_id,"
+    		        + " project_id, project_name, project_repository,"
+    		        + " protein_id, protein_sequence,"
+    	            + " counter " +
+                "FROM digestions NATURAL JOIN peptides NATURAL JOIN metagenomes_proteins NATURAL JOIN projects" + TABLES + 
+                " WHERE (? = 0 OR peptide_id = ?) AND "
+                    + "(? = 0 OR protein_id = ?) AND "
+                    + "(? = 0 OR metagenome_id = ?) AND "
+                    + "(? = 0 OR project_id = ?) AND "
+	                + "(? = '' OR project_name = ?) AND "
+	                + "(? = '' OR project_repository = ?) AND "
+	                + "(? = '' OR peptide_hash = ?) "+
+                "ORDER BY peptide_id LIMIT ? OFFSET ?",
+                protein.getId(),protein.getId(),
+                mg.getId(),mg.getId(),
+                mg.getProject().getId(),mg.getProject().getId()
+            ).bind(string(7,mg.getProject().getName()))
+             .bind(string(8,mg.getProject().getName()))
+             .bind(string(9,mg.getProject().getRepository()))
+             .bind(string(10,mg.getProject().getRepository()))
+             .bind(string(11,peptide.getSequence().toString()))
+             .bind(string(12,peptide.getSHA1().asHexString()))
+             .bind(integer(13, count))
+             .bind(integer(14, start));
+            
+            val statement = sql.bind(query).bind(get);
+            return read(statement).toCollection();    
+    }
+    
+    
     @Override
     public Option<Digestion> get(
         final Enzyme enzyme, final Protein protein, final Peptide peptide
