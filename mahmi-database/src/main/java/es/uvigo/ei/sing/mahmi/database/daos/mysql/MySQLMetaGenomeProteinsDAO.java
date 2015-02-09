@@ -4,17 +4,7 @@ import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins.metagenomeProteins;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.longInt;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseAASequence;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseLong;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,7 +26,7 @@ import fj.data.Option;
 
 public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenomeProteins> implements MetaGenomeProteinsDAO {
 
-    private static final String TABLES = "metagenome_proteins NATURAL JOIN projects NATURAL JOIN proteins";
+    private static final String TABLES = "metagenome_proteins NATURAL JOIN projects NATURAL JOIN proteins ";
 
     private MySQLMetaGenomeProteinsDAO(final ConnectionPool connectionPool) {
         super(connectionPool);
@@ -58,23 +48,19 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     }
     @Override
     public Collection<MetaGenomeProteins> search(
-    		final Protein protein,final MetaGenome mg,
-    		final int start, final int count
+        final Protein protein,final MetaGenome mg,
+        final int start, final int count
     ) throws DAOException{
-    	val sql = sql(
-    			"select metagenome_proteins_id,"
-    		        + " metagenome_id,"
-    		        + " project_id, project_name, project_repository,"
-    		        + " protein_id, protein_sequence,"
-    	            + " counter " +
-                "FROM " + TABLES + 
-                " WHERE (? = 0 OR protein_id = ?) AND "
-                    + "(? = 0 OR metagenome_id = ?) AND "
-                    + "(? = 0 OR project_id = ?) AND "
-	                + "(? = '' OR project_name = ?) AND "
-	                + "(? = '' OR project_repository = ?) AND "
-	                + "(? = '' OR protein_hash = ?) "+
-                "ORDER BY protein_id LIMIT ? OFFSET ?",
+        // TODO: clean-up
+        val sql = sql(
+            "SELECT * FROM " + TABLES +
+            "WHERE (? = 0 OR protein_id = ?) AND "        +
+                "(? = 0 OR metagenome_id = ?) AND "       +
+                "(? = 0 OR project_id = ?) AND "          +
+                "(? = '' OR project_name = ?) AND "       +
+                "(? = '' OR project_repository = ?) AND " +
+                "(? = '' OR protein_hash = ?) "+
+            "ORDER BY protein_id LIMIT ? OFFSET ?",
                 protein.getId(),protein.getId(),
                 mg.getId(),mg.getId(),
                 mg.getProject().getId(),mg.getProject().getId()
@@ -86,7 +72,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
              .bind(string(12,protein.getSHA1().asHexString()))
              .bind(integer(13, count))
              .bind(integer(14, start));
-            
+
             val statement = sql.bind(query).bind(get);
             return read(statement).toCollection();
     }
@@ -113,7 +99,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     @Override
     protected MetaGenomeProteins parse(final ResultSet results) throws SQLException {
         val id      = parseIdentifier(results, "metagenome_proteins_id");
-        val metagenome = parseMetaGenome(results);        
+        val metagenome = parseMetaGenome(results);
         val protein = parseProtein(results);
         val counter = parseLong(results, "counter");
 
@@ -123,10 +109,10 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     @Override
     protected DB<PreparedStatement> prepareSelect(final MetaGenomeProteins metagenomeProteins) {
         val metagenomeId = metagenomeProteins.getMetagenome().getId();
-    	val proteinId = metagenomeProteins.getProtein().getId();
+        val proteinId = metagenomeProteins.getProtein().getId();
 
         return sql(
-            "SELECT * FROM " + TABLES + " WHERE metagenome_id = ? AND protein_id = ? LIMIT 1",
+            "SELECT * FROM " + TABLES + "WHERE metagenome_id = ? AND protein_id = ? LIMIT 1",
             metagenomeId,proteinId
         );
     }
@@ -134,21 +120,16 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     @Override
     protected DB<PreparedStatement> prepareSelect(final Identifier id) {
         return sql(
-            "SELECT * FROM " + TABLES + " WHERE metagenome_proteins_id = ? LIMIT 1", id
+            "SELECT * FROM " + TABLES + "WHERE metagenome_proteins_id = ? LIMIT 1", id
         );
     }
 
     @Override
     protected DB<PreparedStatement> prepareSelect(final int limit, final int offset) {
         return sql(
-            "SELECT metagenome_proteins_id,"
-            + " metagenome_id,"
-            + " project_id, project_name, project_repository,"
-            + " protein_id, protein_sequence"
-            + " counter"
-            + " FROM "+ TABLES +" "
-            + "ORDER BY metagenome_proteins_id "
-            + "LIMIT ? OFFSET ?",
+            "SELECT * FROM " + TABLES +
+            "ORDER BY metagenome_proteins_id "    +
+            "LIMIT ? OFFSET ?",
             limit, offset
         );
     }
@@ -160,9 +141,9 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
 
     @Override
     protected DB<PreparedStatement> prepareInsert(final MetaGenomeProteins metagenomeProteins) {
-    	val metagenomeId = metagenomeProteins.getMetagenome().getId();
-    	val proteinId = metagenomeProteins.getProtein().getId();
-        val counter = metagenomeProteins.getCounter();
+        val metagenomeId = metagenomeProteins.getMetagenome().getId();
+        val proteinId    = metagenomeProteins.getProtein().getId();
+        val counter      = metagenomeProteins.getCounter();
 
         return sql(
             "INSERT INTO metagenome_proteins (metagenome_id, protein_id, counter) VALUES (?, ?, ?)",
@@ -184,7 +165,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
             "UPDATE metagenome_proteins SET counter = ? WHERE metagenome_proteins_id = ?"
         ).bind(longInt(1, counter)).bind(identifier(2, id));
     }
-   
+
     protected MetaGenome parseMetaGenome(final ResultSet results) throws SQLException {
         val id      = parseIdentifier(results, "metagenome_id");
         val project = parseProject(results);
@@ -193,11 +174,11 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     }
 
     private Protein parseProtein(final ResultSet results) throws SQLException {
-    	val id  = parseIdentifier(results, "protein_id");
+        val id  = parseIdentifier(results, "protein_id");
         val seq = parseAASequence(results, "protein_sequence");
         return protein(id, seq);
     }
-    
+
     private Project parseProject(final ResultSet results) throws SQLException {
         val id   = parseIdentifier(results, "project_id");
         val name = parseString(results, "project_name");
@@ -213,7 +194,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
         final int        count
     ) throws DAOException {
         val sql = sql(
-            "SELECT * FROM " + TABLES + " WHERE " + columnName + " = ? ORDER BY metagenome_proteins_id LIMIT ? OFFSET ?",
+            "SELECT * FROM " + TABLES + "WHERE " + columnName + " = ? ORDER BY metagenome_proteins_id LIMIT ? OFFSET ?",
             id
         ).bind(integer(2, count)).bind(integer(3, start));
 

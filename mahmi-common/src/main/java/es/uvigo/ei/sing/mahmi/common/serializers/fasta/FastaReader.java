@@ -73,7 +73,6 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
 
             @Override
             public boolean hasNext() {
-                System.gc();
                 val hasNext = sequence.isSome();
 
                 try {
@@ -103,12 +102,14 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
         });
     }
 
-    public Option<A> getNextSequence(final BufferedReader reader, final int lineNumber) throws IOException {
+    public Option<A> getNextSequence(
+        final BufferedReader reader, final int lineNumber
+    ) throws IOException {
         String line = null;
         A sequence = monoid.zero();
 
         while ((line = reader.readLine()) != null) {
-            if (!line.startsWith(">"))
+            if  (!line.startsWith(">"))
                 sequence = monoid.sum(sequence, parseLine(line, lineNumber));
             else if (!sequence.isEmpty())
                 return some(sequence);

@@ -1,5 +1,8 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
@@ -23,10 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
-import es.uvigo.ei.sing.mahmi.common.entities.Project;
-import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -101,15 +101,13 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
-    	return respond(
-                ()  -> dao.search(Protein.protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
-                				  MetaGenome.metagenome(Identifier.of(metagenomeId), 
-                						  		        Project.project(Identifier.of(projectId),
-                						  		                projectName,
-                						  		                projectRepo), 
-                							                    Fasta.empty()),
-                			      (page - 1) * size, 
-                			      size),
+        // TODO: clean-up
+        return respond(()  ->
+                dao.search(
+                    protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
+                    metagenome(Identifier.of(metagenomeId), project(Identifier.of(projectId), projectName, projectRepo), Fasta.empty()),
+                    (page - 1) * size,  size
+                ),
                 mgps -> status(OK).entity(toGenericEntity(mgps))
             );
     }

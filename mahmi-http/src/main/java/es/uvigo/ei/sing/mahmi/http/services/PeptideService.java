@@ -1,5 +1,9 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
@@ -24,11 +28,7 @@ import javax.ws.rs.core.Response;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
-import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
-import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
-import es.uvigo.ei.sing.mahmi.common.entities.Project;
-import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -67,25 +67,24 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
     @GET
     @Path("/search")
     public Response search(
-    	@QueryParam("proteinId") @DefaultValue("0") final int proteinId,
+        @QueryParam("proteinId") @DefaultValue("0") final int proteinId,
         @QueryParam("metagenomeId") @DefaultValue("0") final int metagenomeId,
-    	@QueryParam("projectId") @DefaultValue("0") final int projectId,
-    	@QueryParam("projectName") @DefaultValue("") final String projectName,
-    	@QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
-    	@QueryParam("sequence") @DefaultValue("") final String sequence,
-    	@QueryParam("enzymeId") @DefaultValue("0") final Integer enzymeId,
+        @QueryParam("projectId") @DefaultValue("0") final int projectId,
+        @QueryParam("projectName") @DefaultValue("") final String projectName,
+        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
+        @QueryParam("sequence") @DefaultValue("") final String sequence,
+        @QueryParam("enzymeId") @DefaultValue("0") final Integer enzymeId,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
-    	return respond(
-            () -> dao.search(Protein.protein(Identifier.of(proteinId),
-            		AminoAcidSequence.empty()),
-            		MetaGenome.metagenome(Identifier.of(metagenomeId),
-            		Project.project(Identifier.of(projectId),projectName,projectRepo),
-            		Fasta.empty()),
-                    AminoAcidSequence.fromString(sequence).orThrow(new IllegalArgumentException()),
-            		Enzyme.enzyme(Identifier.of(enzymeId),""),
-            		(page - 1) * size, size),
+        // TODO: clean-up
+        return respond(
+            () -> dao.search(
+                protein(Identifier.of(proteinId), AminoAcidSequence.empty()),
+                metagenome(Identifier.of(metagenomeId), project(Identifier.of(projectId),projectName,projectRepo), Fasta.empty()),
+                AminoAcidSequence.fromString(sequence).orThrow(new IllegalArgumentException()),
+                enzyme(Identifier.of(enzymeId),""),
+                (page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );
     }

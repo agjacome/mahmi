@@ -15,7 +15,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
 @Data public final class MetaGenomeProteins implements Entity<MetaGenomeProteins> {
 
-	private Identifier id;
+    private Identifier id;
     private MetaGenome metagenome;
     private Protein    protein;
     private long       counter;
@@ -39,7 +39,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
     }
 
     public static MetaGenomeProteins metagenomeProteins(
-    	final MetaGenome metagenome,
+        final MetaGenome metagenome,
         final Protein    protein,
         final long       counter
     ) {
