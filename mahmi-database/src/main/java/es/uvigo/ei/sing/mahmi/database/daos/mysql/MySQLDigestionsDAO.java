@@ -43,7 +43,11 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
             final Enzyme enzyme, final int start, final int count
         ) throws DAOException{
         val sql = sql(
-    			"select * " +
+    			"select DISTINCT digestion_id, " +
+    			"peptide_id, peptide_sequence, " +
+    			"protein_id, protein_sequence," +
+    			"enzyme_id, enzyme_name, " +
+    			"digestions.counter " +
                 "FROM " + TABLES + " NATURAL JOIN metagenome_proteins NATURAL JOIN projects" + 
                 " WHERE (? = 0 OR peptide_id = ?) AND "
                     + "(? = 0 OR enzyme_id = ?) AND "
