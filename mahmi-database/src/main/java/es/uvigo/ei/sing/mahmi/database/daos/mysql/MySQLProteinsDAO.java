@@ -66,6 +66,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         return read(statement).toCollection();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<Protein> search(
             final MetaGenome metagenome,
@@ -131,9 +132,10 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
 
     @Override
     public DB<PreparedStatement> prepareCount() {
-        return prepare("SELECT COUNT(protein_id) FROM proteins");
+        return prepare("SELECT COUNT(protein_hash) FROM proteins");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected DB<PreparedStatement> prepareInsert(final Protein protein) {
         val seq = protein.getSequence().toString();
@@ -150,6 +152,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         return sql("DELETE FROM proteins WHERE protein_id = ?", id);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected DB<PreparedStatement> prepareUpdate(final Protein protein) {
       val id  = protein.getId();

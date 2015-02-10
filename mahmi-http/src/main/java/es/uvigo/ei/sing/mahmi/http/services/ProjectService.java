@@ -3,6 +3,7 @@ package es.uvigo.ei.sing.mahmi.http.services;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.*;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -67,7 +68,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            () -> dao.search(Project.project(Identifier.empty(),name,repo), (page - 1) * size, size),
+            () -> dao.search(project(Identifier.empty(),name,repo), (page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );
     }

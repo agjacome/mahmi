@@ -56,6 +56,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
 
         return read(statement).toOption();
     }
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<MetaGenomeProteins> search(
     		final Protein protein,final MetaGenome mg,
@@ -126,7 +127,11 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     	val proteinId = metagenomeProteins.getProtein().getId();
 
         return sql(
-            "SELECT * FROM " + TABLES + " WHERE metagenome_id = ? AND protein_id = ? LIMIT 1",
+            "SELECT metagenome_proteins_id,"
+            + " metagenome_id,"
+            + " project_id, project_name, project_repository,"
+            + " protein_id, protein_sequence"
+            + " counter FROM " + TABLES + " WHERE metagenome_id = ? AND protein_id = ? LIMIT 1",
             metagenomeId,proteinId
         );
     }
@@ -134,7 +139,11 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     @Override
     protected DB<PreparedStatement> prepareSelect(final Identifier id) {
         return sql(
-            "SELECT * FROM " + TABLES + " WHERE metagenome_proteins_id = ? LIMIT 1", id
+            "SELECT metagenome_proteins_id,"
+            + " metagenome_id,"
+            + " project_id, project_name, project_repository,"
+            + " protein_id, protein_sequence"
+            + " counter FROM " + TABLES + " WHERE metagenome_proteins_id = ? LIMIT 1", id
         );
     }
 
@@ -213,7 +222,12 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
         final int        count
     ) throws DAOException {
         val sql = sql(
-            "SELECT * FROM " + TABLES + " WHERE " + columnName + " = ? ORDER BY metagenome_proteins_id LIMIT ? OFFSET ?",
+            "SELECT metagenome_proteins_id,"
+                    + " metagenome_id,"
+                    + " project_id, project_name, project_repository,"
+                    + " protein_id, protein_sequence"
+                    + " counter"
+            + " FROM " + TABLES + " WHERE " + columnName + " = ? ORDER BY protein_id LIMIT ? OFFSET ?",
             id
         ).bind(integer(2, count)).bind(integer(3, start));
 

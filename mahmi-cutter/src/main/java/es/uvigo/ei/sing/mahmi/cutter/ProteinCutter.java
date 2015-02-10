@@ -121,6 +121,7 @@ public final class ProteinCutter {
     }
 
 
+    @SuppressWarnings("deprecation")
     private org.expasy.mzjava.proteomics.mol.Protein toMzProtein(
         final AminoAcidSequence sequence
     ) {

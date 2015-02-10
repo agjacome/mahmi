@@ -3,6 +3,8 @@ package es.uvigo.ei.sing.mahmi.http.services;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,8 +26,6 @@ import javax.ws.rs.core.Response;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
-import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
-import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
@@ -74,8 +74,8 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            () -> dao.search(MetaGenome.metagenome(Identifier.of(metagenomeId),
-            		Project.project(Identifier.of(projectId),projectName,projectRepo),
+            () -> dao.search(metagenome(Identifier.of(metagenomeId),
+            		project(Identifier.of(projectId),projectName,projectRepo),
             		Fasta.empty()),
             		AminoAcidSequence.fromString(sequence).orThrow(new IllegalArgumentException()),
             		(page - 1) * size, size),

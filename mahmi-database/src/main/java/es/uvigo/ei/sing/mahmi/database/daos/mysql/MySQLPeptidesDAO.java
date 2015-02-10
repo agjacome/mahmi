@@ -66,6 +66,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<Peptide> search(
     		final Protein protein,
@@ -136,9 +137,10 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
 
     @Override
     public DB<PreparedStatement> prepareCount() {
-        return prepare("SELECT COUNT(peptide_id) FROM peptides");
+        return prepare("SELECT COUNT(peptide_hash) FROM peptides");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected DB<PreparedStatement> prepareInsert(final Peptide peptide) {
         val seq = peptide.getSequence().toString();
@@ -155,6 +157,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         return sql("DELETE FROM peptides WHERE peptide_id = ?", id);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected DB<PreparedStatement> prepareUpdate(final Peptide peptide) {
       val id  = peptide.getId();

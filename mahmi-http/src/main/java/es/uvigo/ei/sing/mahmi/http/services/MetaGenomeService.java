@@ -1,5 +1,6 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
@@ -24,7 +25,6 @@ import javax.ws.rs.core.Response;
 
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
-import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 
@@ -57,7 +57,7 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            ()  -> dao.search(Project.project(Identifier.of(projectId),
+            ()  -> dao.search(project(Identifier.of(projectId),
             			      projectName,
             			      projectRepo),
             			      (page - 1) * size, size),

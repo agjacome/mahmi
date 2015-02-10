@@ -46,20 +46,17 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
         return new MySQLDigestionsDAO(pool);
     }
 
-    
+    @SuppressWarnings("deprecation")
     @Override
     public Collection<Digestion> search(
             final Protein protein, final MetaGenome mg, final Peptide peptide,
             final Enzyme enzyme, final int start, final int count
         ) throws DAOException{
-    	val sql = sql(
-    			"select metagenome_proteins_id,"
-    		        + " metagenome_id,"
-    		        + " project_id, project_name, project_repository,"
-    		        + " protein_id, protein_sequence,"
-    	            + " counter " +
-                "FROM digestions NATURAL JOIN peptides NATURAL JOIN metagenomes_proteins NATURAL JOIN projects" + TABLES + 
+        val sql = sql(
+    			"select * " +
+                "FROM " + TABLES + " NATURAL JOIN metagenome_proteins NATURAL JOIN projects" + 
                 " WHERE (? = 0 OR peptide_id = ?) AND "
+                    + "(? = 0 OR enzyme_id = ?) AND "
                     + "(? = 0 OR protein_id = ?) AND "
                     + "(? = 0 OR metagenome_id = ?) AND "
                     + "(? = 0 OR project_id = ?) AND "
@@ -67,17 +64,19 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
 	                + "(? = '' OR project_repository = ?) AND "
 	                + "(? = '' OR peptide_hash = ?) "+
                 "ORDER BY peptide_id LIMIT ? OFFSET ?",
+                peptide.getId(),peptide.getId(),
+                enzyme.getId(),enzyme.getId(),
                 protein.getId(),protein.getId(),
                 mg.getId(),mg.getId(),
                 mg.getProject().getId(),mg.getProject().getId()
-            ).bind(string(7,mg.getProject().getName()))
-             .bind(string(8,mg.getProject().getName()))
-             .bind(string(9,mg.getProject().getRepository()))
-             .bind(string(10,mg.getProject().getRepository()))
-             .bind(string(11,peptide.getSequence().toString()))
-             .bind(string(12,peptide.getSHA1().asHexString()))
-             .bind(integer(13, count))
-             .bind(integer(14, start));
+            ).bind(string(11,mg.getProject().getName()))
+             .bind(string(12,mg.getProject().getName()))
+             .bind(string(13,mg.getProject().getRepository()))
+             .bind(string(14,mg.getProject().getRepository()))
+             .bind(string(15,peptide.getSequence().toString()))
+             .bind(string(16,peptide.getSHA1().asHexString()))
+             .bind(integer(17, count))
+             .bind(integer(18, start));
             
             val statement = sql.bind(query).bind(get);
             return read(statement).toCollection();    
