@@ -129,7 +129,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     @POST
     @Path("/digest")
     public Response digest(final CutProteinsWrapper toDigest) {
-        // FIXME: uglyness
+        // TODO: clean-up
         try {
             val project = toDigest.getProject();
             val enzymes = toDigest.getEnzymes();

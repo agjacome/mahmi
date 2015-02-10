@@ -116,7 +116,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     @POST
     @Path("/load")
     public Response load(final LoadProjectWrapper toLoad) {
-        // FIXME: uglyness
+        // TODO: clean-up
         try {
 
             val project = toLoad.getProject();

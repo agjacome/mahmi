@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>mahmi-aligner</module>
         <module>mahmi-common</module>
         <module>mahmi-cutter</module>
         <module>mahmi-database</module>
