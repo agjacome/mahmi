@@ -1,14 +1,15 @@
 package es.uvigo.ei.sing.mahmi.database.utils;
 
 import static es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter.fastaWriter;
-import static es.uvigo.ei.sing.mahmi.database.utils.IOExtensionMethods.pipeToInput;
 import static fj.P.lazy;
 import static fj.data.Array.array;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.text.MessageFormat.format;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -121,17 +122,10 @@ public final class FunctionalJDBC {
     ) {
         final FastaWriter<A> writer = fastaWriter();
 
-        // TODO: so exceptions, such try, wow
         return statement -> db(connection -> {
-            try {
-                statement.setBlob(index, pipeToInput(os -> {
-                    try {
-                        writer.toOutput(fasta, os);
-                    } catch (final IOException ioe) {
-                        throw new RuntimeException(ioe);
-                    }
-                }));
-
+            try (val stringWriter = new BufferedWriter(new StringWriter())) {
+                writer.toWriter(fasta, stringWriter);
+                statement.setString(index, writer.toString());
                 return statement;
             } catch (final RuntimeException | IOException e) {
                 throw error("Error while binding fasta to DB");

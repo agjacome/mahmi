@@ -19,13 +19,13 @@ public interface PeptidesDAO extends DAO<Peptide> {
         final Protein protein, final int start, final int count
     ) throws DAOException;
 
-
     public Collection<Peptide> search(
-		final Protein protein,
-    	final MetaGenome metagenome, 
+        final Protein           protein,
+        final MetaGenome        metagenome,
         final AminoAcidSequence sequence,
-        final Enzyme enzyme,
-    	final int start, final int count
-    ) throws DAOException;    
+        final Enzyme            enzyme,
+        final int               start,
+        final int               count
+    ) throws DAOException;
 
 }

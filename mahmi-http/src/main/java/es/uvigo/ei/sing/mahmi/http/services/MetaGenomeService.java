@@ -50,17 +50,16 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     @GET
     @Path("/search")
     public Response search(
-    	@QueryParam("projectId") @DefaultValue("0") final int projectId,
-    	@QueryParam("projectName") @DefaultValue("") final String projectName,
-    	@QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
+        @QueryParam("projectId") @DefaultValue("0") final int projectId,
+        @QueryParam("projectName") @DefaultValue("") final String projectName,
+        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            ()  -> dao.search(project(Identifier.of(projectId),
-            			      projectName,
-            			      projectRepo),
-            			      (page - 1) * size, size),
+           ()  -> dao.search(
+                project(Identifier.of(projectId), projectName, projectRepo),
+                (page - 1) * size, size),
             mgs -> status(OK).entity(toGenericEntity(mgs))
         );
     }

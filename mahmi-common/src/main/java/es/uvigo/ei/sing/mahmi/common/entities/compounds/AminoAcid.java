@@ -9,6 +9,7 @@ import static fj.function.Characters.toUpperCase;
 import java.util.EnumSet;
 
 import lombok.Getter;
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
 import fj.data.HashMap;
 import fj.data.Option;
 
@@ -44,7 +45,8 @@ public enum AminoAcid implements Compound {
     XLE("Leucine or isoleucine"      , 'J'),
     XAA("Unknown"                    , 'X');
 
-    private static final HashMap<Character, AminoAcid> codes = HashMap.from(
+    @VisibleForTesting
+    static final HashMap<Character, AminoAcid> codes = HashMap.from(
         iterableStream(EnumSet.allOf(AminoAcid.class)).map(aa -> p(aa.code, aa)).cons(p('*', XAA)),
         charEqual.comap(toUpperCase),
         charHash.comap(toUpperCase)

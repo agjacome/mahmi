@@ -10,6 +10,7 @@ import java.util.EnumSet;
 
 import lombok.Getter;
 import lombok.val;
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
 import fj.data.HashMap;
 import fj.data.Option;
 
@@ -23,7 +24,8 @@ public enum Nucleobase implements Compound {
     U("Uracil"  , 'U'),
     N("Unknown" , 'N');
 
-    private static final HashMap<Character, Nucleobase> codes;
+    @VisibleForTesting
+    static final HashMap<Character, Nucleobase> codes;
 
     static {
         val all = iterableStream(EnumSet.allOf(Nucleobase.class));

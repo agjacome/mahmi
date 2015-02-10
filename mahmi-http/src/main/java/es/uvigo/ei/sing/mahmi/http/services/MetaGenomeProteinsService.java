@@ -101,15 +101,12 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
-    	return respond(
-                ()  -> dao.search(protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
-                				  metagenome(Identifier.of(metagenomeId), 
-                						  		        project(Identifier.of(projectId),
-                						  		                projectName,
-                						  		                projectRepo), 
-                							                    Fasta.empty()),
-                			      (page - 1) * size, 
-                			      size),
+          return respond(()  ->
+                dao.search(
+                    protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
+                    metagenome(Identifier.of(metagenomeId), project(Identifier.of(projectId), projectName, projectRepo), Fasta.empty()),
+                    (page - 1) * size,  size
+                ),
                 mgps -> status(OK).entity(toGenericEntity(mgps))
             );
     }

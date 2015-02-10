@@ -4,17 +4,7 @@ import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
 import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
 import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.longInt;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseAASequence;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseLong;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -80,9 +70,9 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
             
             val statement = sql.bind(query).bind(get);
             return read(statement).toCollection();    
-    }
+    }   
     
-    
+
     @Override
     public Option<Digestion> get(
         final Enzyme enzyme, final Protein protein, final Peptide peptide

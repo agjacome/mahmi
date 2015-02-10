@@ -1,13 +1,7 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,9 +34,10 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
         final Project project, final int start, final int count
     ) throws DAOException {
         val sql = sql(
-            "SELECT * FROM projects WHERE "
-            + "(? = '' OR project_name = ?) AND (? = '' OR project_repository = ?) ORDER BY project_id LIMIT ? OFFSET ?",
-            project.getName(), project.getName(), 
+            "SELECT * FROM projects WHERE " +
+            "(? = '' OR project_name = ?) AND (? = '' OR project_repository = ?) " +
+            "ORDER BY project_id LIMIT ? OFFSET ?",
+            project.getName(), project.getName(),
             project.getRepository(), project.getRepository()
         ).bind(integer(5, count)).bind(integer(6, start));
 
@@ -72,7 +67,7 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
 
     @Override
     public DB<PreparedStatement> prepareCount() {
-    	return prepare("SELECT COUNT(project_id) FROM projects");
+        return prepare("SELECT COUNT(project_id) FROM projects");
     }
 
     @Override

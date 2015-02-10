@@ -102,7 +102,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     @GET
     @Path("/search")
     public Response search(
-    	@QueryParam("peptideID") @DefaultValue("0") final int peptideId,
+        @QueryParam("peptideID") @DefaultValue("0") final int peptideId,
         @QueryParam("peptideSeq") @DefaultValue("") final String peptideSeq,
         @QueryParam("enzymeID")  @DefaultValue("0") final int enzymeId,
         @QueryParam("proteinID") @DefaultValue("0") final int proteinId,
@@ -113,6 +113,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
+
     	return respond(
                 () -> dao.search(protein(Identifier.of(proteinId),
                 		AminoAcidSequence.empty()),
@@ -122,6 +123,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
                         peptide(Identifier.of(peptideId),AminoAcidSequence.fromString(peptideSeq).some()),
                 		enzyme(Identifier.of(enzymeId),""),
                 		(page - 1) * size, size),
+
                 ds -> status(OK).entity(toGenericEntity(ds))
             );
     }
@@ -129,7 +131,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     @POST
     @Path("/digest")
     public Response digest(final CutProteinsWrapper toDigest) {
-        // FIXME: uglyness
+        // TODO: clean-up
         try {
             val project = toDigest.getProject();
             val enzymes = toDigest.getEnzymes();

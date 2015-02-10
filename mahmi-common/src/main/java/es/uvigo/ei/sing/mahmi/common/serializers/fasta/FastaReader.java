@@ -1,15 +1,18 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
 import static fj.P.lazy;
-import static fj.data.Stream.iterableStream;
+import static fj.data.Option.none;
+import static fj.data.Option.some;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AllArgsConstructor;
@@ -49,54 +52,84 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
         );
     }
 
-
     public Fasta<A> fromPath(final Path path) throws IOException {
-        return fromFile(path.toFile());
-    }
-
-    public Fasta<A> fromFile(final File file) throws IOException {
-        return fromInput(new FileInputStream(file));
+        return fromReader(Files.newBufferedReader(path));
     }
 
     public Fasta<A> fromInput(final InputStream input) throws IOException {
-        try (val reader = new BufferedReader(new InputStreamReader(input))) {
+        return fromReader(new BufferedReader(new InputStreamReader(
+            input, StandardCharsets.UTF_8
+        )));
+    }
 
-            val sequences   = new java.util.LinkedList<A>();
-            val lineCounter = new AtomicInteger();
+    public Fasta<A> fromReader(final BufferedReader reader) throws IOException {
+        return Fasta.of(new Iterator<A>() {
 
-            String line;
-            A sequence = monoid.zero();
+            private final AtomicInteger line = new AtomicInteger(1);
 
-            while ((line = reader.readLine()) != null) {
-                final int lineNumber = lineCounter.incrementAndGet();
-                line = line.trim();
+            private Option<A> sequence = getNextSequence(
+                reader, line.incrementAndGet()
+            );
 
-                sequence = line.startsWith(">")
-                    ? addSequence(sequences, sequence)
-                    : appendLine(sequence, line, lineNumber);
+            @Override
+            public boolean hasNext() {
+                val hasNext = sequence.isSome();
+
+                try {
+                    if (!hasNext) reader.close();
+                } catch (final IOException ioe) {
+                    log.error("Error while closing Fasta reader", ioe);
+                    throw new RuntimeException(ioe);
+                }
+
+                return hasNext;
             }
 
-            addSequence(sequences, sequence);
-            log.info("Parsed {} sequences from Fasta of {} lines", sequences.size(), lineCounter.get());
+            @Override
+            public A next() {
+                val toRet = sequence.orThrow(nextError(line.get()));
 
-            return Fasta.of(iterableStream(sequences));
-        }
+                try {
+                    sequence = getNextSequence(reader, line.incrementAndGet());
+                } catch (final IOException ioe) {
+                    log.error("Error while parsing Fasta input", ioe);
+                    sequence = none();
+                }
+
+                return toRet;
+            }
+
+        });
     }
 
-
-    private A addSequence(final java.util.List<A> list, final A seq) {
-        if (!seq.isEmpty()) list.add(seq);
-        return monoid.zero();
-    }
-
-    private A appendLine(
-        final A sequence, final String line, final int lineNumber
+    public Option<A> getNextSequence(
+        final BufferedReader reader, final int lineNumber
     ) throws IOException {
-        return monoid.sum(sequence, parse(line, lineNumber));
+        String line = null;
+        A sequence = monoid.zero();
+
+        while ((line = reader.readLine()) != null) {
+            if  (!line.startsWith(">"))
+                sequence = monoid.sum(sequence, parseLine(line, lineNumber));
+            else if (!sequence.isEmpty())
+                return some(sequence);
+        }
+
+        return Option.iif(!sequence.isEmpty(), sequence);
     }
 
-    private A parse(final String line, final int lineNumber) throws IOException {
-        return constructor.f(line).orThrow(parseError(line, lineNumber));
+    private A parseLine(
+        final String line, final int lineNumber
+    ) throws IOException {
+        return constructor.f(line.trim()).orThrow(
+            parseError(line, lineNumber)
+        );
+    }
+
+    private P1<NoSuchElementException> nextError(final int lineNumber) {
+        return lazy(u -> new NoSuchElementException(String.format(
+            "No more sequences found after line %d", lineNumber
+        )));
     }
 
     private P1<IOException> parseError(

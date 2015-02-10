@@ -1,9 +1,9 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.*;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -62,8 +62,8 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     @GET
     @Path("/search")
     public Response getName(
-    	@QueryParam("name") @DefaultValue("") final String name,
-    	@QueryParam("repo") @DefaultValue("") final String repo,
+        @QueryParam("name") @DefaultValue("") final String name,
+        @QueryParam("repo") @DefaultValue("") final String repo,
         @QueryParam("page") @DefaultValue("1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
@@ -116,7 +116,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     @POST
     @Path("/load")
     public Response load(final LoadProjectWrapper toLoad) {
-        // FIXME: uglyness
+        // TODO: clean-up
         try {
 
             val project = toLoad.getProject();

@@ -1,10 +1,9 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +25,7 @@ import javax.ws.rs.core.Response;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
@@ -66,19 +66,19 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
     @Path("/search")
     public Response getMetagenomeId(
         @QueryParam("metagenomeId") @DefaultValue("0") final int metagenomeId,
-    	@QueryParam("projectId") @DefaultValue("0") final int projectId,
-    	@QueryParam("projectName") @DefaultValue("") final String projectName,
-    	@QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
-    	@QueryParam("sequence") @DefaultValue("") final String sequence,
+        @QueryParam("projectId") @DefaultValue("0") final int projectId,
+        @QueryParam("projectName") @DefaultValue("") final String projectName,
+        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
+        @QueryParam("sequence") @DefaultValue("") final String sequence,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return respond(
-            () -> dao.search(metagenome(Identifier.of(metagenomeId),
-            		project(Identifier.of(projectId),projectName,projectRepo),
-            		Fasta.empty()),
-            		AminoAcidSequence.fromString(sequence).orThrow(new IllegalArgumentException()),
-            		(page - 1) * size, size),
+                () -> dao.search(MetaGenome.metagenome(Identifier.of(metagenomeId),
+                project(Identifier.of(projectId),projectName,projectRepo),
+                Fasta.empty()),
+                AminoAcidSequence.fromString(sequence).orThrow(new IllegalArgumentException()),
+                (page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );
     }
