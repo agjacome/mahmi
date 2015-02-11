@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,15 +42,15 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
     public void toOutput(
         final Fasta<A> fasta, final OutputStream outputStream
     ) throws IOException{
-        toWriter(fasta, new BufferedWriter(new OutputStreamWriter(
+        toWriter(fasta, new OutputStreamWriter(
             outputStream, StandardCharsets.UTF_8
-        )));
+        ));
     }
 
     public void toWriter(
-        final Fasta<A> fasta, final BufferedWriter buffWriter
+        final Fasta<A> fasta, final Writer w
     ) throws IOException {
-        try (val writer = buffWriter) {
+        try (val writer = new BufferedWriter(w)) {
 
             for (final A sequence : fasta) {
                 writeHeader(writer, sequence);

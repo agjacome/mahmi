@@ -62,6 +62,7 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
         )));
     }
 
+    // FIXME: receive a "Reader", and create the "BufferedReader" internally
     public Fasta<A> fromReader(final BufferedReader reader) throws IOException {
         return Fasta.of(new Iterator<A>() {
 
