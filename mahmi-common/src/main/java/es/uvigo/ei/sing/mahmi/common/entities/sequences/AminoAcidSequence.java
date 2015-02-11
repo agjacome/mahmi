@@ -1,47 +1,41 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
 import static fj.Monoid.monoid;
+import static fj.data.Option.none;
+import static fj.data.Option.some;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
 import fj.Monoid;
-import fj.data.List;
 import fj.data.Option;
+import fj.data.Seq;
 
-@Value(staticConstructor = "fromList")
-public final class AminoAcidSequence implements CompoundSequence<AminoAcid> {
+@Value(staticConstructor = "fromSeq")
+@EqualsAndHashCode(callSuper = false)
+public final class AminoAcidSequence extends CompoundSequence<AminoAcid> {
 
     public static final Monoid<AminoAcidSequence> monoid =
-        monoid(a1 -> a2 -> fromList(a1.residues.append(a2.residues)), empty());
+        monoid(a1 -> a2 -> fromSeq(a1.residues.append(a2.residues)), empty());
 
-    private final List<AminoAcid> residues;
+    private final Seq<AminoAcid> residues;
 
     public static AminoAcidSequence empty() {
-        return fromList(List.nil());
+        return fromSeq(Seq.empty());
     }
 
     public static Option<AminoAcidSequence> fromString(
         final String sequence
     ) {
-        val seq = List.fromString(sequence).map(AminoAcid::fromCode);
-        return Option.sequence(seq).map(AminoAcidSequence::fromList);
-    }
+        Seq<AminoAcid> seq = Seq.empty();
 
-    /**
-     * <p>
-     * Please, use <code>CompoundSequence.show</code> or create the String
-     * directly through
-     * <code>List.asString(aas.getResidues().map(Compound::getCode))</code>.
-     * </p>
-     *
-     * <p>
-     * <strong>Never ever again rely on toString.</strong>
-     * </p>
-     */
-    @Override
-    @Deprecated
-    public String toString() {
-        return show.showS(this);
+        for (val code : sequence.toCharArray()) {
+            val aa = AminoAcid.fromCode(code);
+            if (aa.isNone()) return none();
+            else seq = seq.snoc(aa.some());
+        }
+
+        return some(fromSeq(seq));
     }
 
 }

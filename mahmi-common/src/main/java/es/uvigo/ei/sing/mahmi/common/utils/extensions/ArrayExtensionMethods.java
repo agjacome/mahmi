@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.common.utils;
+package es.uvigo.ei.sing.mahmi.common.utils.extensions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ArrayUtils {
+public final class ArrayExtensionMethods {
 
     public static Boolean[ ] box(final boolean ... xs) {
         val result = new Boolean[xs.length];

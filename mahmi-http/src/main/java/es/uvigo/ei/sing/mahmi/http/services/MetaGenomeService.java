@@ -6,10 +6,6 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -28,6 +24,7 @@ import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
+import fj.data.Set;
 
 @Path("/metagenome")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -94,12 +91,6 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
         return buildInsert(metaGenome);
     }
 
-    @POST
-    @Path("/all")
-    public Response insertAll(final Set<MetaGenome> metaGenomes) {
-        return buildInsertAll(metaGenomes);
-    }
-
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") final int id) {
@@ -111,15 +102,17 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     public Response update(
         @PathParam("id") final int id, final MetaGenome metaGenome
     ) {
-        val toUpdate = metaGenome.setId(Identifier.of(id));
+        val toUpdate = metaGenome.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
     @Override
-    protected GenericEntity<List<MetaGenome>> toGenericEntity(
-        final Collection<MetaGenome> metaGenomes
+    protected GenericEntity<java.util.List<MetaGenome>> toGenericEntity(
+        final Set<MetaGenome> metaGenomes
     ) {
-        return new GenericEntity<List<MetaGenome>>(newArrayList(metaGenomes)){};
+        return new GenericEntity<java.util.List<MetaGenome>>(
+            newArrayList(metaGenomes)
+        ) { };
     }
 
 }

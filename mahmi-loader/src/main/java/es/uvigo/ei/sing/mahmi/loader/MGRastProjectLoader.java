@@ -1,35 +1,35 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.combine;
 import static fj.P.p;
-import static java.util.Objects.isNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import fj.P2;
+import fj.data.Stream;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class MGRastProjectLoader implements ProjectLoader {
 
-    private static final FastaReader<NucleobaseSequence>       genomeReader  = FastaReader.forNucleobase();
-    private static final FastaReader<AminoAcidSequence> proteinReader = FastaReader.forAminoAcid();
+    private static final FastaReader<NucleobaseSequence> genomeReader  = FastaReader.forNucleobase();
+    private static final FastaReader<AminoAcidSequence>  proteinReader = FastaReader.forAminoAcid();
 
     public static ProjectLoader mgRastLoader() {
         return new MGRastProjectLoader();
@@ -47,7 +47,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
         val genomeFiles  = findFiles(projectPath, match("*.fna"));
         val proteinFiles = findFiles(projectPath, match("*.faa"));
 
-        return combine(genomeFiles, proteinFiles).stream();
+        return genomeFiles.zip(proteinFiles);
     }
 
     private P2<Fasta<NucleobaseSequence>, Fasta<AminoAcidSequence>> readFastas(
@@ -72,30 +72,17 @@ public final class MGRastProjectLoader implements ProjectLoader {
         }
     }
 
-    private List<Path> findFiles(
+    private Stream<Path> findFiles(
         final Path directory, final PathMatcher filePattern
     ) {
-        return findFiles(directory, filePattern, new LinkedList<Path>());
-    }
-
-    private List<Path> findFiles(
-        final Path        directory,
-        final PathMatcher filePattern,
-        final List<Path>  accumulator
-    ) {
-        final File[ ] files = directory.toFile().listFiles();
-        if (isNull(files)) return accumulator;
-
-        for (val file : files) {
-            val path = file.toPath();
-
-            if (file.isDirectory())
-                findFiles(path, filePattern, accumulator);
-            else if (filePattern.matches(path.getFileName()))
-                accumulator.add(path);
+        try {
+            return Files.walk(directory).filter(
+                path -> filePattern.matches(path.getFileName())
+            ).collect(Collectors.toList()).toStream();
+        } catch (final IOException ioe) {
+            log.error("I/O error while searching Fasta files", ioe);
+            throw LoaderException.withCause(ioe);
         }
-
-        return accumulator;
     }
 
     private PathMatcher match(final String pattern) {

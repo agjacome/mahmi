@@ -6,6 +6,6 @@ public interface Entity<A extends Entity<?>> {
 
     public Identifier getId();
 
-    public A setId(final Identifier id);
+    public A withId(final Identifier id);
 
 }

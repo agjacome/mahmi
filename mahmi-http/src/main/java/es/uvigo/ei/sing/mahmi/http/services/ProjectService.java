@@ -1,14 +1,13 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static fj.Ord.stringOrd;
+import static fj.data.Set.iterableSet;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.*;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -31,6 +30,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.LoadProjectWrapper;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
+import fj.data.Set;
 
 @Slf4j
 @Path("/project")
@@ -94,8 +94,9 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
 
     @POST
     @Path("/all")
-    public Response insertAll(final Set<Project> projects) {
-        return buildInsertAll(projects);
+    public Response insertAll(final java.util.List<Project> projects) {
+        val ord = stringOrd.comap(Project::getName);
+        return buildInsertAll(iterableSet(ord, projects));
     }
 
     @DELETE
@@ -109,7 +110,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     public Response update(
         @PathParam("id") final int id, final Project project
     ) {
-        val toUpdate = project.setId(Identifier.of(id));
+        val toUpdate = project.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
@@ -140,10 +141,12 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     }
 
     @Override
-    protected GenericEntity<List<Project>> toGenericEntity(
-        final Collection<Project> projects
+    protected GenericEntity<java.util.List<Project>> toGenericEntity(
+        final Set<Project> projects
     ) {
-        return new GenericEntity<List<Project>>(newArrayList(projects)) { };
+        return new GenericEntity<java.util.List<Project>>(
+            newArrayList(projects)
+        ) { };
     }
 
 }

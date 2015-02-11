@@ -1,35 +1,39 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.toCollection;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 import static fj.data.List.iterableList;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Set;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.Entity;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAO;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import fj.F;
+import fj.Ord;
 import fj.control.db.DB;
 import fj.data.List;
 import fj.data.Option;
+import fj.data.Set;
 import fj.function.Try0;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@ExtensionMethod(IterableExtensionMethods.class)
 abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
 
     protected final ConnectionPool connectionPool;
+
+    protected final Ord<A> ordering = Identifier.ord.comap(A::getId);
 
     protected final F<ResultSet, DB<List<A>>> get = getWith(this::parse);
 
@@ -46,11 +50,11 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
     }
 
     @Override
-    public Collection<A> getAll(
+    public Set<A> getAll(
         final int start, final int count
     ) throws DAOException {
         val sql = prepareSelect(count, start).bind(query).bind(get);
-        return read(sql).toCollection();
+        return read(sql).toSet(ordering);
     }
 
     @Override
@@ -59,9 +63,9 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
     }
 
     @Override
-    public Collection<A> insertAll(final Set<A> entities) throws DAOException {
+    public Set<A> insertAll(final Set<A> entities) throws DAOException {
         val sql = sequence(iterableList(entities).map(this::getOrInsert));
-        return toCollection(write(sql));
+        return write(sql).toSet(ordering);
     }
 
     @Override
@@ -90,7 +94,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
             .bind(query).bind(get).map(List::toOption);
 
         val insert = prepareInsert(entity)
-            .bind(update).bind(key).map(entity::setId);
+            .bind(update).bind(key).map(entity::withId);
 
         return exists.bind(a -> a.option(insert, DB::unit));
     }

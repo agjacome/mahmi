@@ -10,7 +10,7 @@ public final class PendingImplementationException extends UnsupportedOperationEx
 
     private static final long serialVersionUID = 1L;
 
-    public static PendingImplementationException notYetImplemented =
+    public static final PendingImplementationException notYetImplemented =
         new PendingImplementationException("Not yet implemented!");
 
     private PendingImplementationException(final String message) {

@@ -23,7 +23,7 @@ public final class Fasta<A extends CompoundSequence<? extends Compound>> impleme
     }
 
     public Stream<A> toStream() {
-        return Stream.iterableStream(this);
+        return Stream.iterableStream(() -> sequences);
     }
 
 }

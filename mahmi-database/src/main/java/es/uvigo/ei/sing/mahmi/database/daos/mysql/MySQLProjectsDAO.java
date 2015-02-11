@@ -6,16 +6,19 @@ import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import fj.control.db.DB;
+import fj.data.Set;
 
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements ProjectsDAO {
 
     private MySQLProjectsDAO(final ConnectionPool connectionPool) {
@@ -30,7 +33,7 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
 
 
     @Override
-    public Collection<Project> search(
+    public Set<Project> search(
         final Project project, final int start, final int count
     ) throws DAOException {
         val sql = sql(
@@ -42,7 +45,7 @@ public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements
         ).bind(integer(5, count)).bind(integer(6, start));
 
         val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
     @Override

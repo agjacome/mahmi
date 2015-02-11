@@ -1,7 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.utils.extensions;
 
-import static java.util.concurrent.CompletableFuture.allOf;
-
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
@@ -11,10 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FutureExtensionMethods {
 
-    public static CompletableFuture<Void> sequenceFutures(
+    public static CompletableFuture<Void> sequence(
         final Collection<CompletableFuture<Void>> futures
     ) {
-        return allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
+        return CompletableFuture.allOf(
+            futures.toArray(new CompletableFuture<?>[futures.size()])
+        );
     }
 
 }

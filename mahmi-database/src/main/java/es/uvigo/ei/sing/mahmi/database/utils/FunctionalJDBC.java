@@ -32,11 +32,10 @@ import fj.control.db.DB;
 import fj.control.db.DbState;
 import fj.data.List;
 import fj.data.List.Buffer;
-import fj.data.Option;
 import fj.function.Try1;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod(OptionExtensionMethods.class)
 public final class FunctionalJDBC {
 
     public static <A> A runReadOnly(

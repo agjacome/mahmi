@@ -5,20 +5,20 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Wither;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@EqualsAndHashCode(exclude = "id")
+@Getter @Wither
 @AllArgsConstructor(staticName = "metagenomeProteins")
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-@Data public final class MetaGenomeProteins implements Entity<MetaGenomeProteins> {
+public final class MetaGenomeProteins implements Entity<MetaGenomeProteins> {
 
-    private Identifier id;
-    private MetaGenome metagenome;
-    private Protein    protein;
-    private long       counter;
+    private final Identifier id;
+    private final MetaGenome metagenome;
+    private final Protein    protein;
+    private final long       counter;
 
     @VisibleForJAXB public MetaGenomeProteins() {
         this(Identifier.empty(), new MetaGenome(), new Protein(), 0L);

@@ -10,10 +10,6 @@ import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.*;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -29,19 +25,25 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.CutProteinsWrapper;
+import fj.data.Set;
 
 @Slf4j
 @Path("/digestion")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class })
 public final class DigestionService extends DatabaseEntityAbstractService<Digestion, DigestionsDAO> {
 
     private final ProteinCutterController cutter;
@@ -78,12 +80,6 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
         return buildInsert(digestion);
     }
 
-    @POST
-    @Path("/all")
-    public Response insertAll(final Set<Digestion> digestions) {
-        return buildInsertAll(digestions);
-    }
-
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") final int id) {
@@ -95,7 +91,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     public Response update(
         @PathParam("id") final int id, final Digestion digestion
     ) {
-        val toUpdate = digestion.setId(Identifier.of(id));
+        val toUpdate = digestion.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
@@ -113,19 +109,16 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
         @QueryParam("page")    @DefaultValue( "1") final int page,
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
-
-    	return respond(
-                () -> dao.search(protein(Identifier.of(proteinId),
-                		AminoAcidSequence.empty()),
-                		metagenome(Identifier.of(metagenomeId),
-                		project(Identifier.of(projectId),projectName,projectRepo),
-                		Fasta.empty()),
-                        peptide(Identifier.of(peptideId),AminoAcidSequence.fromString(peptideSeq).some()),
-                		enzyme(Identifier.of(enzymeId),""),
-                		(page - 1) * size, size),
-
-                ds -> status(OK).entity(toGenericEntity(ds))
-            );
+        return respond(() -> dao.search(
+            protein(Identifier.of(proteinId),
+            AminoAcidSequence.empty()),
+            metagenome(Identifier.of(metagenomeId),
+            project(Identifier.of(projectId),projectName,projectRepo),
+            Fasta.empty()),
+            peptide(Identifier.of(peptideId),AminoAcidSequence.fromString(peptideSeq).some()),
+            enzyme(Identifier.of(enzymeId),""),
+            (page - 1) * size, size
+        ), ds -> status(OK).entity(toGenericEntity(ds)));
     }
 
     @POST
@@ -139,7 +132,9 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
             val maxSize = toDigest.getMaxSize();
 
             val future = cutter.cutProjectProteins(
-                project, enzymes, between(minSize, maxSize)
+                project,
+                enzymes.toSet(Enzyme.hash.toOrd()),
+                between(minSize, maxSize)
             );
 
             future.exceptionally(err -> {
@@ -156,10 +151,12 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     }
 
     @Override
-    protected GenericEntity<List<Digestion>> toGenericEntity(
-        final Collection<Digestion> digestions
+    protected GenericEntity<java.util.List<Digestion>> toGenericEntity(
+        final Set<Digestion> digestions
     ) {
-        return new GenericEntity<List<Digestion>>(newArrayList(digestions)) { };
+        return new GenericEntity<java.util.List<Digestion>>(
+            newArrayList(digestions)
+        ) { };
     }
 
 }

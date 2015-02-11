@@ -1,25 +1,40 @@
 package es.uvigo.ei.sing.mahmi.common.entities;
 
+import static fj.Equal.p2Equal;
+import static fj.Equal.stringEqual;
+import static fj.Hash.p2Hash;
+import static fj.Hash.stringHash;
+import static fj.P.p;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Wither;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+import fj.Equal;
+import fj.Hash;
 
-@EqualsAndHashCode(exclude = "id")
+@Getter @Wither
 @AllArgsConstructor(staticName = "project")
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-@Data public final class Project implements Entity<Project> {
+public final class Project implements Entity<Project> {
 
-    private Identifier id;
-    private String     name;
-    private String     repository;
+    public static final Hash<Project> hash =
+        p2Hash(stringHash, stringHash).comap(p -> p(p.name, p.repository));
 
-    @VisibleForJAXB public Project() {
+    public static final Equal<Project> equal =
+        p2Equal(stringEqual, stringEqual).comap(p -> p(p.name, p.repository));
+
+    private final Identifier id;
+    private final String     name;
+    private final String     repository;
+
+    @VisibleForJAXB
+    public Project() {
         this(new Identifier(), "", "");
     }
 

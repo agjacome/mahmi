@@ -6,19 +6,22 @@ import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import fj.control.db.DB;
 import fj.data.Option;
+import fj.data.Set;
 
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements ProteinsDAO {
 
     private MySQLProteinsDAO(final ConnectionPool connectionPool) {
@@ -51,7 +54,7 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
     }
 
     @Override
-    public Collection<Protein> getByMetaGenome(
+    public Set<Protein> getByMetaGenome(
         final MetaGenome mg, final int start, final int count
     ) throws DAOException {
         val sql = sql(
@@ -63,12 +66,11 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         ).bind(integer(2, count)).bind(integer(3, start));
 
         val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public Collection<Protein> search(
+    public Set<Protein> search(
             final MetaGenome metagenome,
             final AminoAcidSequence sequence,
             final int start,
@@ -85,13 +87,13 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
             "ORDER BY protein_id LIMIT ? OFFSET ?",
             metagenome.getId(),  metagenome.getId(),
             metagenome.getProject().getId(), metagenome.getProject().getId()
-        ).bind(string(5, sequence.toString())).bind(string(6, sequence.toString()))
+        ).bind(string(5, sequence.asString())).bind(string(6, sequence.asString()))
         .bind(string(7, metagenome.getProject().getName())).bind(string(8, metagenome.getProject().getName()))
         .bind(string(9, metagenome.getProject().getRepository())).bind(string(10, metagenome.getProject().getRepository()))
         .bind(integer(11, count)).bind(integer(12, start));
 
         val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
     @Override
@@ -135,11 +137,10 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         return prepare("SELECT COUNT(protein_hash) FROM proteins");
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected DB<PreparedStatement> prepareInsert(final Protein protein) {
-        val seq = protein.getSequence().toString();
         val sha = protein.getSHA1().asHexString();
+        val seq = protein.getSequence().asString();
 
         return sql(
             "INSERT INTO proteins (protein_hash, protein_sequence) VALUES (?, ?)",
@@ -152,11 +153,10 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
         return sql("DELETE FROM proteins WHERE protein_id = ?", id);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected DB<PreparedStatement> prepareUpdate(final Protein protein) {
       val id  = protein.getId();
-      val seq = protein.getSequence().toString();
+      val seq = protein.getSequence().asString();
       val sha = protein.getSHA1().asHexString();
 
       return sql(

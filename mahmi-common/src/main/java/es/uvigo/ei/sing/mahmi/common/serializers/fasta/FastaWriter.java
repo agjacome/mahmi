@@ -10,7 +10,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -22,8 +21,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 
 @AllArgsConstructor(staticName = "fastaWriter")
 public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
-
-    private static final int LINE_WIDTH = 80;
 
     public static FastaWriter<AminoAcidSequence> forAminoAcid() {
         return new FastaWriter<>();
@@ -51,13 +48,11 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
         final Fasta<A> fasta, final Writer w
     ) throws IOException {
         try (val writer = new BufferedWriter(w)) {
-
             for (final A sequence : fasta) {
                 writeHeader(writer, sequence);
                 writeSequence(writer, sequence);
-                writer.flush();
             }
-
+            writer.flush();
         }
     }
 
@@ -71,14 +66,7 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
     private void writeSequence(
         final BufferedWriter writer, final A sequence
     ) throws IOException {
-        val counter = new AtomicInteger();
-
-        for (val residue : sequence.getResidues()) {
-            writer.append(residue.getCode());
-            if (counter.incrementAndGet() % LINE_WIDTH == 0)
-                writer.append(lineSeparator());
-        }
-
+        writer.append(sequence.asString());
         writer.append(lineSeparator());
     }
 

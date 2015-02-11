@@ -1,16 +1,35 @@
 package es.uvigo.ei.sing.mahmi.common.utils;
 
+import static fj.Equal.longEqual;
+import static fj.Equal.optionEqual;
+import static fj.Hash.longHash;
+import static fj.Hash.optionHash;
+import static fj.Ord.longOrd;
+import static fj.Ord.optionOrd;
 import static fj.data.Natural.natural;
 import static fj.data.Option.none;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+import fj.Equal;
+import fj.Hash;
+import fj.Ord;
 import fj.data.Natural;
 import fj.data.Option;
 
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Value public final class Identifier {
+public final class Identifier {
+
+    public static final Hash<Identifier> hash =
+        optionHash(longHash.comap(Natural::longValue)).comap(Identifier::getValue);
+
+    public static final Equal<Identifier> equal =
+        optionEqual(longEqual.comap(Natural::longValue)).comap(Identifier::getValue);
+
+    public static final Ord<Identifier> ord =
+        optionOrd(longOrd.comap(Natural::longValue)).comap(Identifier::getValue);
 
     private final Option<Natural> value;
 

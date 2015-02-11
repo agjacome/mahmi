@@ -9,21 +9,24 @@ import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
 import fj.control.db.DB;
 import fj.data.Option;
+import fj.data.Set;
 
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenomeProteins> implements MetaGenomeProteinsDAO {
 
     private static final String TABLES = "metagenome_proteins NATURAL JOIN projects NATURAL JOIN proteins ";
@@ -46,9 +49,9 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
 
         return read(statement).toOption();
     }
-    @SuppressWarnings("deprecation")
+
     @Override
-    public Collection<MetaGenomeProteins> search(
+    public Set<MetaGenomeProteins> search(
         final Protein protein,final MetaGenome mg,
         final int start, final int count
     ) throws DAOException{
@@ -69,17 +72,17 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
              .bind(string(8,mg.getProject().getName()))
              .bind(string(9,mg.getProject().getRepository()))
              .bind(string(10,mg.getProject().getRepository()))
-             .bind(string(11,protein.getSequence().toString()))
+             .bind(string(11,protein.getSequence().asString()))
              .bind(string(12,protein.getSHA1().asHexString()))
              .bind(integer(13, count))
              .bind(integer(14, start));
 
             val statement = sql.bind(query).bind(get);
-            return read(statement).toCollection();
+            return read(statement).toSet(ordering);
     }
 
     @Override
-    public Collection<MetaGenomeProteins> getByProtein(
+    public Set<MetaGenomeProteins> getByProtein(
         final Protein protein, final int start, final int count
     ) throws DAOException {
         return getByForeignIdentifier(
@@ -88,7 +91,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     }
 
     @Override
-    public Collection<MetaGenomeProteins> getByMetaGenome(
+    public Set<MetaGenomeProteins> getByMetaGenome(
         final MetaGenome mg, final int start, final int count
     ) throws DAOException {
         return getByForeignIdentifier(
@@ -197,7 +200,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
         return project(id, name, repo);
     }
 
-    private Collection<MetaGenomeProteins> getByForeignIdentifier(
+    private Set<MetaGenomeProteins> getByForeignIdentifier(
         final String     columnName,
         final Identifier id,
         final int        start,
@@ -215,7 +218,7 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
 
         val statement = sql.bind(query).bind(get);
 
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
 }

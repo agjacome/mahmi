@@ -7,10 +7,6 @@ import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -31,6 +27,7 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
+import fj.data.Set;
 
 @Path("/metagenomeproteins")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -68,12 +65,6 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
         return buildInsert(digestion);
     }
 
-    @POST
-    @Path("/all")
-    public Response insertAll(final Set<MetaGenomeProteins> digestions) {
-        return buildInsertAll(digestions);
-    }
-
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") final int id) {
@@ -85,7 +76,7 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
     public Response update(
         @PathParam("id") final int id, final MetaGenomeProteins digestion
     ) {
-        val toUpdate = digestion.setId(Identifier.of(id));
+        val toUpdate = digestion.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
@@ -112,10 +103,12 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
     }
 
     @Override
-    protected GenericEntity<List<MetaGenomeProteins>> toGenericEntity(
-        final Collection<MetaGenomeProteins> metagenomeproteins
+    protected GenericEntity<java.util.List<MetaGenomeProteins>> toGenericEntity(
+        final Set<MetaGenomeProteins> metagenomeproteins
     ) {
-        return new GenericEntity<List<MetaGenomeProteins>>(newArrayList(metagenomeproteins)) { };
+        return new GenericEntity<java.util.List<MetaGenomeProteins>>(
+            newArrayList(metagenomeproteins)
+        ) { };
     }
 
 }

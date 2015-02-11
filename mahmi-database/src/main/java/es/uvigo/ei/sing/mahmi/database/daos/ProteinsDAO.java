@@ -1,13 +1,12 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
-import java.util.Collection;
-import java.util.function.Consumer;
-
 import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import fj.data.Option;
+import fj.data.Set;
+import fj.function.Effect1;
 
 public interface ProteinsDAO extends DAO<Protein> {
 
@@ -17,26 +16,26 @@ public interface ProteinsDAO extends DAO<Protein> {
 
     public long countByMetaGenome(final MetaGenome mg);
 
-    public Collection<Protein> getByMetaGenome(
+    public Set<Protein> getByMetaGenome(
         final MetaGenome mg, final int start, final int count
     ) throws DAOException;
 
-    public Collection<Protein> search(
-        final MetaGenome metagenome, 
-        final AminoAcidSequence sequence, 
-        final int start, 
+    public Set<Protein> search(
+        final MetaGenome metagenome,
+        final AminoAcidSequence sequence,
+        final int start,
         final int count
     ) throws DAOException;
 
     public default void forEachProteinOf(
-        final MetaGenome                    metaGenome,
-        final Consumer<Collection<Protein>> consumer
+        final MetaGenome            metaGenome,
+        final Effect1<Set<Protein>> effect
     ) throws DAOException {
         val pageSize = 250; // TODO: configurable pageSize
         val numPages = countByMetaGenome(metaGenome);
 
         for (int pageNum = 0; pageNum < numPages; pageNum += pageSize) {
-            consumer.accept(getByMetaGenome(metaGenome, pageNum, pageSize));
+            effect.f(getByMetaGenome(metaGenome, pageNum, pageSize));
         }
     }
 

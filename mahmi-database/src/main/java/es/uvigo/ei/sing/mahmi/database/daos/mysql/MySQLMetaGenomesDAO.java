@@ -9,10 +9,9 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Map;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -20,13 +19,17 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import fj.control.db.DB;
+import fj.data.HashMap;
 import fj.data.List.Buffer;
 import fj.data.Option;
+import fj.data.Set;
 
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> implements MetaGenomesDAO {
 
     private MySQLMetaGenomesDAO(final ConnectionPool conectionPool) {
@@ -68,7 +71,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     }
 
     @Override
-    public Collection<MetaGenome> getByProject(
+    public Set<MetaGenome> getByProject(
         final Project project, final int start, final int count
     ) throws DAOException {
         val sql = sql(
@@ -80,11 +83,11 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
         ).bind(integer(2, count)).bind(integer(3, start));
 
         val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
     @Override
-    public Collection<MetaGenome> search(
+    public Set<MetaGenome> search(
         final Project project, final int start, final int count
     ) throws DAOException {
         // TODO: clean-up
@@ -104,11 +107,11 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
          .bind(integer(8, start));
 
         val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
     @Override
-    public Collection<MetaGenome> getByProtein(
+    public Set<MetaGenome> getByProtein(
         final Protein protein, final int start, final int count
     ) throws DAOException {
         val sql = sql(
@@ -120,7 +123,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
         ).bind(integer(2, count)).bind(integer(3, start));
 
         val statement = sql.bind(query).bind(get);
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
     @Override
@@ -136,13 +139,12 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
 
     @Override
     public void addProteins(
-        final MetaGenome metaGenome, final Map<Protein, Long> proteins
+        final MetaGenome metaGenome, final HashMap<Protein, Long> proteins
     ) throws DAOException {
         val statement = Buffer.<DB<ResultSet>>empty();
 
-        for (val entry : proteins.entrySet()) {
-            val protein = entry.getKey();
-            val counter = entry.getValue();
+        for (val protein : proteins) {
+            val counter = proteins.get(protein).some();
 
             val sql = prepareProteinInsert(metaGenome, protein, counter);
             statement.snoc(sql.bind(update));
@@ -243,7 +245,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     protected DB<MetaGenome> getOrInsert(final MetaGenome metaGenome) {
         // do not check for duplicates, always insert
         return prepareInsert(metaGenome)
-            .bind(update).bind(key).map(metaGenome::setId);
+            .bind(update).bind(key).map(metaGenome::withId);
     }
 
 
@@ -253,7 +255,7 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
         val metaGenome  = parse(results);
         val genomeFasta = parseFasta(results);
 
-        return metaGenome.setFasta(genomeFasta);
+        return metaGenome.withFasta(genomeFasta);
     }
 
     private Project parseProject(final ResultSet results) throws SQLException {

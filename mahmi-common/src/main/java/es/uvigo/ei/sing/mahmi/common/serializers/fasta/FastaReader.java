@@ -32,7 +32,7 @@ import fj.data.Option;
 
 @Slf4j
 @AllArgsConstructor(staticName = "fastaReader")
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod(OptionExtensionMethods.class)
 public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
 
     private final F<String, Option<A>> constructor;

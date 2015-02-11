@@ -5,13 +5,11 @@ import static fj.P.lazy;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.experimental.ExtensionMethod;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import fj.P1;
-import fj.data.Option;
 
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod(OptionExtensionMethods.class)
 public final class NucleobaseSequenceAdapter extends XmlAdapter<String, NucleobaseSequence> {
 
     @Override
@@ -21,7 +19,7 @@ public final class NucleobaseSequenceAdapter extends XmlAdapter<String, Nucleoba
 
     @Override
     public String marshal(final NucleobaseSequence seq) throws Exception {
-        return CompoundSequence.show.showS(seq);
+        return seq.asString();
     }
 
     private P1<IllegalArgumentException> invalidSeq(final String str) {

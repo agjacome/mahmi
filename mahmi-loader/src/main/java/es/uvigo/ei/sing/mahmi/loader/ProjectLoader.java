@@ -1,12 +1,12 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
 import java.nio.file.Path;
-import java.util.stream.Stream;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import fj.P2;
+import fj.data.Stream;
 
 public interface ProjectLoader {
 

@@ -5,22 +5,29 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.Wither;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+import fj.Equal;
+import fj.Hash;
 
-@EqualsAndHashCode(exclude = "id")
+@Getter @Wither
 @AllArgsConstructor(staticName = "protein")
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-@Data public final class Protein implements Entity<Protein> {
+public final class Protein implements Entity<Protein> {
 
-    private Identifier        id;
-    private AminoAcidSequence sequence;
+    public static final Hash<Protein>  hash  = CompoundSequence.hash.comap(Protein::getSequence);
+    public static final Equal<Protein> equal = CompoundSequence.equal.comap(Protein::getSequence);
 
-    @VisibleForJAXB public Protein() {
+    private final Identifier        id;
+    private final AminoAcidSequence sequence;
+
+    @VisibleForJAXB
+    public Protein() {
         this(new Identifier(), AminoAcidSequence.empty());
     }
 

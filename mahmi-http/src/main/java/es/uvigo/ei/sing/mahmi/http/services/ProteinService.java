@@ -1,13 +1,12 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static fj.data.Set.iterableSet;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -30,14 +29,15 @@ import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import fj.data.Option;
+import fj.data.Set;
 
 @Path("/protein")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod({ HashExtensionMethods.class, OptionExtensionMethods.class })
 public final class ProteinService extends DatabaseEntityAbstractService<Protein, ProteinsDAO> {
 
     private ProteinService(final ProteinsDAO dao) {
@@ -96,8 +96,9 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
 
     @POST
     @Path("/all")
-    public Response insertAll(final Set<Protein> proteins) {
-        return buildInsertAll(proteins);
+    public Response insertAll(final List<Protein> proteins) {
+        val ord = Protein.hash.toOrd();
+        return buildInsertAll(iterableSet(ord, proteins));
     }
 
     @DELETE
@@ -111,15 +112,17 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
     public Response update(
         @PathParam("id") final int id, final Protein protein
     ) {
-        val toUpdate = protein.setId(Identifier.of(id));
+        val toUpdate = protein.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
     @Override
-    protected GenericEntity<List<Protein>> toGenericEntity(
-        final Collection<Protein> proteins
+    protected GenericEntity<java.util.List<Protein>> toGenericEntity(
+        final Set<Protein> proteins
     ) {
-        return new GenericEntity<List<Protein>>(newArrayList(proteins)) { };
+        return new GenericEntity<java.util.List<Protein>>(
+            newArrayList(proteins)
+        ) { };
     }
 
 }

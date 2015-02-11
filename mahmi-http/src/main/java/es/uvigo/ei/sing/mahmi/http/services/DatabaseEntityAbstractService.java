@@ -5,9 +5,6 @@ import static fj.Unit.unit;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.ws.rs.core.GenericEntity;
@@ -23,6 +20,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.DAO;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import fj.F;
 import fj.data.Option;
+import fj.data.Set;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -110,8 +108,8 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
         return respond(optSupplier, op -> op.option(noneResponse, someMapper));
     }
 
-    protected abstract GenericEntity<List<A>> toGenericEntity(
-        final Collection<A> entities
+    protected abstract GenericEntity<java.util.List<A>> toGenericEntity(
+        final Set<A> entities
     );
 
 }

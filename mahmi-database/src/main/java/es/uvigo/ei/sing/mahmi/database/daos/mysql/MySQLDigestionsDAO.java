@@ -9,21 +9,24 @@ import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import fj.control.db.DB;
 import fj.data.Option;
+import fj.data.Set;
 
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implements DigestionsDAO {
 
     private static final String TABLES = "digestions NATURAL JOIN peptides NATURAL JOIN proteins NATURAL JOIN enzymes";
@@ -36,27 +39,26 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
         return new MySQLDigestionsDAO(pool);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public Collection<Digestion> search(
+    public Set<Digestion> search(
             final Protein protein, final MetaGenome mg, final Peptide peptide,
             final Enzyme enzyme, final int start, final int count
         ) throws DAOException{
         val sql = sql(
-    			"select DISTINCT digestion_id, " +
-    			"peptide_id, peptide_sequence, " +
-    			"protein_id, protein_sequence," +
-    			"enzyme_id, enzyme_name, " +
-    			"digestions.counter " +
-                "FROM " + TABLES + " NATURAL JOIN metagenome_proteins NATURAL JOIN projects" + 
+                "select DISTINCT digestion_id, " +
+                "peptide_id, peptide_sequence, " +
+                "protein_id, protein_sequence," +
+                "enzyme_id, enzyme_name, " +
+                "digestions.counter " +
+                "FROM " + TABLES + " NATURAL JOIN metagenome_proteins NATURAL JOIN projects" +
                 " WHERE (? = 0 OR peptide_id = ?) AND "
                     + "(? = 0 OR enzyme_id = ?) AND "
                     + "(? = 0 OR protein_id = ?) AND "
                     + "(? = 0 OR metagenome_id = ?) AND "
                     + "(? = 0 OR project_id = ?) AND "
-	                + "(? = '' OR project_name = ?) AND "
-	                + "(? = '' OR project_repository = ?) AND "
-	                + "(? = '' OR peptide_hash = ?) "+
+                    + "(? = '' OR project_name = ?) AND "
+                    + "(? = '' OR project_repository = ?) AND "
+                    + "(? = '' OR peptide_hash = ?) "+
                 "ORDER BY peptide_id LIMIT ? OFFSET ?",
                 peptide.getId(),peptide.getId(),
                 enzyme.getId(),enzyme.getId(),
@@ -71,11 +73,10 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
              .bind(string(16,peptide.getSHA1().asHexString()))
              .bind(integer(17, count))
              .bind(integer(18, start));
-            
+
             val statement = sql.bind(query).bind(get);
-            return read(statement).toCollection();    
-    }   
-    
+            return read(statement).toSet(ordering);
+    }
 
     @Override
     public Option<Digestion> get(
@@ -89,7 +90,7 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
 
 
     @Override
-    public Collection<Digestion> getByEnzyme(
+    public Set<Digestion> getByEnzyme(
         final Enzyme enzyme, final int start, final int count
     ) throws DAOException {
         return getByForeignIdentifier(
@@ -98,7 +99,7 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
     }
 
     @Override
-    public Collection<Digestion> getByProtein(
+    public Set<Digestion> getByProtein(
         final Protein protein, final int start, final int count
     ) throws DAOException {
         return getByForeignIdentifier(
@@ -107,7 +108,7 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
     }
 
     @Override
-    public Collection<Digestion> getByPeptide(
+    public Set<Digestion> getByPeptide(
         final Peptide peptide, final int start, final int count
     ) throws DAOException {
         return getByForeignIdentifier(
@@ -209,7 +210,7 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
         );
     }
 
-    private Collection<Digestion> getByForeignIdentifier(
+    private Set<Digestion> getByForeignIdentifier(
         final String     columnName,
         final Identifier id,
         final int        start,
@@ -222,7 +223,7 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
 
         val statement = sql.bind(query).bind(get);
 
-        return read(statement).toCollection();
+        return read(statement).toSet(ordering);
     }
 
 }

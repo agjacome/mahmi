@@ -1,13 +1,11 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static fj.Ord.stringOrd;
+import static fj.data.Set.iterableSet;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -27,6 +25,7 @@ import lombok.val;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
+import fj.data.Set;
 
 @Path("/enzyme")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -62,8 +61,9 @@ public final class EnzymeService extends DatabaseEntityAbstractService<Enzyme, E
 
     @POST
     @Path("/all")
-    public Response insertAll(final Set<Enzyme> enzymes) {
-        return buildInsertAll(enzymes);
+    public Response insertAll(final java.util.List<Enzyme> enzymes) {
+        val ord = stringOrd.comap(Enzyme::getName);
+        return buildInsertAll(iterableSet(ord, enzymes));
     }
 
     @DELETE
@@ -77,7 +77,7 @@ public final class EnzymeService extends DatabaseEntityAbstractService<Enzyme, E
     public Response update(
         @PathParam("id") final int id, final Enzyme enzymes
     ) {
-        val toUpdate = enzymes.setId(Identifier.of(id));
+        val toUpdate = enzymes.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
@@ -92,10 +92,12 @@ public final class EnzymeService extends DatabaseEntityAbstractService<Enzyme, E
     }
 
     @Override
-    protected GenericEntity<List<Enzyme>> toGenericEntity(
-        final Collection<Enzyme> enzymes
+    protected GenericEntity<java.util.List<Enzyme>> toGenericEntity(
+        final Set<Enzyme> enzymes
     ) {
-        return new GenericEntity<List<Enzyme>>(newArrayList(enzymes)) { };
+        return new GenericEntity<java.util.List<Enzyme>>(
+            newArrayList(enzymes)
+        ) { };
     }
 
 }

@@ -1,17 +1,19 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.jaxb;
 
-import static java.util.Objects.isNull;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import fj.data.Natural;
 
+@ExtensionMethod(Objects.class)
 public final class IdentifierAdapter extends XmlAdapter<Long, Identifier> {
 
     @Override
     public Identifier unmarshal(final Long id) throws Exception {
-        return isNull(id) ? Identifier.empty() : Identifier.of(id);
+        return id.isNull() ? Identifier.empty() : Identifier.of(id);
     }
 
     @Override

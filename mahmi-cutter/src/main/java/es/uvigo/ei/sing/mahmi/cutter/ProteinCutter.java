@@ -1,18 +1,10 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.frequencies;
 import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withCause;
 import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withMessage;
+import static fj.F1Functions.o;
 import static fj.P.lazy;
-
-import java.security.cert.PKIXRevocationChecker.Option;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
@@ -27,50 +19,51 @@ import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
+import fj.F;
+import fj.data.HashMap;
+import fj.data.HashSet;
+import fj.data.Set;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutter")
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class, OptionExtensionMethods.class })
 public final class ProteinCutter {
 
     public Set<Digestion> cutProtein(
-        final Protein            protein,
-        final Collection<Enzyme> enzymes,
-        final Predicate<Integer> sizeFilter
+        final Protein     protein,
+        final Set<Enzyme> enzymes,
+        final F<Integer, Boolean> sizeFilter
     ) throws CutterException {
-        val digestions = new HashSet<Digestion>(enzymes.size());
+        val digestions = new HashSet<>(Digestion.equal, Digestion.hash);
 
         for (val enzyme : enzymes) {
-            val ds = digest(protein, enzyme, sizeFilter);
-            digestions.addAll(ds);
+            digest(protein, enzyme, sizeFilter).forEach(digestions::set);
         }
 
-        return digestions;
+        return digestions.toSet(Digestion.hash.toOrd());
     }
 
     public Set<Digestion> cutProteins(
-        final Collection<Protein> proteins,
-        final Collection<Enzyme>  enzymes,
-        final Predicate<Integer>  sizeFilter
+        final Set<Protein> proteins,
+        final Set<Enzyme>  enzymes,
+        final F<Integer, Boolean> sizeFilter
     ) throws CutterException {
-        val digestions = new HashSet<Digestion>(
-            proteins.size() * enzymes.size()
-        );
+        val digestions = new HashSet<>(Digestion.equal, Digestion.hash);
 
         for (val protein : proteins) {
-            val ds = cutProtein(protein, enzymes, sizeFilter);
-            digestions.addAll(ds);
+            cutProtein(protein, enzymes, sizeFilter).forEach(digestions::set);
         }
 
-        return digestions;
+        return digestions.toSet(Digestion.hash.toOrd());
     }
 
-
     private Set<Digestion> digest(
-        final Protein            protein,
-        final Enzyme             enzyme,
-        final Predicate<Integer> sizeFilter
+        final Protein protein,
+        final Enzyme  enzyme,
+        final F<Integer, Boolean> sizeFilter
     ) {
         log.debug("Cutting {} with {}", protein, enzyme);
 
@@ -89,44 +82,41 @@ public final class ProteinCutter {
         return new ProteinDigester.Builder(matcher).build();
     }
 
-    private Map<Peptide, Long> cutAminoAcidSequence(
-        final ProteinDigester    digester,
-        final AminoAcidSequence  sequence,
-        final Predicate<Integer> sizeFilter
+    private HashMap<Peptide, Long> cutAminoAcidSequence(
+        final ProteinDigester     digester,
+        final AminoAcidSequence   sequence,
+        final F<Integer, Boolean> sizeFilter
     ) {
         val mzPeptides = digester.digest(toMzProtein(sequence));
 
-        return mzPeptides.parallelStream()
-            .filter(p -> sizeFilter.test(p.size()))
+        return mzPeptides.toStream()
+            .filter(o(sizeFilter, p -> p.size()))
             .map(this::toAminoAcidSequence)
             .map(Peptide::peptide)
-            .collect(frequencies());
+            .frequencies(Peptide.equal, Peptide.hash);
     }
 
     private Set<Digestion> createDigestions(
-        final Map<Peptide, Long> cuts,
-        final Protein            protein,
-        final Enzyme             enzyme
+        final HashMap<Peptide, Long> cuts,
+        final Protein protein,
+        final Enzyme  enzyme
     ) {
-        val digestions = new HashSet<Digestion>(cuts.size());
+        val digestions = new HashSet<>(Digestion.equal, Digestion.hash);
 
-        for (val entry : cuts.entrySet()) {
-            val peptide = entry.getKey();
-            val counter = entry.getValue();
-
-            digestions.add(digestion(protein, peptide, enzyme, counter));
+        for (val peptide : cuts) {
+            val counter   = cuts.get(peptide).some();
+            val digestion = digestion(protein, peptide, enzyme, counter);
+            digestions.set(digestion);
         }
 
-        return digestions;
+        return digestions.toSet(Digestion.hash.toOrd());
     }
 
-
-    @SuppressWarnings("deprecation")
     private org.expasy.mzjava.proteomics.mol.Protein toMzProtein(
         final AminoAcidSequence sequence
     ) {
         return new org.expasy.mzjava.proteomics.mol.Protein(
-            "", sequence.toString()
+            "", sequence.asString()
         );
     }
 
@@ -138,7 +128,6 @@ public final class ProteinCutter {
             lazy(u -> withMessage("Illegal aminoacid sequence produced by MZJava: " + sequence))
         );
     }
-
 
     private CleavageSiteMatcher getMatcherByName(final String name) {
         try {

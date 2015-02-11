@@ -4,13 +4,10 @@ import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
+import static fj.data.Set.iterableSet;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -32,14 +29,15 @@ import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
-import fj.data.Option;
+import fj.data.Set;
 
 @Path("/peptide")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod({ HashExtensionMethods.class, OptionExtensionMethods.class })
 public final class PeptideService extends DatabaseEntityAbstractService<Peptide, PeptidesDAO> {
 
     private PeptideService(final PeptidesDAO dao) {
@@ -101,8 +99,9 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
 
     @POST
     @Path("/all")
-    public Response insertAll(final Set<Peptide> peptides) {
-        return buildInsertAll(peptides);
+    public Response insertAll(final java.util.List<Peptide> peptides) {
+        val ord = Peptide.hash.toOrd();
+        return buildInsertAll(iterableSet(ord, peptides));
     }
 
     @DELETE
@@ -116,7 +115,7 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
     public Response update(
         @PathParam("id") final int id, final Peptide peptide
     ) {
-        val toUpdate = peptide.setId(Identifier.of(id));
+        val toUpdate = peptide.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
     }
 
@@ -131,10 +130,12 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
     }*/
 
     @Override
-    protected GenericEntity<List<Peptide>> toGenericEntity(
-        final Collection<Peptide> peptides
+    protected GenericEntity<java.util.List<Peptide>> toGenericEntity(
+        final Set<Peptide> peptides
     ) {
-        return new GenericEntity<List<Peptide>>(newArrayList(peptides)) { };
+        return new GenericEntity<java.util.List<Peptide>>(
+            newArrayList(peptides)
+        ) { };
     }
 
 }

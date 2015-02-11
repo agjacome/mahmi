@@ -1,21 +1,17 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.CollectionExtensionMethods.frequencies;
 import static fj.P.p;
 import static fj.Unit.unit;
 import static java.util.concurrent.CompletableFuture.runAsync;
-import static java.util.stream.Collectors.toMap;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
@@ -23,15 +19,20 @@ import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
 import fj.P2;
+import fj.data.HashMap;
+import fj.data.Set;
 
 @Slf4j
 @AllArgsConstructor(staticName = "projectLoaderCtrl")
+@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class })
 public final class ProjectLoaderController {
 
     private final ProjectLoader  loader;
@@ -51,9 +52,9 @@ public final class ProjectLoaderController {
     }
 
     public void loadFastas(
-        final Project                  project,
-        final Fasta<NucleobaseSequence>       genomeFasta,
-        final Fasta<AminoAcidSequence> proteinFasta
+        final Project                   project,
+        final Fasta<NucleobaseSequence> genomeFasta,
+        final Fasta<AminoAcidSequence>  proteinFasta
     ) throws LoaderException {
         val metaGenome = insertMetaGenome(metagenome(project, genomeFasta));
         loadProteinFasta(metaGenome, proteinFasta);
@@ -78,15 +79,15 @@ public final class ProjectLoaderController {
     private void loadProteinFasta(
         final MetaGenome metaGenome, final Fasta<AminoAcidSequence> fasta
     ) {
-        val frequencies = frequencies(
-            fasta.toStream().map(Protein::protein).toCollection()
-        );
+        val frequencies = fasta.toStream().map(Protein::protein)
+            .frequencies(Protein.equal, Protein.hash);
 
-        val proteins = insertProteins(frequencies.keySet()).stream().collect(
-            toMap(protein -> protein, protein -> frequencies.get(protein))
-        );
+        val toInsert = frequencies.keys().toSet(Protein.hash.toOrd());
+        val inserted = insertProteins(toInsert).toIdentityMap(
+            Protein.equal, Protein.hash
+        ).mapValues(p -> frequencies.get(p).some());
 
-        insertMetaGenomeProteins(metaGenome, proteins);
+        insertMetaGenomeProteins(metaGenome, inserted);
     }
 
 
@@ -100,13 +101,13 @@ public final class ProjectLoaderController {
         return daoAction(() -> metaGenomesDAO.insert(metaGenome));
     }
 
-    private Collection<Protein> insertProteins(final Set<Protein> proteins) {
+    private Set<Protein> insertProteins(final Set<Protein> proteins) {
         log.info("Inserting {} proteins into database", proteins.size());
         return daoAction(() -> proteinsDAO.insertAll(proteins));
     }
 
     private void insertMetaGenomeProteins(
-        final MetaGenome metaGenome, final Map<Protein, Long> proteins
+        final MetaGenome metaGenome, final HashMap<Protein, Long> proteins
     ) {
         log.info("Associating {} proteins to {} in database", proteins.size(), metaGenome);
         daoAction(() -> {

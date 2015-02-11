@@ -8,9 +8,8 @@ import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import fj.P1;
-import fj.data.Option;
 
-@ExtensionMethod({ Option.class, OptionExtensionMethods.class })
+@ExtensionMethod(OptionExtensionMethods.class)
 public final class AminoAcidAdapter extends XmlAdapter<Character, AminoAcid> {
 
     @Override
