@@ -3,6 +3,7 @@ package es.uvigo.ei.sing.mahmi.common.entities;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
+import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseFastaAdapter;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
@@ -22,6 +24,7 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
     private Identifier id;
     private Project    project;
 
+    @XmlJavaTypeAdapter(NucleobaseFastaAdapter.class)
     private Fasta<NucleobaseSequence> fasta;
 
     @VisibleForJAXB

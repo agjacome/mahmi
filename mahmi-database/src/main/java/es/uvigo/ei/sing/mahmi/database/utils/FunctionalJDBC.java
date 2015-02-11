@@ -6,7 +6,6 @@ import static fj.data.Array.array;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.text.MessageFormat.format;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -123,9 +122,9 @@ public final class FunctionalJDBC {
         final FastaWriter<A> writer = fastaWriter();
 
         return statement -> db(connection -> {
-            try (val stringWriter = new BufferedWriter(new StringWriter())) {
+            try (val stringWriter = new StringWriter()) {
                 writer.toWriter(fasta, stringWriter);
-                statement.setString(index, writer.toString());
+                statement.setString(index, stringWriter.toString());
                 return statement;
             } catch (final RuntimeException | IOException e) {
                 throw error("Error while binding fasta to DB");
