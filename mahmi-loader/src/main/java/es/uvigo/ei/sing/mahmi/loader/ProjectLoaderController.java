@@ -27,6 +27,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
+import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
 import fj.P2;
 
 @Slf4j
@@ -37,6 +38,7 @@ public final class ProjectLoaderController {
     private final ProjectsDAO    projectsDAO;
     private final MetaGenomesDAO metaGenomesDAO;
     private final ProteinsDAO    proteinsDAO;
+    private final Table_Stats    tableStats;
 
 
     public P2<Project, CompletableFuture<Void>> loadProject(
@@ -66,6 +68,10 @@ public final class ProjectLoaderController {
         val projectFiles = loader.loadProject(path);
         projectFiles.forEach(paths -> loadFastas(project, paths._1(), paths._2()));
 
+        tableStats.updateStats(1, projectsDAO.count());
+        tableStats.updateStats(2, metaGenomesDAO.count());
+        tableStats.updateStats(3, proteinsDAO.count());
+        
         log.info("Finished loading Fasta files of {} from {}", project, path);
     }
 

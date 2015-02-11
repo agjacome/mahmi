@@ -152,6 +152,38 @@ CREATE TABLE IF NOT EXISTS `digestions` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `table_stats`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `table_stats` ;
+
+CREATE TABLE IF NOT EXISTS `table_stats` (
+  `table_stats_id` INT NOT NULL AUTO_INCREMENT,
+  `table_stats_name` VARCHAR(20) NOT NULL,
+  `table_stats_counter` INT NOT NULL ,
+  PRIMARY KEY (`table_stats_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `users`
+-- -----------------------------------------------------
+CREATE TABLE  `users` (
+  `user_id` INT( 11 ) NOT NULL AUTO_INCREMENT,
+  `user_name` VARCHAR( 60 ) NOT NULL ,
+  `user_organization` VARCHAR( 60 ) NOT NULL ,
+  `user_username` VARCHAR( 60 ) NOT NULL ,
+  `user_pass` VARCHAR( 60 ) NOT NULL,
+  PRIMARY KEY (`user_id`))
+) ENGINE = INNODB;
+
+
+
+
+-- -----------------------------------------------------
+-- MYSQL USER
+-- -----------------------------------------------------
 SET SQL_MODE = '';
 GRANT USAGE ON *.* TO mahmiuser;
  DROP USER mahmiuser;
@@ -163,6 +195,8 @@ GRANT ALL ON * TO 'mahmiuser';
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
 
 -- -----------------------------------------------------
 -- Data for table `enzymes`
@@ -196,6 +230,21 @@ INSERT INTO `enzymes` (`enzyme_id`, `enzyme_name`) VALUES (24, 'PEPSINE_PH_1_3')
 INSERT INTO `enzymes` (`enzyme_id`, `enzyme_name`) VALUES (25, 'PEPSINE_PH_GT_2');
 INSERT INTO `enzymes` (`enzyme_id`, `enzyme_name`) VALUES (26, 'PROTEINASE_K');
 INSERT INTO `enzymes` (`enzyme_id`, `enzyme_name`) VALUES (27, 'THERMOLYSINE');
+
+
+-- -----------------------------------------------------
+-- Data for table `table_stats`
+-- ----------------------------------------------------
+INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_counter`) VALUES (1, 'PROJECTS', 0);
+INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_counter`) VALUES (2, 'METAGENOMES', 0);
+INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_counter`) VALUES (3, 'PROTEINS', 0);
+INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_counter`) VALUES (4, 'PEPTIDES', 0);
+
+
+-- -----------------------------------------------------
+-- Data for table `users`
+-- ----------------------------------------------------
+INSERT INTO `users` (`user_name`,`user_organization`,`user_username`,`user_pass`) VALUES ('admin','mahmi','admin','admin');
 
 COMMIT;
 

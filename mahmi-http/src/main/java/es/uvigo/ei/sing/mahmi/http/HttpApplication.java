@@ -10,6 +10,7 @@ import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLMetaGenomesDAO.mys
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLPeptidesDAO.mysqlPeptidesDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlProjectsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
+import static es.uvigo.ei.sing.mahmi.database.utils.Table_Stats.tableStats;
 import static es.uvigo.ei.sing.mahmi.http.services.DigestionService.digestionService;
 import static es.uvigo.ei.sing.mahmi.http.services.EnzymeService.enzymeService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeProteinsService.metaGenomeProteinsService;
@@ -49,12 +50,14 @@ public final class HttpApplication extends Application {
         val peptidesDAO           = mysqlPeptidesDAO(connectionPool);
         val projectsDAO           = mysqlProjectsDAO(connectionPool);
         val proteinsDAO           = mysqlProteinsDAO(connectionPool);
+        val tableStats            = tableStats(connectionPool);
 
         val loaderController = projectLoaderCtrl(
             mgRastLoader(),
             projectsDAO,
             metaGenomesDAO,
-            proteinsDAO
+            proteinsDAO,
+            tableStats
         );
 
         val cutterController = proteinCutterCtrl(
@@ -62,7 +65,8 @@ public final class HttpApplication extends Application {
             metaGenomesDAO,
             proteinsDAO,
             peptidesDAO,
-            digestionsDAO
+            digestionsDAO,
+            tableStats
         );
 
         return Sets.newHashSet(

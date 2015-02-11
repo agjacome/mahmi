@@ -16,7 +16,7 @@ public interface MetaGenomesDAO extends DAO<MetaGenome> {
     public Option<MetaGenome> getWithFasta(
         final Identifier id
     ) throws DAOException;
-
+    
     public long countByProject(final Project project);
 
     public Collection<MetaGenome> getByProject(

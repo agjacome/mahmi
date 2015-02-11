@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.mahmi.http.services;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
@@ -45,6 +46,16 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     @Path("/{id}")
     public Response get(@PathParam("id") final int id) {
         return buildGet(Identifier.of(id));
+    }
+    
+    @GET
+    @Path("/fasta/{id}")
+    public Response getWithFasta(@PathParam("id") final int id) {
+        return respond(
+                () -> dao.getWithFasta(Identifier.of(id)),
+                status(OK)::entity,
+                status(NOT_FOUND)
+            );
     }
 
     @GET

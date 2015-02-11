@@ -26,6 +26,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
+import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
 import fj.function.Try0;
 
 @Slf4j
@@ -37,6 +38,7 @@ public final class ProteinCutterController {
     private final ProteinsDAO    proteinsDAO;
     private final PeptidesDAO    peptidesDAO;
     private final DigestionsDAO  digestionsDAO;
+    private final Table_Stats    tableStats;
 
     public CompletableFuture<Void> cutProjectProteins(
         final Project            project,
@@ -49,7 +51,9 @@ public final class ProteinCutterController {
             metaGenomesDAO.forEachMetaGenomeOf(project, mg -> {
                 val future = cutMetaGenomeProteins(mg, enzymes, sizeFilter);
                 future.join();
-            });
+            });            
+
+            tableStats.updateStats(3, peptidesDAO.count());
 
             log.info("Finished cutting proteins of {}", project);
         });

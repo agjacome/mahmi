@@ -3,7 +3,6 @@ package es.uvigo.ei.sing.mahmi.common.entities;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +22,6 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
     private Identifier id;
     private Project    project;
 
-    @XmlTransient
     private Fasta<NucleobaseSequence> fasta;
 
     @VisibleForJAXB
