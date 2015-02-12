@@ -22,6 +22,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 @AllArgsConstructor(staticName = "fastaWriter")
 public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
 
+    public static final int MAX_LINE_LENGTH = 70;
+
     public static FastaWriter<AminoAcidSequence> forAminoAcid() {
         return new FastaWriter<>();
     }
@@ -66,7 +68,14 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
     private void writeSequence(
         final BufferedWriter writer, final A sequence
     ) throws IOException {
-        writer.append(sequence.asString());
+        final char [ ] cs = sequence.asString().toCharArray();
+
+        for (int i = 0; i < cs.length; ++i) {
+            writer.append(cs[i]);
+            if (i % MAX_LINE_LENGTH == 0)
+                writer.append(lineSeparator());
+        }
+
         writer.append(lineSeparator());
     }
 
