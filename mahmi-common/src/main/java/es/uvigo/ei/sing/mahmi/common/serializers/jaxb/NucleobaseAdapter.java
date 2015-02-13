@@ -1,13 +1,15 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.jaxb;
 
-import static fj.P.lazy;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.experimental.ExtensionMethod;
+
+import fj.P1;
+
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
-import fj.P1;
+
+import static fj.P.lazy;
 
 @ExtensionMethod(OptionExtensionMethods.class)
 public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleobase> {

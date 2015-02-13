@@ -10,14 +10,18 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@AllArgsConstructor(staticName = "cutProteins")
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+
+@Getter
+@AllArgsConstructor(staticName = "wrap")
 @XmlRootElement(name = "cutProteins") @XmlAccessorType(XmlAccessType.FIELD)
-@Value public final class CutProteinsWrapper {
+public final class CutProteinsWrapper {
 
     private final Project project;
 
@@ -30,7 +34,10 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
     @VisibleForJAXB
     public CutProteinsWrapper() {
-        this(new Project(), new LinkedHashSet<>(), 0, Integer.MAX_VALUE);
+        this.project = project("", "");
+        this.enzymes = new LinkedHashSet<Enzyme>();
+        this.minSize = 0;
+        this.maxSize = Integer.MAX_VALUE;
     }
 
 }

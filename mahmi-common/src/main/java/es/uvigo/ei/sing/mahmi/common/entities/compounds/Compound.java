@@ -1,10 +1,11 @@
 package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
+import fj.Equal;
+import fj.Hash;
+
 import static fj.Equal.charEqual;
 import static fj.Hash.charHash;
 import static fj.function.Characters.toUpperCase;
-import fj.Equal;
-import fj.Hash;
 
 public interface Compound {
 

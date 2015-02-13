@@ -1,15 +1,18 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
-import static fj.Monoid.monoid;
-import static fj.data.Option.none;
-import static fj.data.Option.some;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
+
 import fj.Monoid;
 import fj.data.Option;
 import fj.data.Seq;
+
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
+
+import static fj.Monoid.monoid;
+import static fj.data.Option.none;
+import static fj.data.Option.some;
 
 @Getter
 @AllArgsConstructor(staticName = "fromSeq")

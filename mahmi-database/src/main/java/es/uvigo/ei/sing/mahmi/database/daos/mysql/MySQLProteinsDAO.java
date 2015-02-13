@@ -1,14 +1,16 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
+
+import fj.control.db.DB;
+import fj.data.Option;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
@@ -17,9 +19,9 @@ import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import fj.control.db.DB;
-import fj.data.Option;
-import fj.data.Set;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements ProteinsDAO {

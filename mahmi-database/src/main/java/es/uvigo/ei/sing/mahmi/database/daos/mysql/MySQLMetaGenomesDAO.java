@@ -1,10 +1,5 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
-import static fj.Bottom.error;
-
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +7,13 @@ import java.sql.SQLException;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
+
+import fj.control.db.DB;
+import fj.data.HashMap;
+import fj.data.List.Buffer;
+import fj.data.Option;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -23,11 +25,12 @@ import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
-import fj.control.db.DB;
-import fj.data.HashMap;
-import fj.data.List.Buffer;
-import fj.data.Option;
-import fj.data.Set;
+
+import static fj.Bottom.error;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> implements MetaGenomesDAO {

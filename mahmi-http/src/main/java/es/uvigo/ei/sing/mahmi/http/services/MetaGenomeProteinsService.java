@@ -1,12 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.OK;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -21,13 +14,22 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import lombok.val;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
-import fj.data.Set;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.OK;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Path("/metagenomeproteins")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -76,8 +78,7 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
     public Response update(
         @PathParam("id") final int id, final MetaGenomeProteins digestion
     ) {
-        val toUpdate = digestion.withId(Identifier.of(id));
-        return buildUpdate(toUpdate);
+        return buildUpdate(digestion.withId(Identifier.of(id)));
     }
 
     @GET
@@ -93,13 +94,13 @@ public final class MetaGenomeProteinsService extends DatabaseEntityAbstractServi
         @QueryParam("size")    @DefaultValue("50") final int size
     ) {
           return respond(()  ->
-                dao.search(
-                    protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
-                    metagenome(Identifier.of(metagenomeId), project(Identifier.of(projectId), projectName, projectRepo), Fasta.empty()),
-                    (page - 1) * size,  size
-                ),
-                mgps -> status(OK).entity(toGenericEntity(mgps))
-            );
+              dao.search(
+                  protein(Identifier.of(proteinId), AminoAcidSequence.fromString(proteinSeq).some()),
+                  metagenome(Identifier.of(metagenomeId), project(Identifier.of(projectId), projectName, projectRepo), Fasta.empty()),
+                  (page - 1) * size,  size
+              ),
+              mgps -> status(OK).entity(toGenericEntity(mgps))
+          );
     }
 
     @Override

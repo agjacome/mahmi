@@ -1,8 +1,8 @@
 package es.uvigo.ei.sing.mahmi.http.server;
 
-import static java.lang.Runtime.getRuntime;
-
 import java.io.IOException;
+
+import static java.lang.Runtime.getRuntime;
 
 public interface Server {
 

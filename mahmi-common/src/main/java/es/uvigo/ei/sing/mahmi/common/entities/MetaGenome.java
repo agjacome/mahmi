@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
+
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseFastaAdapter;

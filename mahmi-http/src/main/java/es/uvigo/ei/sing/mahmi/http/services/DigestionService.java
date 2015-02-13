@@ -1,15 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.*;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -27,6 +17,9 @@ import javax.ws.rs.core.Response;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
@@ -37,7 +30,18 @@ import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.CutProteinsWrapper;
-import fj.data.Set;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.*;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
+import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Slf4j
 @Path("/digestion")

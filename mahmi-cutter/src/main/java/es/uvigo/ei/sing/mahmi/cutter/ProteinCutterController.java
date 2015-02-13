@@ -1,15 +1,17 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequence;
-import static java.util.concurrent.CompletableFuture.runAsync;
-
-import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.F;
+import fj.data.HashMap;
+import fj.data.Set;
+import fj.function.Try0;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
@@ -24,9 +26,10 @@ import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
-import fj.F;
-import fj.data.Set;
-import fj.function.Try0;
+
+import static java.util.concurrent.CompletableFuture.runAsync;
+
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequence;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutterCtrl")
@@ -49,8 +52,7 @@ public final class ProteinCutterController {
             log.info("Cutting proteins of {} with {}", project, enzymes);
 
             metaGenomesDAO.forEachMetaGenomeOf(project, mg -> {
-                val future = cutMetaGenomeProteins(mg, enzymes, sizeFilter);
-                future.join();
+                cutMetaGenomeProteins(mg, enzymes, sizeFilter).join();
             });
 
             tableStats.updateStats(3, peptidesDAO.count());
@@ -67,10 +69,9 @@ public final class ProteinCutterController {
         return runAsync(() -> {
             log.info("Cutting proteins of {} with {}", metaGenome, enzymes);
 
-            val futures = new LinkedList<CompletableFuture<Void>>();
+            final java.util.List<CompletableFuture<Void>> futures = new java.util.LinkedList<>();
             proteinsDAO.forEachProteinOf(metaGenome, proteins -> {
-                val future = cutProteins(proteins, enzymes, sizeFilter);
-                futures.add(future);
+                futures.add(cutProteins(proteins, enzymes, sizeFilter));
             });
 
             sequence(futures).thenRun(
@@ -87,13 +88,13 @@ public final class ProteinCutterController {
         return runAsync(() -> {
             log.info("Digesting {} proteins", proteins.size());
 
-            val cuts = cutter.cutProteins(proteins, enzymes, sizeFilter);
+            final Set<Digestion> cuts = cutter.cutProteins(proteins, enzymes, sizeFilter);
             insertCuts(cuts);
         });
     }
 
     private void insertCuts(final Set<Digestion> digestions) {
-        val peptides = digestions.map(
+        final Set<Peptide> peptides = digestions.map(
             Peptide.hash.toOrd(),
             d -> d.getPeptide()
         );
@@ -121,12 +122,12 @@ public final class ProteinCutterController {
         final Set<Digestion> digestions,
         final Set<Peptide>   peptides
     ) {
-        val peptideMap = peptides.toIdentityMap(
+        final HashMap<Peptide, Peptide> peptideMap = peptides.toIdentityMap(
             Peptide.equal, Peptide.hash
         );
 
         return digestions.map(digestions.ord(), d -> {
-            val p = peptideMap.get(d.getPeptide()).some();
+            final Peptide p =peptideMap.get(d.getPeptide()).some();
             return d.withPeptide(p);
         });
     }

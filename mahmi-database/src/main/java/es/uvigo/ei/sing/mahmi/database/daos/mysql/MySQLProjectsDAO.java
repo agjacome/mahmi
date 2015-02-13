@@ -1,22 +1,24 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
+
+import fj.control.db.DB;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
-import fj.control.db.DB;
-import fj.data.Set;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLProjectsDAO extends MySQLAbstractDAO<Project> implements ProjectsDAO {

@@ -1,10 +1,5 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static fj.P.p;
-import static fj.Unit.unit;
-import static java.util.concurrent.CompletableFuture.runAsync;
-
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -13,6 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.P2;
+import fj.data.HashMap;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -26,9 +26,13 @@ import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
-import fj.P2;
-import fj.data.HashMap;
-import fj.data.Set;
+
+import static java.util.concurrent.CompletableFuture.runAsync;
+
+import static fj.P.p;
+import static fj.Unit.unit;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 
 @Slf4j
 @AllArgsConstructor(staticName = "projectLoaderCtrl")
@@ -79,11 +83,12 @@ public final class ProjectLoaderController {
     private void loadProteinFasta(
         final MetaGenome metaGenome, final Fasta<AminoAcidSequence> fasta
     ) {
-        val frequencies = fasta.toStream().map(Protein::protein)
+        final HashMap<Protein, Long> frequencies = fasta.toStream()
+            .map(Protein::protein)
             .frequencies(Protein.equal, Protein.hash);
 
-        val toInsert = frequencies.keys().toSet(Protein.hash.toOrd());
-        val inserted = insertProteins(toInsert).toIdentityMap(
+        final Set<Protein> toInsert = frequencies.keys().toSet(Protein.hash.toOrd());
+        final HashMap<Protein, Long> inserted = insertProteins(toInsert).toIdentityMap(
             Protein.equal, Protein.hash
         ).mapValues(p -> frequencies.get(p).some());
 

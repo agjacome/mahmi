@@ -5,8 +5,10 @@ import java.util.Objects;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.experimental.ExtensionMethod;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+
 import fj.data.Natural;
+
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 
 @ExtensionMethod(Objects.class)
 public final class IdentifierAdapter extends XmlAdapter<Long, Identifier> {

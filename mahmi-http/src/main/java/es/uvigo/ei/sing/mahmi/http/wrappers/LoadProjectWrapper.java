@@ -5,20 +5,25 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@AllArgsConstructor(staticName = "loadProject")
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+
+@Getter
+@AllArgsConstructor(staticName = "wrap")
 @XmlRootElement(name = "loadProject") @XmlAccessorType(XmlAccessType.FIELD)
-@Value public class LoadProjectWrapper {
+public class LoadProjectWrapper {
 
     private final Project project;
     private final String  path;
 
     @VisibleForJAXB
     public LoadProjectWrapper() {
-        this(new Project(), "/tmp");
+        this.project = project("", "");
+        this.path    = "/tmp";
     }
 
 }

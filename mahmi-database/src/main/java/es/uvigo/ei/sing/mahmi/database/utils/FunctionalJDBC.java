@@ -1,11 +1,5 @@
 package es.uvigo.ei.sing.mahmi.database.utils;
 
-import static es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter.fastaWriter;
-import static fj.P.lazy;
-import static fj.data.Array.array;
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.text.MessageFormat.format;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -13,19 +7,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import lombok.experimental.ExtensionMethod;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
-import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
+
 import fj.F;
 import fj.control.db.Connector;
 import fj.control.db.DB;
@@ -34,8 +20,23 @@ import fj.data.List;
 import fj.data.List.Buffer;
 import fj.function.Try1;
 
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
+import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
+
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.text.MessageFormat.format;
+
+import static fj.P.lazy;
+import static fj.data.Array.array;
+
+import static es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter.fastaWriter;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@ExtensionMethod(OptionExtensionMethods.class)
 public final class FunctionalJDBC {
 
     public static <A> A runReadOnly(
@@ -52,8 +53,8 @@ public final class FunctionalJDBC {
 
     public static <A> DB<Iterable<A>> sequence(final Iterable<DB<A>> dbs) {
         return db(connection -> {
-            val buffer = new LinkedList<A>();
-            for (val db : dbs) {
+            final java.util.List<A> buffer = new java.util.LinkedList<A>();
+            for (final DB<A> db : dbs) {
                 buffer.add(db.run(connection));
             }
             return buffer;
@@ -97,9 +98,16 @@ public final class FunctionalJDBC {
         final int index, final Identifier id
     ) {
         return statement -> db(connection -> {
-            val value = id.getValue().orThrow(
-                lazy(u -> error("Empty Identifier on index {0}", index))
-            ).longValue();
+            // Cannot use @ExtensionMethod because lombok compilation with
+            // Maven throws a StackOverflowError (see github issue #6)
+            //
+            //     val value = id.getValue().orThrow(
+            //         lazy(u -> error("Empty Identifier on index {0}", index))
+            //     ).longValue();
+            //
+            final long value = OptionExtensionMethods.orThrow(id.getValue(), lazy(
+                u -> error("Empty Identifier on index {0}", index)
+            )).longValue();
 
             statement.setLong(index, value);
             return statement;
@@ -121,7 +129,7 @@ public final class FunctionalJDBC {
         final FastaWriter<A> writer = fastaWriter();
 
         return statement -> db(connection -> {
-            try (val stringWriter = new StringWriter()) {
+            try (final StringWriter stringWriter = new StringWriter()) {
                 writer.toWriter(fasta, stringWriter);
                 statement.setString(index, stringWriter.toString());
                 return statement;
@@ -165,7 +173,16 @@ public final class FunctionalJDBC {
         final ResultSet results, final String column
     ) throws SQLException {
         val str = parseString(results, column);
-        return AminoAcidSequence.fromString(str).orThrow(
+        // Cannot use @ExtensionMethod because lombok compilation with
+        // Maven throws a StackOverflowError (see github issue #6)
+        //
+        //     return AminoAcidSequence.fromString(str).orThrow(
+        //         lazy(u -> error("Invalid AminoAcid sequence at {0}: {1}", column, str))
+        //     );
+        //
+
+        return OptionExtensionMethods.orThrow(
+            AminoAcidSequence.fromString(str),
             lazy(u -> error("Invalid AminoAcid sequence at {0}: {1}", column, str))
         );
     }
@@ -207,8 +224,8 @@ public final class FunctionalJDBC {
         final Try1<ResultSet, A, SQLException> parser
     ) {
         return resultSet -> db(connection -> {
-            try (val results = resultSet) {
-                val buffer = Buffer.<A>empty();
+            try (final ResultSet results = resultSet) {
+                final Buffer<A> buffer = Buffer.<A>empty();
                 while (results.next()) buffer.snoc(parser.f(results));
 
                 return buffer.toList();
@@ -255,8 +272,6 @@ public final class FunctionalJDBC {
         return new SQLException(format(message, args));
     }
 
-    // TODO: Can be replaced with DB::db with a bit of work (the throw of
-    // SQLException and some type-inference problems)
     @FunctionalInterface
     private static interface DBAction<A> {
         public A apply(final Connection c) throws SQLException;

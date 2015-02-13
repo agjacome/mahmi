@@ -1,12 +1,14 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
-import es.uvigo.ei.sing.mahmi.common.entities.Protein;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+
 import fj.data.Option;
 import fj.data.Set;
 import fj.function.Effect1;
+
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 
 public interface ProteinsDAO extends DAO<Protein> {
 

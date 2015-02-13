@@ -5,17 +5,19 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
+
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@AllArgsConstructor(staticName = "longWrapper")
+@Getter
+@AllArgsConstructor(staticName = "wrap")
 @XmlRootElement(name = "count") @XmlAccessorType(XmlAccessType.FIELD)
-@Value public final class LongIntegerWrapper {
+public final class CountWrapper {
 
     private final long total;
 
-    @VisibleForJAXB public LongIntegerWrapper() {
-        this(0);
+    @VisibleForJAXB public CountWrapper() {
+        this.total = 0L;
     }
 
 }

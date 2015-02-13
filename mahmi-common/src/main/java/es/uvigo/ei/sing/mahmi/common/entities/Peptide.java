@@ -7,13 +7,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
+
+import fj.Equal;
+import fj.Hash;
+
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
-import fj.Equal;
-import fj.Hash;
 
 @Getter @Wither
 @AllArgsConstructor(staticName = "peptide")

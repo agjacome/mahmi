@@ -1,9 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
-import static fj.P.lazy;
-import static fj.data.Option.none;
-import static fj.data.Option.some;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,16 +15,22 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.F;
+import fj.Monoid;
+import fj.P1;
+import fj.data.Option;
+
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
-import fj.F;
-import fj.Monoid;
-import fj.P1;
-import fj.data.Option;
+
+import static fj.P.lazy;
+import static fj.data.Option.none;
+import static fj.data.Option.some;
 
 @Slf4j
 @AllArgsConstructor(staticName = "fastaReader")
@@ -88,7 +90,7 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
 
             @Override
             public A next() {
-                val toRet = sequence.orThrow(nextError(line.get()));
+                final A toRet = sequence.orThrow(nextError(line.get()));
 
                 try {
                     sequence = getNextSequence(reader, line.incrementAndGet());

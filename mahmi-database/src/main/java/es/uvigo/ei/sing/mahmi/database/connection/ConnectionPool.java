@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import lombok.val;
+
 import fj.control.db.Connector;
 
 public interface ConnectionPool {

@@ -1,12 +1,14 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
-import static java.util.Collections.emptyIterator;
-
 import java.util.Iterator;
 
 import lombok.Value;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
+
 import fj.data.Stream;
+
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
+
+import static java.util.Collections.emptyIterator;
 
 @Value(staticConstructor = "of")
 public final class Fasta<A extends CompoundSequence<? extends Compound>> implements Iterable<A> {

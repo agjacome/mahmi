@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.mahmi.common.utils.extensions;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import fj.data.Seq;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

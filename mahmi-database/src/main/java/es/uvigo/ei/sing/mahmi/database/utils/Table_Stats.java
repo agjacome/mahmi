@@ -1,21 +1,19 @@
 package es.uvigo.ei.sing.mahmi.database.utils;
 
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.longInt;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.runReadWrite;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.update;
-
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
-import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
+
 import fj.control.db.DB;
 import fj.function.Try0;
+
+import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
+import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
+
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @Slf4j
 @AllArgsConstructor(staticName = "tableStats")

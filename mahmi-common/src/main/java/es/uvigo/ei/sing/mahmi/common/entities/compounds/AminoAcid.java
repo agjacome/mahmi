@@ -1,17 +1,19 @@
 package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
+import java.util.EnumSet;
+
+import lombok.Getter;
+
+import fj.data.HashMap;
+import fj.data.Option;
+
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
+
 import static fj.Equal.charEqual;
 import static fj.Hash.charHash;
 import static fj.P.p;
 import static fj.data.Stream.iterableStream;
 import static fj.function.Characters.toUpperCase;
-
-import java.util.EnumSet;
-
-import lombok.Getter;
-import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
-import fj.data.HashMap;
-import fj.data.Option;
 
 @Getter
 public enum AminoAcid implements Compound {

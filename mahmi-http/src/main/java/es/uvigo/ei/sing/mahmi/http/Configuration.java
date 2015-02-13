@@ -1,13 +1,13 @@
 package es.uvigo.ei.sing.mahmi.http;
 
-import static javax.ws.rs.core.UriBuilder.fromUri;
-
 import java.net.URI;
 
 import lombok.NoArgsConstructor;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+
+import static javax.ws.rs.core.UriBuilder.fromUri;
 
 @NoArgsConstructor(staticName = "configuration")
 public final class Configuration {

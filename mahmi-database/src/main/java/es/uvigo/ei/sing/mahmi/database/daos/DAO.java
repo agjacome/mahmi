@@ -1,10 +1,10 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
-import es.uvigo.ei.sing.mahmi.common.entities.Entity;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-
 import fj.data.Option;
 import fj.data.Set;
+
+import es.uvigo.ei.sing.mahmi.common.entities.Entity;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 
 public interface DAO<A extends Entity<A>> {
 

@@ -1,11 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.OK;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -21,10 +15,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
-import fj.data.Set;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.OK;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Path("/metagenome")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -44,7 +48,7 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     public Response get(@PathParam("id") final int id) {
         return buildGet(Identifier.of(id));
     }
-    
+
     @GET
     @Path("/fasta/{id}")
     public Response getWithFasta(@PathParam("id") final int id) {

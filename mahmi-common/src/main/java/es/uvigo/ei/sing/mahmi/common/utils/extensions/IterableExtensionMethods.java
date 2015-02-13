@@ -1,13 +1,11 @@
 package es.uvigo.ei.sing.mahmi.common.utils.extensions;
 
-import static fj.P.p;
-import static fj.data.IterableW.wrap;
-
 import java.util.Collection;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
+
 import fj.Equal;
 import fj.Hash;
 import fj.Ord;
@@ -15,6 +13,9 @@ import fj.data.HashMap;
 import fj.data.List;
 import fj.data.Set;
 import fj.data.Stream;
+
+import static fj.P.p;
+import static fj.data.IterableW.wrap;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class IterableExtensionMethods {

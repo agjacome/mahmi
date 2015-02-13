@@ -1,8 +1,5 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
-import static fj.data.List.iterableList;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,12 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-import es.uvigo.ei.sing.mahmi.common.entities.Entity;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
-import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
-import es.uvigo.ei.sing.mahmi.database.daos.DAO;
-import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
+
 import fj.F;
 import fj.Ord;
 import fj.control.db.DB;
@@ -25,6 +17,17 @@ import fj.data.List;
 import fj.data.Option;
 import fj.data.Set;
 import fj.function.Try0;
+
+import es.uvigo.ei.sing.mahmi.common.entities.Entity;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
+import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
+import es.uvigo.ei.sing.mahmi.database.daos.DAO;
+import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
+
+import static fj.data.List.iterableList;
+
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)

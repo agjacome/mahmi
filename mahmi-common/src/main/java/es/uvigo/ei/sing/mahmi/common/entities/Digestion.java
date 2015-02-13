@@ -1,9 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.entities;
 
-import static fj.Equal.p3Equal;
-import static fj.Hash.p3Hash;
-import static fj.P.p;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,10 +7,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+
 import fj.Equal;
 import fj.Hash;
+
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+
+import static fj.Equal.p3Equal;
+import static fj.Hash.p3Hash;
+import static fj.P.p;
 
 @Getter @Wither
 @AllArgsConstructor(staticName = "digestion")

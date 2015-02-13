@@ -1,24 +1,26 @@
 package es.uvigo.ei.sing.mahmi.common.utils;
 
-import static fj.Equal.arrayEqual;
-import static fj.Equal.byteEqual;
-import static fj.Hash.arrayHash;
-import static fj.Hash.byteHash;
-import static fj.data.Array.array;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.Equal;
+import fj.Hash;
+import fj.data.Array;
+import fj.data.Option;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.ArrayExtensionMethods;
-import fj.Equal;
-import fj.Hash;
-import fj.data.Array;
-import fj.data.Option;
+
+import static fj.Equal.arrayEqual;
+import static fj.Equal.byteEqual;
+import static fj.Hash.arrayHash;
+import static fj.Hash.byteHash;
+import static fj.data.Array.array;
 
 @Slf4j
 @Getter

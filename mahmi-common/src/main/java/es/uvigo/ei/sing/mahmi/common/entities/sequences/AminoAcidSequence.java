@@ -1,15 +1,18 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
-import static fj.Monoid.monoid;
-import static fj.data.Option.none;
-import static fj.data.Option.some;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import lombok.val;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
+
 import fj.Monoid;
 import fj.data.Option;
 import fj.data.Seq;
+
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
+
+import static fj.Monoid.monoid;
+import static fj.data.Option.none;
+import static fj.data.Option.some;
 
 @Value(staticConstructor = "fromSeq")
 @EqualsAndHashCode(callSuper = false)

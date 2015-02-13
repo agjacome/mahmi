@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.mahmi.common.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import fj.F;
 
 /**

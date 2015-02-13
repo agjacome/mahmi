@@ -1,10 +1,11 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
+import fj.data.Option;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenomeProteins;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
-import fj.data.Option;
-import fj.data.Set;
 
 public interface MetaGenomeProteinsDAO extends DAO<MetaGenomeProteins> {
 

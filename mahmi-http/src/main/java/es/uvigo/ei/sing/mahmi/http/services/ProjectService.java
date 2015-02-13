@@ -1,12 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static fj.Ord.stringOrd;
-import static fj.data.Set.iterableSet;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.*;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import java.nio.file.Paths;
 
 import javax.ws.rs.Consumes;
@@ -25,12 +18,24 @@ import javax.ws.rs.core.Response;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.LoadProjectWrapper;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
-import fj.data.Set;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.*;
+
+import static fj.Ord.stringOrd;
+import static fj.data.Set.iterableSet;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Slf4j
 @Path("/project")

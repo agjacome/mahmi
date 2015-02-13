@@ -3,12 +3,14 @@ package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 import java.util.Objects;
 
 import lombok.experimental.ExtensionMethod;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
-import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.SeqExtensionMethods;
+
 import fj.Equal;
 import fj.Hash;
 import fj.data.Seq;
+
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
+import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.SeqExtensionMethods;
 
 @ExtensionMethod({ SeqExtensionMethods.class, Objects.class })
 public abstract class CompoundSequence<A extends Compound> {

@@ -1,7 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.fasta;
 
-import static java.lang.System.lineSeparator;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,11 +11,14 @@ import java.nio.file.Path;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
+
+import static java.lang.System.lineSeparator;
 
 @AllArgsConstructor(staticName = "fastaWriter")
 public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {

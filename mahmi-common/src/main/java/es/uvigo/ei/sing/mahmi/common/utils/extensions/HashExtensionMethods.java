@@ -1,11 +1,13 @@
 package es.uvigo.ei.sing.mahmi.common.utils.extensions;
 
-import static fj.Ord.ord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import fj.Hash;
 import fj.Ord;
 import fj.Ordering;
+
+import static fj.Ord.ord;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HashExtensionMethods {

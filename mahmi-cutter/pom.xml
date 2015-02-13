@@ -3,25 +3,21 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
-
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>es.uvigo.ei.sing</groupId>
         <artifactId>mahmi</artifactId>
         <version>0.0.1</version>
     </parent>
-
     <artifactId>mahmi.cutter</artifactId>
     <name>MAHMI - Peptide Cutter</name>
     <packaging>jar</packaging>
-
     <repositories>
         <repository>
             <id>Expasy MzJava</id>
             <url>http://mzjava.expasy.org/maven</url>
         </repository>
     </repositories>
-
     <dependencies>
         <!-- mahmi-common & mahmi-database -->
         <dependency>
@@ -34,7 +30,6 @@
             <artifactId>mahmi.database</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <!-- mz-java dependencies -->
         <dependency>
             <groupId>org.expasy.mzjava</groupId>
@@ -47,5 +42,4 @@
             <version>1.0.0</version>
         </dependency>
     </dependencies>
-
 </project>

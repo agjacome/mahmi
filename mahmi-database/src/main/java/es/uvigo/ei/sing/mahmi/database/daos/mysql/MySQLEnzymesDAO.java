@@ -1,20 +1,22 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import lombok.val;
+
+import fj.control.db.DB;
+import fj.data.Option;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
-import fj.control.db.DB;
-import fj.data.Option;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements EnzymesDAO {
 

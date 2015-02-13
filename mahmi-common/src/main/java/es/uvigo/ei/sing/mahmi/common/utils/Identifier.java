@@ -1,5 +1,17 @@
 package es.uvigo.ei.sing.mahmi.common.utils;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import fj.Equal;
+import fj.Hash;
+import fj.Ord;
+import fj.data.Natural;
+import fj.data.Option;
+
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+
 import static fj.Equal.longEqual;
 import static fj.Equal.optionEqual;
 import static fj.Hash.longHash;
@@ -8,15 +20,6 @@ import static fj.Ord.longOrd;
 import static fj.Ord.optionOrd;
 import static fj.data.Natural.natural;
 import static fj.data.Option.none;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
-import fj.Equal;
-import fj.Hash;
-import fj.Ord;
-import fj.data.Natural;
-import fj.data.Option;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

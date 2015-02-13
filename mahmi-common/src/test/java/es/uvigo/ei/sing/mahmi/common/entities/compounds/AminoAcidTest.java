@@ -1,15 +1,15 @@
 package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeFalse;
-
 import org.junit.contrib.theories.Theories;
 import org.junit.contrib.theories.Theory;
 import org.junit.runner.RunWith;
 
 import com.pholser.junit.quickcheck.ForAll;
 import com.pholser.junit.quickcheck.generator.ValuesOf;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeFalse;
 
 @RunWith(Theories.class)
 public final class AminoAcidTest {

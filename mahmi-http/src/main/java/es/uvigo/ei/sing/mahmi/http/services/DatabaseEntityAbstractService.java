@@ -1,10 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static es.uvigo.ei.sing.mahmi.http.wrappers.LongIntegerWrapper.longWrapper;
-import static fj.Unit.unit;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.*;
-
 import java.util.function.Supplier;
 
 import javax.ws.rs.core.GenericEntity;
@@ -14,13 +9,21 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.F;
+import fj.data.Option;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Entity;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.DAO;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
-import fj.F;
-import fj.data.Option;
-import fj.data.Set;
+import es.uvigo.ei.sing.mahmi.http.wrappers.CountWrapper;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.*;
+
+import static fj.Unit.unit;
 
 @Slf4j
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,7 +41,7 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
 
     protected final Response buildCount(){
         return respond(
-            () -> longWrapper(dao.count()),
+            () -> CountWrapper.wrap(dao.count()),
             status(OK)::entity
         );
     }
@@ -86,11 +89,6 @@ abstract class DatabaseEntityAbstractService<A extends Entity<A>, B extends DAO<
             return dataMapper.f(dataSupplier.get()).build();
         } catch (final DAOException daoe) {
             log.error("Error while accessing database", daoe);
-            // FIXME: it won't always be a InternalServerError, sometimes it can
-            // simply be a BadRequest. "Inspect" DAOException in some way (maybe
-            // add info to the class like isDBError()? or isClientError()?, or
-            // even make it an enum with different exception types à la
-            // Algebraic Data Type).
             return status(INTERNAL_SERVER_ERROR).entity(
                 daoe.getMessage()
             ).build();

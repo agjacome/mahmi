@@ -1,14 +1,14 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
-import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withCause;
-import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withMessage;
-import static fj.F1Functions.o;
-import static fj.P.lazy;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.F;
+import fj.data.HashMap;
+import fj.data.HashSet;
+import fj.data.Set;
 
 import org.expasy.mzjava.proteomics.mol.digest.CleavageSiteMatcher;
 import org.expasy.mzjava.proteomics.mol.digest.Protease;
@@ -22,10 +22,12 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
-import fj.F;
-import fj.data.HashMap;
-import fj.data.HashSet;
-import fj.data.Set;
+
+import static fj.P.lazy;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
+import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withCause;
+import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withMessage;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutter")
@@ -90,7 +92,7 @@ public final class ProteinCutter {
         val mzPeptides = digester.digest(toMzProtein(sequence));
 
         return mzPeptides.toStream()
-            .filter(o(sizeFilter, p -> p.size()))
+            .filter(p -> sizeFilter.f(p.size()))
             .map(this::toAminoAcidSequence)
             .map(Peptide::peptide)
             .frequencies(Peptide.equal, Peptide.hash);

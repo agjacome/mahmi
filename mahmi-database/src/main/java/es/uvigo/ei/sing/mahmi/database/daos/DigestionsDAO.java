@@ -1,12 +1,13 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
+import fj.data.Option;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
-import fj.data.Option;
-import fj.data.Set;
 
 public interface DigestionsDAO extends DAO<Digestion> {
 

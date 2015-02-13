@@ -1,8 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.entities;
 
-import static fj.Equal.stringEqual;
-import static fj.Hash.stringHash;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,10 +7,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
-import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+
 import fj.Equal;
 import fj.Hash;
+
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
+
+import static fj.Equal.stringEqual;
+import static fj.Hash.stringHash;
 
 @Getter @Wither
 @AllArgsConstructor(staticName = "enzyme")

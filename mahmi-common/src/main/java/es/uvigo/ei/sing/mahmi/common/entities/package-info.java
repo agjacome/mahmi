@@ -16,8 +16,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.AminoAcidAdapter;
 import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.AminoAcidSequenceAdapter;
-import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseSequenceAdapter;
 import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.IdentifierAdapter;
 import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseAdapter;
+import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseSequenceAdapter;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 

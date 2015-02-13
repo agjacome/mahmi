@@ -1,12 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
-import static fj.Ord.stringOrd;
-import static fj.data.Set.iterableSet;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.OK;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -22,10 +15,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import lombok.val;
+
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
-import fj.data.Set;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.OK;
+
+import static fj.Ord.stringOrd;
+import static fj.data.Set.iterableSet;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Path("/enzyme")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
