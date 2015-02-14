@@ -21,7 +21,7 @@ public abstract class CompoundSequence<A extends Compound> {
     public static final Equal<CompoundSequence<? extends Compound>> equal =
         SHA1.equal.comap(CompoundSequence::getSHA1);
 
-    private StringBuilder strBuilder = null;
+    private String asString = null;
 
     public boolean isEmpty() {
         return getResidues().isEmpty();
@@ -31,11 +31,12 @@ public abstract class CompoundSequence<A extends Compound> {
         return SHA1.of(asString());
     }
 
-    public String asString() {
-        if (strBuilder.isNull())
-            strBuilder = getResidues().map(Compound::getCode).buildString();
+    public synchronized String asString() {
+        if (asString.isNull()) {
+            asString = getResidues().map(Compound::getCode).buildString();
+        }
 
-        return strBuilder.toString();
+        return asString;
     }
 
     public abstract Seq<A> getResidues();

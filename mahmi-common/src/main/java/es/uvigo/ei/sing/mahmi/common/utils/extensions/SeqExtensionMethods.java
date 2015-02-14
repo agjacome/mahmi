@@ -8,8 +8,10 @@ import fj.data.Seq;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SeqExtensionMethods {
 
-    public static StringBuilder buildString(final Seq<Character> cs) {
-        return cs.foldLeft(StringBuilder::append, new StringBuilder());
+    public static String buildString(final Seq<Character> cs) {
+        return cs.foldLeft(
+            StringBuilder::append, new StringBuilder()
+        ).toString();
     }
 
 }
