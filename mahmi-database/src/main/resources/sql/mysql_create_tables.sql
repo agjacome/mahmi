@@ -169,14 +169,16 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `users`
 -- -----------------------------------------------------
-CREATE TABLE  `users` (
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE  IF NOT EXISTS `users` (
   `user_id` INT( 11 ) NOT NULL AUTO_INCREMENT,
   `user_name` VARCHAR( 60 ) NOT NULL ,
   `user_organization` VARCHAR( 60 ) NOT NULL ,
   `user_username` VARCHAR( 60 ) NOT NULL ,
   `user_pass` VARCHAR( 60 ) NOT NULL,
   PRIMARY KEY (`user_id`))
-) ENGINE = INNODB;
+ENGINE = INNODB;
 
 
 
