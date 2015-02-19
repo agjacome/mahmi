@@ -1,4 +1,7 @@
 package es.uvigo.ei.sing.mahmi.http.services;
+import static es.uvigo.ei.sing.mahmi.common.entities.User.user;
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import javax.ws.rs.Consumes;
@@ -16,6 +19,7 @@ import javax.ws.rs.core.Response;
 import es.uvigo.ei.sing.mahmi.common.entities.User;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
+import es.uvigo.ei.sing.mahmi.http.wrappers.BooleanWrapper;
 import fj.data.Set;
 
 @Path("/users")
@@ -45,11 +49,31 @@ public class UserService extends DatabaseEntityAbstractService<User, UsersDAO>{
          return buildGetAll(page, size);
      }
      
+     @GET
+     @Path("/username/{username}")
+     public Response get(@PathParam("username") final String username) {
+         return respond(
+                 () -> BooleanWrapper.wrap(dao.exists(
+                         user(Identifier.empty(),"","",username,""))),
+                 status(OK)::entity
+             );
+     }
+     
      @POST
+     @Path("/register")
      public Response insert(final User user) {
          return buildInsert(user);
      }
-
+     
+     
+     @POST
+     @Path("/login")
+     public Response login(final User user) {
+         return respond(
+                 () -> BooleanWrapper.wrap(dao.login(user)),
+                 status(OK)::entity
+             );
+     }
      @Override
      protected GenericEntity<java.util.List<User>> toGenericEntity(
          final Set<User> users

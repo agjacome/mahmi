@@ -6,4 +6,9 @@ public interface UsersDAO extends DAO<User>{
     public boolean login(
             final User user
     ) throws DAOException;
+    
+    public boolean exists(
+            final User user
+    ) throws DAOException;
+    
 }
