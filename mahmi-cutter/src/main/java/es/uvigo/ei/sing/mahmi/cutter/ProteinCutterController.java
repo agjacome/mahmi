@@ -1,23 +1,22 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequence;
+import static java.util.concurrent.CompletableFuture.runAsync;
+
 import java.util.concurrent.CompletableFuture;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-
-import fj.F;
-import fj.data.HashMap;
-import fj.data.Set;
-import fj.function.Try0;
-
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
@@ -25,11 +24,11 @@ import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
-
-import static java.util.concurrent.CompletableFuture.runAsync;
-
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequence;
+import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
+import fj.F;
+import fj.data.HashMap;
+import fj.data.Set;
+import fj.function.Try0;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutterCtrl")
@@ -41,7 +40,7 @@ public final class ProteinCutterController {
     private final ProteinsDAO    proteinsDAO;
     private final PeptidesDAO    peptidesDAO;
     private final DigestionsDAO  digestionsDAO;
-    private final Table_Stats    tableStats;
+    private final TableStatsDAO    tableStatsDAO;
 
     public CompletableFuture<Void> cutProjectProteins(
         final Project     project,
@@ -55,7 +54,7 @@ public final class ProteinCutterController {
                 cutMetaGenomeProteins(mg, enzymes, sizeFilter).join();
             });
 
-            tableStats.updateStats(3, peptidesDAO.count());
+            tableStatsDAO.update(tableStat(Identifier.of(4),"", peptidesDAO.count()));
 
             log.info("Finished cutting proteins of {}", project);
         });

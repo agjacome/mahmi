@@ -1,5 +1,11 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
+import static fj.P.p;
+import static fj.Unit.unit;
+import static java.util.concurrent.CompletableFuture.runAsync;
+
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -8,31 +14,23 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-
-import fj.P2;
-import fj.data.HashMap;
-import fj.data.Set;
-
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import es.uvigo.ei.sing.mahmi.database.utils.Table_Stats;
-
-import static java.util.concurrent.CompletableFuture.runAsync;
-
-import static fj.P.p;
-import static fj.Unit.unit;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
+import fj.P2;
+import fj.data.HashMap;
+import fj.data.Set;
 
 @Slf4j
 @AllArgsConstructor(staticName = "projectLoaderCtrl")
@@ -43,7 +41,7 @@ public final class ProjectLoaderController {
     private final ProjectsDAO    projectsDAO;
     private final MetaGenomesDAO metaGenomesDAO;
     private final ProteinsDAO    proteinsDAO;
-    private final Table_Stats    tableStats;
+    private final TableStatsDAO    tableStatsDAO;
 
 
     public P2<Project, CompletableFuture<Void>> loadProject(
@@ -73,9 +71,9 @@ public final class ProjectLoaderController {
         val projectFiles = loader.loadProject(path);
         projectFiles.forEach(paths -> loadFastas(project, paths._1(), paths._2()));
 
-        tableStats.updateStats(1, projectsDAO.count());
-        tableStats.updateStats(2, metaGenomesDAO.count());
-        tableStats.updateStats(3, proteinsDAO.count());
+        tableStatsDAO.update(tableStat(Identifier.of(1),"", projectsDAO.count()));
+        tableStatsDAO.update(tableStat(Identifier.of(2),"", metaGenomesDAO.count()));
+        tableStatsDAO.update(tableStat(Identifier.of(3),"", proteinsDAO.count()));
         
         log.info("Finished loading Fasta files of {} from {}", project, path);
     }
