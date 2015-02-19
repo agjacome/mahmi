@@ -40,7 +40,7 @@ public final class ProteinCutterController {
     private final ProteinsDAO    proteinsDAO;
     private final PeptidesDAO    peptidesDAO;
     private final DigestionsDAO  digestionsDAO;
-    private final TableStatsDAO    tableStatsDAO;
+    private final TableStatsDAO  tableStatsDAO;
 
     public CompletableFuture<Void> cutProjectProteins(
         final Project     project,

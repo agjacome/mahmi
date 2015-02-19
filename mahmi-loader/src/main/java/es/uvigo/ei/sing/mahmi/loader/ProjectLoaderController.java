@@ -41,7 +41,7 @@ public final class ProjectLoaderController {
     private final ProjectsDAO    projectsDAO;
     private final MetaGenomesDAO metaGenomesDAO;
     private final ProteinsDAO    proteinsDAO;
-    private final TableStatsDAO    tableStatsDAO;
+    private final TableStatsDAO  tableStatsDAO;
 
 
     public P2<Project, CompletableFuture<Void>> loadProject(
