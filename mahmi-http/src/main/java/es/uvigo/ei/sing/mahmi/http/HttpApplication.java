@@ -10,6 +10,7 @@ import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLPeptidesDAO.mysqlP
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlProjectsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLTableStatsDAO.mysqlTableStatsDAO;
+import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLUsersDAO.mysqlUsersDAO;
 import static es.uvigo.ei.sing.mahmi.http.services.DigestionService.digestionService;
 import static es.uvigo.ei.sing.mahmi.http.services.EnzymeService.enzymeService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeProteinsService.metaGenomeProteinsService;
@@ -18,6 +19,7 @@ import static es.uvigo.ei.sing.mahmi.http.services.PeptideService.peptideService
 import static es.uvigo.ei.sing.mahmi.http.services.ProjectService.projectService;
 import static es.uvigo.ei.sing.mahmi.http.services.ProteinService.proteinService;
 import static es.uvigo.ei.sing.mahmi.http.services.TableStatService.tableStatService;
+import static es.uvigo.ei.sing.mahmi.http.services.UserService.userService;
 import static es.uvigo.ei.sing.mahmi.loader.MGRastProjectLoader.mgRastLoader;
 import static es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController.projectLoaderCtrl;
 
@@ -37,6 +39,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
 
 @AllArgsConstructor(staticName = "httpApplication")
@@ -54,6 +57,7 @@ public final class HttpApplication extends Application {
         final ProjectsDAO           projectsDAO           = mysqlProjectsDAO(connectionPool);
         final ProteinsDAO           proteinsDAO           = mysqlProteinsDAO(connectionPool);
         final TableStatsDAO         tableStatsDAO         = mysqlTableStatsDAO(connectionPool);
+        final UsersDAO              usersDAO              = mysqlUsersDAO(connectionPool);
 
         final ProjectLoaderController loaderController = projectLoaderCtrl(
             mgRastLoader(), projectsDAO, metaGenomesDAO, proteinsDAO, tableStatsDAO
@@ -71,7 +75,8 @@ public final class HttpApplication extends Application {
             (Object) peptideService(peptidesDAO),
             (Object) projectService(projectsDAO, loaderController),
             (Object) proteinService(proteinsDAO),
-            (Object) tableStatService(tableStatsDAO)
+            (Object) tableStatService(tableStatsDAO),
+            (Object) userService(usersDAO)
         );
     }
 
