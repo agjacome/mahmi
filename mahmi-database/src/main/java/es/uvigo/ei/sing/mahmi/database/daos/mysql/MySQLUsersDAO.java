@@ -130,8 +130,12 @@ public class MySQLUsersDAO extends MySQLAbstractDAO<User> implements UsersDAO{
 
     @Override
     public boolean register(User user) throws DAOException {
-        // TODO Auto-generated method stub
-        return false;
+        try{
+            write(getOrInsert(user));      
+        }catch(Exception e){
+            return false;
+        }
+        return true;
     }
    
 }

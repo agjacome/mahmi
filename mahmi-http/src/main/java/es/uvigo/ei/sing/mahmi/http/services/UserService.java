@@ -77,6 +77,8 @@ public class UserService extends DatabaseEntityAbstractService<User, UsersDAO>{
                  status(OK)::entity
              );
      }
+     
+     
      @Override
      protected GenericEntity<java.util.List<User>> toGenericEntity(
          final Set<User> users
