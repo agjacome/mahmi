@@ -61,8 +61,11 @@ public class UserService extends DatabaseEntityAbstractService<User, UsersDAO>{
      
      @POST
      @Path("/register")
-     public Response insert(final User user) {
-         return buildInsert(user);
+     public Response register(final User user) {
+         return respond(
+                 () -> BooleanWrapper.wrap(dao.register(user)),
+                 status(OK)::entity
+             );
      }
      
      

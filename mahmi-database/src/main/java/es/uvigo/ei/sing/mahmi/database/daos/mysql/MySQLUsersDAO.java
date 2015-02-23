@@ -1,6 +1,7 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.User.user;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.getWith;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
@@ -53,6 +54,16 @@ public class MySQLUsersDAO extends MySQLAbstractDAO<User> implements UsersDAO{
         return user(id, name, organization, username, "");
     }
     
+    private User parseWithPass (ResultSet resultSet) throws SQLException {
+        val id           = parseIdentifier(resultSet, "user_id");
+        val name         = parseString(resultSet,"user_name");
+        val organization = parseString(resultSet,"user_organization");
+        val username     = parseString(resultSet,"user_username");
+        val pass         = parseString(resultSet,"user_pass");
+
+        return user(id, name, organization, username, pass);
+    }
+    
     @Override
     protected DB<PreparedStatement> prepareSelect(User user) {
         return sql(
@@ -99,13 +110,9 @@ public class MySQLUsersDAO extends MySQLAbstractDAO<User> implements UsersDAO{
     }
     
     private String getPassword(User user){
-        val sql = prepareSelect(user).bind(query).bind(get);
-        final Option<User> result = read(sql).toOption();
-        if(result.isSome()){
-            return result.some().getPassword();
-        }else{
-            return "";
-        }
+        val sql = prepareSelect(user).bind(query).bind(getWith(this::parseWithPass));
+        Option<User> result = read(sql).toOption();
+        return result.some().getPassword();
     }
     
     @Override 
@@ -119,6 +126,12 @@ public class MySQLUsersDAO extends MySQLAbstractDAO<User> implements UsersDAO{
     public boolean login(User user) throws DAOException {
         final StrongPasswordEncryptor spe = new StrongPasswordEncryptor();
         return spe.checkPassword(user.getPassword(), getPassword(user));
+    }
+
+    @Override
+    public boolean register(User user) throws DAOException {
+        // TODO Auto-generated method stub
+        return false;
     }
    
 }

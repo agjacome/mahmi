@@ -32,7 +32,7 @@ public class MySQLTableStatsDAO extends MySQLAbstractDAO<TableStat> implements T
     @Override
     protected DB<PreparedStatement> prepareUpdate(final TableStat tableStat) {
         return prepare(
-                "UPDATE table_stats (table_counter) VALUES(?) WHERE table_stats_id=?"
+                "UPDATE table_stats SET table_stats_counter=? WHERE table_stats_id=?"
          ).bind(longInt(1,tableStat.getCounter())).bind(identifier(2, tableStat.getId()));        
     }   
   

@@ -11,4 +11,8 @@ public interface UsersDAO extends DAO<User>{
             final User user
     ) throws DAOException;
     
+    public boolean register(
+            final User user
+    ) throws DAOException;
+    
 }

@@ -176,7 +176,7 @@ CREATE TABLE  IF NOT EXISTS `users` (
   `user_name` VARCHAR( 60 ) NOT NULL ,
   `user_organization` VARCHAR( 60 ) NOT NULL ,
   `user_username` VARCHAR( 60 ) NOT NULL ,
-  `user_pass` VARCHAR( 60 ) NOT NULL,
+  `user_pass` VARCHAR( 120 ) NOT NULL,
   PRIMARY KEY (`user_id`))
 ENGINE = INNODB;
 
@@ -242,11 +242,6 @@ INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_co
 INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_counter`) VALUES (3, 'PROTEINS', 0);
 INSERT INTO `table_stats` (`table_stats_id`, `table_stats_name`, `table_stats_counter`) VALUES (4, 'PEPTIDES', 0);
 
-
--- -----------------------------------------------------
--- Data for table `users`
--- ----------------------------------------------------
-INSERT INTO `users` (`user_name`,`user_organization`,`user_username`,`user_pass`) VALUES ('admin','mahmi','admin','admin');
 
 COMMIT;
 
