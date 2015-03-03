@@ -12,7 +12,7 @@ public class PSortB {
     
     public int sort(char gram, Path input, Path output){
         try{
-            String[] command = {"sh","-c","psort -"+gram+" -o=terse --verbose "+
+            final String[] command = {"sh","-c","psort -"+gram+" -o=terse --verbose "+
                                 input.toString()+" > "+
                                 output.toString()};
             final Process process = Runtime.getRuntime().exec(command);
