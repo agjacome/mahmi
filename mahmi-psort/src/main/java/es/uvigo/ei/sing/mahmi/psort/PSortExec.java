@@ -1,7 +1,6 @@
 package es.uvigo.ei.sing.mahmi.psort;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -36,8 +35,11 @@ public class PSortExec {
     }    
     
     private void deleteOutFile(Path path){
-        final File outFile = new File(path.toString());
-        outFile.delete();
+    	try {
+			Files.delete(path);
+		} catch (IOException e) {
+			log.error(e.getMessage());
+		}
     }
     
     private void createSortFile(List<String> in, List<String> out, Path path){
