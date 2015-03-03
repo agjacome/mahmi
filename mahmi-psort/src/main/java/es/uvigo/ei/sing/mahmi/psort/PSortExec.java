@@ -41,15 +41,11 @@ public class PSortExec {
     }
     
     private void createSortFile(List<String> in, List<String> out, Path path){
-        File sortFile = new File(path+"/sort.faa");
-        if (sortFile.exists()) {
-            sortFile.delete();
-            sortFile = new File(path+"/sort.faa");
+        try {
+            Files.deleteIfExists(Paths.get(path+"/sort.faa"));
+        } catch (IOException e1) {
+            log.error(e1.getMessage());
         }
-        writeSortFile(in, out, path); 
-    }
-    
-    private void writeSortFile(List<String> in, List<String> out, Path path){
         int currentProtein=1;
         int currentLine=19; 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(path+"/sort.faa"))) {   
