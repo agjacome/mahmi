@@ -1,21 +1,21 @@
 package es.uvigo.ei.sing.mahmi.psort;
 
-import java.io.*;
 import java.nio.file.Path;
 
-import org.apache.commons.io.IOUtils;
-
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.io.IOUtils;
 
 @Slf4j
 public class PSortB {
     
     public int sort(char gram, Path input, Path output){
         try{
-            final String[] command = {"sh","-c","psort -"+gram+" -o=terse --verbose "+
+        	final String[] command = {"sh","-c","psort -"+gram+" -o=terse --verbose "+
                                 input.toString()+" > "+
                                 output.toString()};
-            final Process process = Runtime.getRuntime().exec(command);
+            val process = Runtime.getRuntime().exec(command);
             
             logExec(process);
             logErrors(process);
@@ -31,7 +31,7 @@ public class PSortB {
         new Thread(){
             public void run(){
                 try{
-                    InputStream is = process.getInputStream();
+                    val is = process.getInputStream();
                     log.info(IOUtils.toString(is, "UTF-8"));
                 }catch(Exception e){
                     e.printStackTrace();
@@ -44,7 +44,7 @@ public class PSortB {
         new Thread(){
             public void run(){
                 try{
-                    InputStream is = process.getErrorStream();
+                    val is = process.getErrorStream();
                     log.error(IOUtils.toString(is, "UTF-8"));
                 }
                 catch(Exception e){

@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -18,7 +19,7 @@ public class PSortExec {
     private PSortB psb=new PSortB();
     
     public void exec(char gram, Path inputPath){
-        final Path outputPath=Paths.get(inputPath.getParent()+"/psortb.out");
+        val outputPath=Paths.get(inputPath.getParent()+"/psortb.out");
         if(psb.sort(gram, inputPath ,outputPath) == 0){
             List<String> out=new ArrayList<String>();
             List<String> in=new ArrayList<String>();
@@ -44,7 +45,7 @@ public class PSortExec {
     
     private void createSortFile(List<String> in, List<String> out, Path path){
         int currentLine=0;
-        try (final BufferedWriter bw = new BufferedWriter(new FileWriter(path+"/sort.faa",false))) {   
+        try (val bw = new BufferedWriter(new FileWriter(path+"/sort.faa",false))) {   
             for(String protein:out){
                 if(protein.contains("Extracellular")||protein.contains("Unknown")){
                     bw.write(in.get((currentLine*2)-2)+"\n");
