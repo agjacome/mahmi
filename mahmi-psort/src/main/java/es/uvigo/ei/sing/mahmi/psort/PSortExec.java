@@ -46,18 +46,14 @@ public class PSortExec {
         } catch (IOException e1) {
             log.error(e1.getMessage());
         }
-        int currentProtein=1;
-        int currentLine=19; 
+        int currentLine=0;
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(path+"/sort.faa"))) {   
-            while(currentProtein<=out.size()/22){
-                String result=out.get(currentLine-1);
-            
-                if(result.contains("Extracellular")||result.contains("Unknown")){
-                    bw.write(in.get((currentProtein*2)-2)+"\n");
-                    bw.write(in.get((currentProtein*2)-1)+"\n");
+            for(String protein:out){
+                if(protein.contains("Extracellular")||protein.contains("Unknown")){
+                    bw.write(in.get((currentLine*2)-2)+"\n");
+                    bw.write(in.get((currentLine*2)-1)+"\n");
                 }
-                currentLine=currentLine+22;
-                currentProtein++;
+                currentLine++;
             }
         }catch (IOException e) {
             log.error(e.getMessage());
