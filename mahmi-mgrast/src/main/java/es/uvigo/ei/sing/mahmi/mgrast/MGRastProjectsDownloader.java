@@ -15,14 +15,17 @@ public class MGRastProjectsDownloader {
     final MGRastGetter mgrGetter = new MGRastGetter(); 
     
     public void downloadProject(String id){
-        val projectName = mgrGetter.getProjectName(id);
-        createFolder(config.getString("downloadDirectory")+projectName);
-        val metagenomes = mgrGetter.getProject(id);
-        for(String metagenome : metagenomes){
-            createFolder(config.getString("downloadDirectory")+id+"/"+metagenome);
-            mgrGetter.getMetagenome(metagenome);
-            mgrGetter.getProtein(metagenome);
-        }       
+        if(mgrGetter.existsProject(id)){
+            val projectName = mgrGetter.getProjectName(id);
+            createFolder(config.getString("downloadDirectory")+projectName);
+            val metagenomes = mgrGetter.getProject(id);
+            for(String metagenome : metagenomes){
+                val directory = config.getString("downloadDirectory")+id+"/"+metagenome;
+                createFolder(directory);
+                mgrGetter.getMetagenome(metagenome, directory);
+                mgrGetter.getProtein(metagenome, directory);
+            }   
+        }
     }
     
     public boolean createFolder(String path){
