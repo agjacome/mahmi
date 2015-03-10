@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.mgrast;
+package es.uvigo.ei.sing.mahmi.loader.mgrast;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -44,7 +44,7 @@ public class MGRastGetter {
     }
     
     @SuppressWarnings("unchecked")
-    public List<String> getProject(String id){
+    public List<String> getProjectMetagenomes(String id){
         val metagenomes = new ArrayList<String>();
         try {
             val response = getJSON(new URL("http://api.metagenomics.anl.gov/1/project/"+id+"?verbosity=full"));
