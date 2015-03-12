@@ -15,7 +15,7 @@
         <module>mahmi-database</module>
         <module>mahmi-http</module>
         <module>mahmi-loader</module>
-   	<module>mahmi-mgrast</module>
+     	<module>mahmi-psort</module>
   </modules>
 
     <properties>
