@@ -1,5 +1,7 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
+import static fj.P.p;
+
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -12,18 +14,15 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-
-import fj.P2;
-import fj.data.Stream;
-
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
-
-import static fj.P.p;
+import es.uvigo.ei.sing.mahmi.psort.PSortExec;
+import fj.P2;
+import fj.data.Stream;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,8 +30,7 @@ import static fj.P.p;
 public final class MGRastProjectLoader implements ProjectLoader {
 
     private static final FastaReader<NucleobaseSequence> genomeReader  = FastaReader.forNucleobase();
-    private static final FastaReader<AminoAcidSequence>  proteinReader = FastaReader.forAminoAcid();
-
+   
     public static ProjectLoader mgRastLoader() {
         return new MGRastProjectLoader();
     }
@@ -57,7 +55,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     ) {
         log.info("Reading genome fasta file {} and protein fasta file {}", paths._1(), paths._2());
         val genomes  = readFasta(genomeReader , paths._1());
-        val proteins = readFasta(proteinReader, paths._2());
+        val proteins = new PSortExec().exec('p',paths._2());
 
         return p(genomes, proteins);
     }
