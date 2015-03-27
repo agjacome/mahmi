@@ -31,7 +31,7 @@ public class PSortExec {
                 log.error(e.getMessage());
             }            
 
-            fasta = createSortFile(out, inputPath);
+            fasta = getSortFasta(out, inputPath);
         }
         deleteOutFile(outputPath);
         return fasta;
@@ -45,13 +45,13 @@ public class PSortExec {
 		}
     }
     
-    private Fasta<AminoAcidSequence> createSortFile(List<String> out, Path path){
+    private Fasta<AminoAcidSequence> getSortFasta(List<String> out, Path path){
     	 try {
 			val iterator = proteinReader.fromPath(path).iterator();
 			List<AminoAcidSequence> list = new ArrayList<AminoAcidSequence>();
 	    	for(String protein:out){
 	    		val aminoAcid = iterator.next();
-	            if(protein.contains("Extracellular")||protein.contains("Unknown")){	            	
+	            if(protein.contains("Extracellular")){//||protein.contains("Unknown")){	            	
 	            	list.add(aminoAcid);
 	            }	            
 	        }	    	
