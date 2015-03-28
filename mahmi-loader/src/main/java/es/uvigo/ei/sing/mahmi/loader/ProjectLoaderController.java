@@ -1,11 +1,5 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
-import static fj.P.p;
-import static fj.Unit.unit;
-import static java.util.concurrent.CompletableFuture.runAsync;
-
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -14,6 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.P2;
+import fj.data.HashMap;
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -28,9 +27,14 @@ import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-import fj.P2;
-import fj.data.HashMap;
-import fj.data.Set;
+
+import static java.util.concurrent.CompletableFuture.runAsync;
+
+import static fj.P.p;
+import static fj.Unit.unit;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
+import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
 
 @Slf4j
 @AllArgsConstructor(staticName = "projectLoaderCtrl")

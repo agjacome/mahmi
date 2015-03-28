@@ -10,6 +10,7 @@ import java.util.List;
 
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;

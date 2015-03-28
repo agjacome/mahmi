@@ -1,15 +1,17 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
-import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequence;
-import static java.util.concurrent.CompletableFuture.runAsync;
-
 import java.util.concurrent.CompletableFuture;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.F;
+import fj.data.HashMap;
+import fj.data.Set;
+import fj.function.Try0;
+
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
@@ -25,10 +27,11 @@ import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-import fj.F;
-import fj.data.HashMap;
-import fj.data.Set;
-import fj.function.Try0;
+
+import static java.util.concurrent.CompletableFuture.runAsync;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.FutureExtensionMethods.sequence;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutterCtrl")

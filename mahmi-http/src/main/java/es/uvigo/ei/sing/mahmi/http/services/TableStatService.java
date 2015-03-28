@@ -1,6 +1,4 @@
 package es.uvigo.ei.sing.mahmi.http.services;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -12,10 +10,13 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.TableStat;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-import fj.data.Set;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Path("/tableStats")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })

@@ -1,18 +1,14 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.User.user;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.getWith;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
+
+import fj.control.db.DB;
+import fj.data.Option;
 
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
@@ -22,8 +18,9 @@ import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
-import fj.control.db.DB;
-import fj.data.Option;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.User.user;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public class MySQLUsersDAO extends MySQLAbstractDAO<User> implements UsersDAO{

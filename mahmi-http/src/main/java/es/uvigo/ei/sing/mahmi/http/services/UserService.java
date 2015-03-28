@@ -1,9 +1,4 @@
 package es.uvigo.ei.sing.mahmi.http.services;
-import static es.uvigo.ei.sing.mahmi.common.entities.User.user;
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.OK;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -16,11 +11,19 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import fj.data.Set;
+
 import es.uvigo.ei.sing.mahmi.common.entities.User;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.BooleanWrapper;
-import fj.data.Set;
+
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.OK;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.User.user;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Path("/users")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })

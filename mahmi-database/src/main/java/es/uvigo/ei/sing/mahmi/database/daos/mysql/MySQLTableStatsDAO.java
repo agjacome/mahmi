@@ -1,20 +1,22 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
-import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
+
+import fj.control.db.DB;
+
 import es.uvigo.ei.sing.mahmi.common.entities.TableStat;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-import fj.control.db.DB;
+
+import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public class MySQLTableStatsDAO extends MySQLAbstractDAO<TableStat> implements TableStatsDAO{

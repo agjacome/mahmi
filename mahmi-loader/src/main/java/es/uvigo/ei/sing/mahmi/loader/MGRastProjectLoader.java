@@ -1,7 +1,5 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
-import static fj.P.p;
-
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -14,6 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
+
+import fj.P2;
+import fj.data.Stream;
+
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
@@ -21,8 +23,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.psort.PSortExec;
-import fj.P2;
-import fj.data.Stream;
+
+import static fj.P.p;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
