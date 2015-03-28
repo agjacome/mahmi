@@ -22,7 +22,7 @@ public class PSortExec {
     
     public Fasta<AminoAcidSequence> exec(char gram, Path inputPath){
         val outputPath=Paths.get(inputPath.getParent()+"/psortb.out");
-        Fasta<AminoAcidSequence> fasta=Fasta.empty();
+        Fasta<AminoAcidSequence> fasta = Fasta.empty();
         if(psb.sort(gram, inputPath ,outputPath) == 0){
             List<String> out=new ArrayList<String>();
             try {
@@ -49,12 +49,16 @@ public class PSortExec {
     	 try {
 			val iterator = proteinReader.fromPath(path).iterator();
 			List<AminoAcidSequence> list = new ArrayList<AminoAcidSequence>();
+			
 	    	for(String protein:out){
-	    		val aminoAcid = iterator.next();
-	            if(protein.contains("Extracellular")){//||protein.contains("Unknown")){	            	
-	            	list.add(aminoAcid);
-	            }	            
-	        }	    	
+	    		if(!protein.equals("SeqID	Localization	Score")){
+	    			val aminoAcid = iterator.next();
+		            if(protein.contains("Extracellular")){//||protein.contains("Unknown")){	            	
+		            	list.add(aminoAcid);
+		            	
+		            }	
+	    		}
+	        }
             return Fasta.of(list.iterator());
 	    	
 		} catch (IOException e) {
