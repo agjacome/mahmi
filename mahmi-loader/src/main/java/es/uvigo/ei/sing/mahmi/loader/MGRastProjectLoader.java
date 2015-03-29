@@ -22,7 +22,7 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
-import es.uvigo.ei.sing.mahmi.psort.PSortRunner;
+import es.uvigo.ei.sing.mahmi.psort.PSortFastaFilter;
 
 import static fj.P.p;
 
@@ -37,7 +37,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     private static final FastaReader<NucleobaseSequence> genomeReader = FastaReader.forNucleobase();
 
     // TODO: receive in constructor
-    private final PSortRunner psort = PSortRunner.of(
+    private final PSortFastaFilter psort = PSortFastaFilter.of(
         Positive, Extracellular.single()
     );
 
@@ -87,7 +87,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
             log.info("Parsing and filtering sequences from fasta file {}", file);
             return psort.filter(file);
         } catch (final IOException ioe) {
-            log.error("I/O error while loading sequences from file", ioe);
+            log.error("I/O error while loading and filtering sequences from file", ioe);
             throw LoaderException.withCause(ioe);
         }
     }

@@ -1,65 +1,55 @@
 package es.uvigo.ei.sing.mahmi.psort;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.util.EnumSet;
-import java.util.regex.Pattern;
+import java.text.MessageFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
-import fj.data.List.Buffer;
+@Slf4j
+@AllArgsConstructor(staticName = "psort")
+final class PSortRunner implements Runnable {
 
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
+    private final PSortGramMode mode;
+    private final Path input;
+    private final Path output;
 
-import static fj.data.List.list;
-
-@AllArgsConstructor(staticName = "of")
-public final class PSortRunner {
-
-    private static final FastaReader<AminoAcidSequence> proteinFastaReader = FastaReader.forAminoAcid();
-
-    private final PSortGramMode            mode;
-    private final EnumSet<PSortFilterType> filter;
-
-    public Fasta<AminoAcidSequence> filter(final Path input) throws IOException {
-        val output = input.resolveSibling("psortb.out");
-        val psortb = PSortWrapper.run(mode, input, output);
-
-        // TODO: It's probably better to launch an exception, or return an
-        // Option instead of failing silently with an empty Fasta.
-        if (!psortb) return Fasta.empty();
-
-        val fasta = filterFasta(proteinFastaReader.fromPath(input), output);
-        Files.deleteIfExists(output);
-        return fasta;
+    @Override
+    public void run() {
+        try {
+            val process = buildProcess().start();
+            redirectErrorToLogs(process);
+            checkExitValue(process.waitFor());
+        } catch (final IOException | InterruptedException ie){
+            log.error("PSORT error", ie);
+            throw new RuntimeException(ie);
+        }
     }
 
-    private Fasta<AminoAcidSequence> filterFasta(
-        final Fasta<AminoAcidSequence> fasta, final Path output
-    ) throws IOException {
-        val pattern   = PSortFilterType.compile(filter);
+    private ProcessBuilder buildProcess() {
+        return new ProcessBuilder(
+            "psort",
+            mode.getModeFlag(),
+            "-o=terse",
+            "--verbose",
+            input.toString()
+        ).redirectOutput(output.toFile());
+    }
 
-        val outLines  = list(Files.readAllLines(output)).tail();
-        val fastaIter = fasta.iterator();
+    private void checkExitValue(final int value) throws IOException {
+        if (value != 0) throw new IOException(
+            MessageFormat.format("PSORT exited anormally ({})", value)
+        );
+    }
 
-        // FIXME: all these filtered sequences are kept in memory, if the
-        // original Fasta file is too big or if the filter does keep too many
-        // sequences, this can cause memory-related problems.
-        val filtered = Buffer.<AminoAcidSequence>empty();
-
-        // TODO: can be done without a side-effectful loop, it's just zip(),
-        // filter() and map().
-        for (final String line : outLines) {
-            val sequence = fastaIter.next();
-            if (Pattern.matches(pattern, line))
-                filtered.snoc(sequence);
+    private void redirectErrorToLogs(final Process proc) throws IOException {
+        try (val stderr = new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
+            stderr.lines().forEach(log::info);
         }
-
-        return Fasta.of(filtered.iterator());
     }
 
 }
