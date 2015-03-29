@@ -1,11 +1,12 @@
 package es.uvigo.ei.sing.mahmi.psort;
 
 import java.util.EnumSet;
-import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.val;
 
+import static java.util.stream.Collectors.joining;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum PSortFilterType {
@@ -18,9 +19,8 @@ public enum PSortFilterType {
     private final String regex;
 
     static String compile(final EnumSet<PSortFilterType> filter) {
-        return filter.stream()
-              .map(PSortFilterType::getRegex)
-              .collect(Collectors.joining(".*|.*"));
+        val or = filter.stream().map(p -> p.getRegex()).collect(joining("|"));
+        return ".*(" + or + ").*";
     }
 
     String getRegex() {
