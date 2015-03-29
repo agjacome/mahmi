@@ -20,7 +20,7 @@ public enum PSortFilterType {
     static String compile(final EnumSet<PSortFilterType> filter) {
         return filter.stream()
               .map(PSortFilterType::getRegex)
-              .collect(Collectors.joining("|"));
+              .collect(Collectors.joining(".*|.*"));
     }
 
     String getRegex() {

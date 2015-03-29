@@ -9,13 +9,9 @@ import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.val;
 
-import fj.data.List.Buffer;
-
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
-
-import static fj.data.List.list;
 
 import static es.uvigo.ei.sing.mahmi.psort.PSortRunner.psort;
 
@@ -50,15 +46,16 @@ public final class PSortFastaFilter {
     ) throws IOException {
         val pattern = PSortFilterType.compile(filter);
 
-        val outLines  = list(Files.readAllLines(output)).tail();
+        val outLines  = Files.lines(output).skip(1);
         val fastaIter = fasta.iterator();
 
-        val filtered = Buffer.<AminoAcidSequence>empty();
-        for (final String line : outLines) {
+        val filtered = new java.util.LinkedList<AminoAcidSequence>();
+
+        outLines.forEach(line -> {
             val sequence = fastaIter.next();
-            if (Pattern.matches(pattern, line))
-                filtered.snoc(sequence);
-        }
+            if (Pattern.matches(pattern, line)) filtered.add(sequence);
+        });
+
         return Fasta.of(filtered.iterator());
     }
 
