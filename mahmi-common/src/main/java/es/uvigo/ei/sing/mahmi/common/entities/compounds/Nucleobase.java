@@ -2,6 +2,8 @@ package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
 import java.util.EnumSet;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 
@@ -17,6 +19,7 @@ import static fj.data.Stream.iterableStream;
 import static fj.function.Characters.toLowerCase;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Nucleobase implements Compound {
 
     A("Adenine" , 'A'),
@@ -38,13 +41,8 @@ public enum Nucleobase implements Compound {
         );
     }
 
-    private final char   code;
     private final String fullName;
-
-    private Nucleobase(final String fullName, final char code) {
-        this.code      = code;
-        this.fullName  = fullName;
-    }
+    private final char   code;
 
     public static Option<Nucleobase> fromCode(final char code) {
         return codes.get(code);

@@ -22,17 +22,25 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
-import es.uvigo.ei.sing.mahmi.psort.PSortExec;
+import es.uvigo.ei.sing.mahmi.psort.PSortRunner;
 
 import static fj.P.p;
+
+import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Extracellular;
+import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class MGRastProjectLoader implements ProjectLoader {
 
-    private static final FastaReader<NucleobaseSequence> genomeReader  = FastaReader.forNucleobase();
-   
+    private static final FastaReader<NucleobaseSequence> genomeReader = FastaReader.forNucleobase();
+
+    // TODO: receive in constructor
+    private final PSortRunner psort = PSortRunner.of(
+        Positive, Extracellular.single()
+    );
+
     public static ProjectLoader mgRastLoader() {
         return new MGRastProjectLoader();
     }
@@ -57,7 +65,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     ) {
         log.info("Reading genome fasta file {} and protein fasta file {}", paths._1(), paths._2());
         val genomes  = readFasta(genomeReader , paths._1());
-        val proteins = new PSortExec().exec('p',paths._2());
+        val proteins = filterFasta(paths._2());
 
         return p(genomes, proteins);
     }
@@ -68,6 +76,16 @@ public final class MGRastProjectLoader implements ProjectLoader {
         try {
             log.info("Parsing sequences from fasta file {}", file);
             return reader.fromPath(file);
+        } catch (final IOException ioe) {
+            log.error("I/O error while loading sequences from file", ioe);
+            throw LoaderException.withCause(ioe);
+        }
+    }
+
+    private Fasta<AminoAcidSequence> filterFasta(final Path file) {
+        try {
+            log.info("Parsing and filtering sequences from fasta file {}", file);
+            return psort.filter(file);
         } catch (final IOException ioe) {
             log.error("I/O error while loading sequences from file", ioe);
             throw LoaderException.withCause(ioe);

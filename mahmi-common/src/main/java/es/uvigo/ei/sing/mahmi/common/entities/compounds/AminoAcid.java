@@ -2,6 +2,8 @@ package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
 import java.util.EnumSet;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import fj.data.HashMap;
@@ -16,6 +18,7 @@ import static fj.data.Stream.iterableStream;
 import static fj.function.Characters.toUpperCase;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum AminoAcid implements Compound {
 
     ALA("Alanine"       , 'A'),
@@ -54,13 +57,8 @@ public enum AminoAcid implements Compound {
         charHash.comap(toUpperCase)
     );
 
-    private final char   code;
     private final String fullName;
-
-    private AminoAcid(final String fullName, final char code) {
-        this.code      = code;
-        this.fullName  = fullName;
-    }
+    private final char   code;
 
     public static Option<AminoAcid> fromCode(final char code) {
         return codes.get(code);
