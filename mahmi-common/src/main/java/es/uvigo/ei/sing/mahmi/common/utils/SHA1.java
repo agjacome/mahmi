@@ -16,10 +16,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.ArrayExtensionMethods;
 
-import static fj.Equal.arrayEqual;
-import static fj.Equal.byteEqual;
-import static fj.Hash.arrayHash;
-import static fj.Hash.byteHash;
+import static fj.Equal.stringEqual;
+import static fj.Hash.stringHash;
 import static fj.data.Array.array;
 
 @Slf4j
@@ -28,11 +26,8 @@ import static fj.data.Array.array;
 @ExtensionMethod(ArrayExtensionMethods.class)
 public final class SHA1 {
 
-    public static final Hash<SHA1> hash =
-        arrayHash(byteHash).comap(SHA1::getDigest);
-
-    public static final Equal<SHA1> equal =
-        arrayEqual(byteEqual).comap(SHA1::getDigest);
+    public static final Hash<SHA1>  hash  = stringHash.comap(SHA1::asHexString);
+    public static final Equal<SHA1> equal = stringEqual.comap(SHA1::asHexString);
 
     private final Array<Byte> digest;
 
