@@ -25,7 +25,7 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAO;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 
-import static fj.data.List.iterableList;
+import static fj.data.List.list;
 
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
@@ -67,7 +67,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
 
     @Override
     public Set<A> insertAll(final Set<A> entities) throws DAOException {
-        val sql = sequence(iterableList(entities).map(this::getOrInsert));
+        val sql = sequence(list(entities).map(this::getOrInsert));
         return write(sql).toSet(ordering);
     }
 

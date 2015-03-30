@@ -106,7 +106,7 @@ public final class ProteinCutter {
         val digestions = new HashSet<>(Digestion.equal, Digestion.hash);
 
         for (val peptide : cuts) {
-            val counter   = cuts.get(peptide).some();
+            val counter   = cuts.get(peptide).or(1L);
             val digestion = digestion(protein, peptide, enzyme, counter);
             digestions.set(digestion);
         }

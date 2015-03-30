@@ -9,8 +9,8 @@ import static fj.function.Characters.toUpperCase;
 
 public interface Compound {
 
-    public static final Hash<Compound>  hash  = charHash.comap(toUpperCase).comap(Compound::getCode);
-    public static final Equal<Compound> equal = charEqual.comap(toUpperCase).comap(Compound::getCode);
+    public static final Hash<? extends Compound>  hash  = charHash.comap(toUpperCase).comap(Compound::getCode);
+    public static final Equal<? extends Compound> equal = charEqual.comap(toUpperCase).comap(Compound::getCode);
 
     public char getCode();
 

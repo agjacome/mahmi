@@ -13,16 +13,18 @@ import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.SeqExtensionMethods;
 
+import static fj.Equal.seqEqual;
+import static fj.Hash.seqHash;
 import static fj.P.lazy;
 
 @ExtensionMethod({ SeqExtensionMethods.class, Objects.class })
 public abstract class CompoundSequence<A extends Compound> {
 
     public static final Hash<CompoundSequence<? extends Compound>> hash =
-        SHA1.hash.comap(CompoundSequence::getSHA1);
+        seqHash(Compound.hash).comap(CompoundSequence::getResidues);
 
     public static final Equal<CompoundSequence<? extends Compound>> equal =
-        SHA1.equal.comap(CompoundSequence::getSHA1);
+        seqEqual(Compound.equal).comap(CompoundSequence::getResidues);
 
     private final P1<String> asString = lazy(
         () -> getResidues().map(Compound::getCode).buildString()
