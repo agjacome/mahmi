@@ -16,7 +16,8 @@
         <module>mahmi-http</module>
         <module>mahmi-loader</module>
      	<module>mahmi-psort</module>
-  </modules>
+     	<module>mahmi-calculator</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
