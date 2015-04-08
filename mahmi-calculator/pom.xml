@@ -9,15 +9,26 @@
         <artifactId>mahmi</artifactId>
         <version>0.0.1</version>
     </parent>
-    <artifactId>mahmi.psort</artifactId>
-    <name>MAHMI - PSORTB</name>
+    <artifactId>mahmi.calculator</artifactId>
+    <name>MAHMI - PEPTIDE CALCULATOR</name>
     <packaging>jar</packaging>
     <dependencies>
-        <dependency>
+	    <dependency>
 	      <groupId>junit</groupId>
 	      <artifactId>junit</artifactId>
 	      <version>3.8.1</version>
 	      <scope>test</scope>
 	    </dependency>
+	    
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.database</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
