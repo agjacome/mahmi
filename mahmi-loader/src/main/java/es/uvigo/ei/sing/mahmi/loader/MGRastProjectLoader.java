@@ -1,5 +1,9 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
+import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Extracellular;
+import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
+import static fj.P.p;
+
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -12,10 +16,6 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-
-import fj.P2;
-import fj.data.Stream;
-
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
@@ -23,11 +23,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.psort.PSortFastaFilter;
-
-import static fj.P.p;
-
-import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Extracellular;
-import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
+import fj.P2;
+import fj.data.Stream;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -35,6 +32,7 @@ import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
 public final class MGRastProjectLoader implements ProjectLoader {
 
     private static final FastaReader<NucleobaseSequence> genomeReader = FastaReader.forNucleobase();
+    private static final FastaReader<AminoAcidSequence> proteinReader = FastaReader.forAminoAcid();
 
     // TODO: receive in constructor
     private final PSortFastaFilter psort = PSortFastaFilter.of(
@@ -65,7 +63,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     ) {
         log.info("Reading genome fasta file {} and protein fasta file {}", paths._1(), paths._2());
         val genomes  = readFasta(genomeReader , paths._1());
-        val proteins = filterFasta(paths._2());
+        val proteins = readFasta(proteinReader, paths._2());//filterFasta(paths._2());
 
         return p(genomes, proteins);
     }

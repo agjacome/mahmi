@@ -51,9 +51,9 @@ public class PeptideCalculator {
 		return Math.round(pI*Math.pow(10,2))/Math.pow(10,2);
 	}
 	
-	public double calculateMW(String sequence){
+	public Double calculateMW(String sequence){
 		char aminoAcid;
-		double mW = 18.01524;
+		Double mW = 18.01524;
 		for (int i = 0; i < sequence.length(); i++){
 			aminoAcid = sequence.charAt(i);
 			if(aminoAcid != ' '){

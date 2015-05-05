@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-
 import fj.F;
 import fj.Ord;
 import fj.control.db.DB;
@@ -17,16 +16,13 @@ import fj.data.List;
 import fj.data.Option;
 import fj.data.Set;
 import fj.function.Try0;
-
 import es.uvigo.ei.sing.mahmi.common.entities.Entity;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAO;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
-
 import static fj.data.List.list;
-
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
 @Slf4j
@@ -68,7 +64,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
     @Override
     public Set<A> insertAll(final Set<A> entities) throws DAOException {
         val sql = sequence(list(entities).map(this::getOrInsert));
-        return write(sql).toSet(ordering);
+		return write(sql).toSet(ordering);
     }
 
     @Override

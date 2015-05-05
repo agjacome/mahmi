@@ -15,9 +15,7 @@ public final class HashExtensionMethods {
     public static <A> Ord<A> toOrd(final Hash<A> hash) {
         return ord(a1 -> a2 -> {
             final int diff = hash.hash(a1) - hash.hash(a2);
-            return diff < 0 ? Ordering.LT
-                 : diff > 0 ? Ordering.GT
-                 : Ordering.EQ;
+            return diff < 0 ? Ordering.LT : diff == 0 ? Ordering.EQ : Ordering.GT;
         });
     }
 
