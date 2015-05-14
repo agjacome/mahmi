@@ -15,8 +15,8 @@
         <module>mahmi-database</module>
         <module>mahmi-http</module>
         <module>mahmi-loader</module>
-     	<module>mahmi-psort</module>
-     	<module>mahmi-calculator</module>
+        <module>mahmi-psort</module>
+        <module>mahmi-calculator</module>
     </modules>
 
     <properties>
@@ -53,13 +53,5 @@
             </plugin>
         </plugins>
     </reporting>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.2</version>
-        </dependency>
-    </dependencies>
 
 </project>
