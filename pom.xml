@@ -16,7 +16,6 @@
         <module>mahmi-http</module>
         <module>mahmi-loader</module>
      	<module>mahmi-psort</module>
-     	<module>mahmi-calculator</module>
     </modules>
 
     <properties>
