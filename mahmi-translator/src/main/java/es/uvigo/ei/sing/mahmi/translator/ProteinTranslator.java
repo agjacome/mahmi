@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.mahmi.translator;
 
 import static es.uvigo.ei.sing.mahmi.translator.BlastDbCmdRunner.blastdbcmd;
 import static es.uvigo.ei.sing.mahmi.translator.BlastxRunner.blastx;
+import static es.uvigo.ei.sing.mahmi.translator.MetahitDiscoverRunner.mhdiscover;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -27,25 +28,32 @@ public class ProteinTranslator {
         val output = input.resolveSibling("blastx.out");
         val readPath = input.resolveSibling("read.fna");
         try (val pw = new PrintWriter(new BufferedWriter(new FileWriter(readPath.toString(), false)))){	    	
-        	pw.println(nbs.asString());     	
+        	pw.println(nbs.asString()); 
         }catch(IOException e){
-        	log.error(e.getMessage());
+        	log.error("Error creating blast auxiliar file:\n"+e.getMessage());
         }
         blastx(readPath, output, db).run();
-        try {
-			Files.deleteIfExists(readPath);
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
+        try {	    	        	
+        	Files.deleteIfExists(readPath);
+        }catch(IOException e){
+        	log.error("Error deleting blast auxiliar file:\n"+e.getMessage());
+        }
         return output;
     }
 	
 	
+	@SuppressWarnings("unused")
 	private Path runBlastDbCmd(final String input, final Path inputPath) {
 		val output = inputPath.resolveSibling("blastdbcmd.out");
-        blastdbcmd(input, output).run();
+        blastdbcmd(input, output, db).run();
         return output;
     }
+	
+	private Path runMetahitDiscover(final Path input, final Path blastx){
+		val output = input.resolveSibling("mhdiscover.out");
+		mhdiscover(blastx, output).run();
+		return output;
+	}	
 	
 	public void translate(final Path input){
 		val protPath=input.resolveSibling("proteins.faa");
@@ -53,18 +61,12 @@ public class ProteinTranslator {
 			val genomes = readFromPath(input);
 			val fastaIter = genomes.iterator();
 			while(fastaIter.hasNext()){	
-				val protein=Files.readAllLines(
-					runBlastDbCmd(
-						Files.readAllLines( 
-									runBlastX(input,fastaIter.next())
-								).get(21).split("\\|",-1)[1],
-						input)
-					);
+				val protein = Files.readAllLines(runMetahitDiscover(input, runBlastX(input, fastaIter.next())));
 				for(val line : protein){
 					pw.println(line);
 				}	
 				Files.deleteIfExists(input.resolveSibling("blastx.out"));
-				Files.deleteIfExists(input.resolveSibling("blastdbcmd.out"));
+				Files.deleteIfExists(input.resolveSibling("mhdiscover.out"));
 			}
 		} catch (IOException e) {
 			log.error("Error translating fasta file:\n"+e.getMessage());

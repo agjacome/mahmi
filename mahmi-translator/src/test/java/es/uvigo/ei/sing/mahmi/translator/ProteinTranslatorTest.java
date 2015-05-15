@@ -16,9 +16,15 @@ public class ProteinTranslatorTest extends TestCase{
         return new TestSuite( ProteinTranslatorTest.class );
     }
 
-    public void testApp(){    	
-    	val pt = new ProteinTranslator("nr");
+    public void testApp(){   
+    	
+    	long time_start, time_end;
+    	time_start = System.currentTimeMillis();
+    	val pt = new ProteinTranslator("mh");
     	pt.translate(Paths.get("/home/mahmi/test.fna"));
         assertTrue( true );
+    	time_end = System.currentTimeMillis();
+    	System.out.println("The task has taken "+ ( time_end - time_start )/1000+" seconds");
+    	
     }
 }

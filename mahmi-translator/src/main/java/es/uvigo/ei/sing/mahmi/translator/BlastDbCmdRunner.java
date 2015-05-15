@@ -16,6 +16,7 @@ final class BlastDbCmdRunner implements Runnable {
 
     private final String input;
     private final Path output;
+    private final String db;
 
     @Override
     public void run() {
@@ -32,6 +33,8 @@ final class BlastDbCmdRunner implements Runnable {
     private ProcessBuilder buildProcess() {
         return new ProcessBuilder(
             "blastdbcmd",
+            "-db",
+            db,
             "-entry",
             input
         ).redirectOutput(output.toFile());
