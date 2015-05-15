@@ -1,6 +1,8 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
 import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Extracellular;
+import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Cytoplasmic;
+import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.CytoplasmicMembrane;
 import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
 import static fj.P.p;
 
@@ -36,7 +38,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
 
     // TODO: receive in constructor
     private final PSortFastaFilter psort = PSortFastaFilter.of(
-        Positive, Extracellular.single()
+        Positive, Cytoplasmic.or(CytoplasmicMembrane)//Extracellular.single()
     );
 
     public static ProjectLoader mgRastLoader() {
