@@ -6,21 +6,21 @@ import lombok.experimental.ExtensionMethod;
 
 import fj.P1;
 
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleotide;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionUtils;
 
 import static fj.P.lazy;
 
-@ExtensionMethod(OptionExtensionMethods.class)
-public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleobase> {
+@ExtensionMethod(OptionUtils.class)
+public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleotide> {
 
     @Override
-    public Nucleobase unmarshal(final Character code) throws Exception {
-        return Nucleobase.fromCode(code).orThrow(invalidCode(code));
+    public Nucleotide unmarshal(final Character code) throws Exception {
+        return Nucleotide.fromCode(code).orThrow(invalidCode(code));
     }
 
     @Override
-    public Character marshal(final Nucleobase nucleobase) throws Exception {
+    public Character marshal(final Nucleotide nucleobase) throws Exception {
         return nucleobase.getCode();
     }
 

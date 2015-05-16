@@ -1,53 +1,50 @@
 package es.uvigo.ei.sing.mahmi.common.utils;
 
-import static fj.Equal.longEqual;
-import static fj.Equal.optionEqual;
-import static fj.Hash.longHash;
-import static fj.Hash.optionHash;
-import static fj.Ord.optionOrd;
-import static fj.data.Natural.natural;
-import static fj.data.Option.none;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
-import fj.Equal;
-import fj.Hash;
-import fj.Ord;
-import fj.data.Natural;
-import fj.data.Option;
+import java.util.Optional;
 
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Identifier {
 
-    public static final Hash<Identifier> hash =
-        optionHash(longHash.comap(Natural::longValue)).comap(Identifier::getValue);
+    private final Optional<Long> value;
 
-    public static final Equal<Identifier> equal =
-        optionEqual(longEqual.comap(Natural::longValue)).comap(Identifier::getValue);
-
-    public static final Ord<Identifier> ord =
-    	  optionOrd(Ord.naturalOrd).comap(Identifier::getValue);
-//        optionOrd(longOrd.comap(Natural::longValue)).comap(Identifier::getValue);
-
-    private final Option<Natural> value;
-
-    @VisibleForJAXB
     public Identifier() {
-        this(none());
+        this.value = Optional.empty();
+    }
+
+    public Identifier(final long value) {
+        this.value = Optional.of(value);
     }
 
     public static Identifier empty() {
-        return new Identifier(none());
+        return new Identifier();
     }
 
     public static Identifier of(final long value) {
-        return new Identifier(natural(value));
+        return new Identifier(value);
     }
 
     public boolean isEmpty() {
-        return value.isNone();
+        return !value.isPresent();
+    }
+
+    public Optional<Long> get() {
+        return value;
+    }
+
+    public long unsafeGet() {
+        return value.orElseThrow(() -> new Error(
+            "Unsafe Operation failed: unsafeGet() on empty Identifier"
+        ));
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object that) {
+        return that instanceof Identifier
+            && this.value.equals(((Identifier) that).value);
     }
 
 }

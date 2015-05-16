@@ -16,7 +16,7 @@ import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleotideSequence;
 
 import static java.lang.System.lineSeparator;
 
@@ -29,7 +29,7 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
         return new FastaWriter<>();
     }
 
-    public static FastaWriter<NucleobaseSequence> forNucleobase() {
+    public static FastaWriter<NucleotideSequence> forNucleobase() {
         return new FastaWriter<>();
     }
 

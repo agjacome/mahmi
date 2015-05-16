@@ -25,8 +25,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleotideSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionUtils;
 
 import static fj.P.lazy;
 import static fj.data.Option.none;
@@ -34,7 +34,7 @@ import static fj.data.Option.some;
 
 @Slf4j
 @AllArgsConstructor(staticName = "fastaReader")
-@ExtensionMethod(OptionExtensionMethods.class)
+@ExtensionMethod(OptionUtils.class)
 public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
 
     private final F<String, Option<A>> constructor;
@@ -47,10 +47,10 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
         );
     }
 
-    public static FastaReader<NucleobaseSequence> forNucleobase() {
+    public static FastaReader<NucleotideSequence> forNucleobase() {
         return new FastaReader<>(
-            NucleobaseSequence::fromString,
-            NucleobaseSequence.monoid
+            NucleotideSequence::fromString,
+            NucleotideSequence.monoid
         );
     }
 

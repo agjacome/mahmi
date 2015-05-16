@@ -1,44 +1,57 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
-import lombok.EqualsAndHashCode;
-import lombok.Value;
-import lombok.val;
-
-import fj.Monoid;
-import fj.data.Option;
-import fj.data.Seq;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
 
-import static fj.Monoid.monoid;
-import static fj.data.Option.none;
-import static fj.data.Option.some;
+import static java.util.Collections.emptyList;
 
-@Value(staticConstructor = "fromSeq")
-@EqualsAndHashCode(callSuper = false)
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.listify;
+
 public final class AminoAcidSequence extends CompoundSequence<AminoAcid> {
 
-    public static final Monoid<AminoAcidSequence> monoid =
-        monoid(a1 -> a2 -> fromSeq(a1.residues.append(a2.residues)), empty());
-
-    private final Seq<AminoAcid> residues;
-
-    public static AminoAcidSequence empty() {
-        return fromSeq(Seq.empty());
+    public AminoAcidSequence(final List<AminoAcid> residues) {
+        super(residues);
     }
 
-    public static Option<AminoAcidSequence> fromString(
+    public static AminoAcidSequence empty() {
+        return new AminoAcidSequence(emptyList());
+    }
+
+    public static AminoAcidSequence fromIterable(
+        final Iterable<AminoAcid> residues
+    ) {
+        return new AminoAcidSequence(listify(residues));
+    }
+
+    public static Optional<AminoAcidSequence> fromString(
         final String sequence
     ) {
-        Seq<AminoAcid> seq = Seq.empty();
+        final List<AminoAcid> residues = new ArrayList<>(sequence.length());
 
-        for (val code : sequence.toCharArray()) {
-            val aa = AminoAcid.fromCode(code);
-            if (aa.isNone()) return none();
-            else seq = seq.snoc(aa.some());
+        for (final char code: sequence.toCharArray()) {
+            final Optional<AminoAcid> aa = AminoAcid.fromCode(code);
+
+            if (aa.isPresent())
+                residues.add(aa.get());
+            else
+                return Optional.empty();
         }
 
-        return some(fromSeq(seq));
+        return Optional.of(residues).map(AminoAcidSequence::new);
+    }
+
+    @Override
+    public int hashCode() {
+        return residues.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object that) {
+        return that instanceof AminoAcidSequence
+            && this.residues.equals(((AminoAcidSequence) that).residues);
     }
 
 }

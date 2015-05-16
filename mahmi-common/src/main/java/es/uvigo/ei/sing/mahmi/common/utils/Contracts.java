@@ -1,9 +1,8 @@
 package es.uvigo.ei.sing.mahmi.common.utils;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.function.Function;
 
-import fj.F;
+import es.uvigo.ei.sing.mahmi.common.utils.annotations.DisallowConstruction;
 
 /**
  * A helper non-constructible class providing runtime checks of pre- and
@@ -24,8 +23,10 @@ import fj.F;
  * require(x.equals(y), "%s given where %s was expected", x, y);
  * </pre>
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Contracts {
+
+    @DisallowConstruction
+    private Contracts() { }
 
     /**
      * Checks if a given precondition holds, throwing a {@link RuntimeException}
@@ -33,7 +34,7 @@ public final class Contracts {
      *
      * @param condition
      *            Precondition that should hold before an operation takes place.
-     * @param constructor
+     * @param exception
      *            Function that takes a String a returns a RuntimeException,
      *            probably a RuntimeException constructor. Will be called when
      *            the precondition fails.
@@ -48,11 +49,11 @@ public final class Contracts {
      */
     public static void require(
         final boolean condition,
-        final F<String, ? extends RuntimeException> constructor,
+        final Function<String, ? extends RuntimeException> exception,
         final String     message,
         final Object ... args
     ) {
-        if (!condition) throw constructor.f(String.format(message, args));
+        if (!condition) throw exception.apply(String.format(message, args));
     }
 
     /**
@@ -96,7 +97,7 @@ public final class Contracts {
      *
      * @param value
      *            Value that should be checked to be non null.
-     * @param constructor
+     * @param exception
      *            Function that takes a String a returns a RuntimeException,
      *            probably a RuntimeException constructor. Will be called when
      *            the value is null.
@@ -111,11 +112,11 @@ public final class Contracts {
      */
     public static <A> void requireNonNull(
         final A value,
-        final F<String, ? extends RuntimeException> constructor,
+        final Function<String, ? extends RuntimeException> exception,
         final String     message,
         final Object ... args
     ) {
-        require(value != null, constructor, message, args);
+        require(value != null, exception, message, args);
     }
 
     /**

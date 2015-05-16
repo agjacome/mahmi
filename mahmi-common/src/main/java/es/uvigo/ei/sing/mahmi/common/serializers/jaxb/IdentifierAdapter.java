@@ -20,7 +20,7 @@ public final class IdentifierAdapter extends XmlAdapter<Long, Identifier> {
 
     @Override
     public Long marshal(final Identifier id) throws Exception {
-        return id.getValue().map(Natural::longValue).orSome(-1L);
+        return id.get().map(Natural::longValue).orSome(-1L);
     }
 
 }

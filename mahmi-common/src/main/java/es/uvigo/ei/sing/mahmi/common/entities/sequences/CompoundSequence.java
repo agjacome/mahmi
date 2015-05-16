@@ -1,45 +1,51 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
-import java.util.Objects;
-
-import lombok.experimental.ExtensionMethod;
-
-import fj.Equal;
-import fj.Hash;
-import fj.P1;
-import fj.data.Seq;
+import java.lang.ref.SoftReference;
+import java.util.Iterator;
+import java.util.List;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.SeqExtensionMethods;
 
-import static fj.P.lazy;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.joining;
 
-@ExtensionMethod({ SeqExtensionMethods.class, Objects.class })
-public abstract class CompoundSequence<A extends Compound> {
+public abstract class CompoundSequence<A extends Compound> implements Iterable<A> {
 
-    public static final Hash<CompoundSequence<? extends Compound>> hash =
-        SHA1.hash.comap(CompoundSequence::getSHA1);
+    protected final List<A> residues;
 
-    public static final Equal<CompoundSequence<? extends Compound>> equal =
-        SHA1.equal.comap(CompoundSequence::getSHA1);
+    private volatile SoftReference<String> asString;
 
-    private final P1<String> asString = lazy(
-        () -> getResidues().map(Compound::getCode).buildString()
-    ).memo();
+    protected CompoundSequence(final List<A> residues) {
+        this.residues = unmodifiableList(residues);
+    }
+
+    public List<A> getResidues() {
+        return residues;
+    }
 
     public boolean isEmpty() {
         return getResidues().isEmpty();
     }
 
     public SHA1 getSHA1() {
-        return SHA1.of(asString());
+        return SHA1.of(toString());
     }
 
-    public String asString() {
-        return asString._1();
+    @Override
+    public Iterator<A> iterator() {
+        return residues.iterator();
     }
 
-    public abstract Seq<A> getResidues();
+    @Override
+    public final synchronized String toString() {
+        if (asString == null || asString.get() == null) {
+            asString = new SoftReference<>(residues.stream().map(
+                c -> String.valueOf(c.getCode())
+           ).collect(joining()));
+        }
+
+        return asString.get();
+    }
 
 }

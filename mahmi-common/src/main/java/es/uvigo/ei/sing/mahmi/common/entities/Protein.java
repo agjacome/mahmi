@@ -22,8 +22,8 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
 public final class Protein implements Entity<Protein> {
 
-    public static final Hash<Protein>  hash  = CompoundSequence.hash.comap(Protein::getSequence);
-    public static final Equal<Protein> equal = CompoundSequence.equal.comap(Protein::getSequence);
+    public static final Hash<Protein>  hash  = CompoundSequence.hashStrategy.comap(Protein::getSequence);
+    public static final Equal<Protein> equal = CompoundSequence.equalStrategy.comap(Protein::getSequence);
 
     private final Identifier        id;
     private final AminoAcidSequence sequence;

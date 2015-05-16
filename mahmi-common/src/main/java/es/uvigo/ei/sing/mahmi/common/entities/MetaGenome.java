@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.experimental.Wither;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleotideSequence;
 import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseFastaAdapter;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
@@ -24,7 +24,7 @@ public final class MetaGenome implements Entity<MetaGenome> {
     private final Project    project;
 
     @XmlJavaTypeAdapter(NucleobaseFastaAdapter.class)
-    private final Fasta<NucleobaseSequence> fasta;
+    private final Fasta<NucleotideSequence> fasta;
 
     @VisibleForJAXB
     public MetaGenome() {
@@ -32,7 +32,7 @@ public final class MetaGenome implements Entity<MetaGenome> {
     }
 
     public static MetaGenome metagenome(
-        final Project project, final Fasta<NucleobaseSequence> fasta
+        final Project project, final Fasta<NucleotideSequence> fasta
     ) {
         return metagenome(Identifier.empty(), project, fasta);
     }

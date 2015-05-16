@@ -6,21 +6,21 @@ import lombok.experimental.ExtensionMethod;
 
 import fj.P1;
 
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleotideSequence;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionUtils;
 
 import static fj.P.lazy;
 
-@ExtensionMethod(OptionExtensionMethods.class)
-public final class NucleobaseSequenceAdapter extends XmlAdapter<String, NucleobaseSequence> {
+@ExtensionMethod(OptionUtils.class)
+public final class NucleobaseSequenceAdapter extends XmlAdapter<String, NucleotideSequence> {
 
     @Override
-    public NucleobaseSequence unmarshal(final String str) throws Exception {
-        return NucleobaseSequence.fromString(str).orThrow(invalidSeq(str));
+    public NucleotideSequence unmarshal(final String str) throws Exception {
+        return NucleotideSequence.fromString(str).orThrow(invalidSeq(str));
     }
 
     @Override
-    public String marshal(final NucleobaseSequence seq) throws Exception {
+    public String marshal(final NucleotideSequence seq) throws Exception {
         return seq.asString();
     }
 

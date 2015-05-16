@@ -1,24 +1,14 @@
 package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
 import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import static java.lang.Character.toUpperCase;
+import static java.util.function.Function.identity;
 
-import fj.data.HashMap;
-import fj.data.Option;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.mapify;
 
-import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
-
-import static fj.Equal.charEqual;
-import static fj.Hash.charHash;
-import static fj.P.p;
-import static fj.data.Stream.iterableStream;
-import static fj.function.Characters.toUpperCase;
-
-@Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum AminoAcid implements Compound {
 
     ALA("Alanine"       , 'A'),
@@ -44,24 +34,40 @@ public enum AminoAcid implements Compound {
     SEC("Selenocysteine", 'U'),
     PYL("Pyrrolysine"   , 'O'),
 
-    // ambiguous amino-acids:
     ASX("Asparagine or aspartic acid", 'B'),
     GLX("Glutamine or glutamic acid" , 'Z'),
     XLE("Leucine or isoleucine"      , 'J'),
     XAA("Unknown"                    , 'X');
 
-    @VisibleForTesting
-    static final HashMap<Character, AminoAcid> codes = HashMap.from(
-        iterableStream(EnumSet.allOf(AminoAcid.class)).map(aa -> p(aa.code, aa)).cons(p('*', XAA)),
-        charEqual.comap(toUpperCase),
-        charHash.comap(toUpperCase)
+    private static final Map<Character, AminoAcid> codes = mapify(
+        EnumSet.allOf(AminoAcid.class), aa -> aa.getCode(), identity()
     );
 
-    private final String fullName;
+    private final String name;
     private final char   code;
 
-    public static Option<AminoAcid> fromCode(final char code) {
-        return codes.get(code);
+    private AminoAcid(final String name, final char code) {
+        this.name = name;
+        this.code = code;
+    }
+
+    public static Optional<AminoAcid> fromCode(final char code) {
+        return Optional.ofNullable(codes.get(toUpperCase(code)));
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public char getCode() {
+        return code;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getCode());
     }
 
 }

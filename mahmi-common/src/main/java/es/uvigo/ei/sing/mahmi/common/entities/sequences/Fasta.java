@@ -1,31 +1,58 @@
 package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
 import java.util.Iterator;
-
-import lombok.Value;
-
-import fj.data.Stream;
+import java.util.Map;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
+import es.uvigo.ei.sing.mahmi.common.utils.Tuple;
 
-import static java.util.Collections.emptyIterator;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableMap;
 
-@Value(staticConstructor = "of")
-public final class Fasta<A extends CompoundSequence<? extends Compound>> implements Iterable<A> {
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.mapify;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.streamify;
 
-    private final Iterator<A> sequences;
+public final class Fasta<A extends CompoundSequence<? extends Compound>> implements Iterable<Tuple<String, A>> {
+
+    private final Map<String, A> sequences;
+
+    public Fasta(final Iterable<Tuple<String, A>> sequences) {
+        this.sequences = unmodifiableMap(
+            mapify(sequences, Tuple::getLeft, Tuple::getRight)
+        );
+    }
+
+    public static <A extends CompoundSequence<? extends Compound>> Fasta<A> of(
+        final Iterable<Tuple<String, A>> sequences
+    ) {
+        return new Fasta<>(sequences);
+    }
 
     public static <A extends CompoundSequence<? extends Compound>> Fasta<A> empty() {
-        return of(emptyIterator());
+        return new Fasta<>(emptyList());
     }
 
     @Override
-    public Iterator<A> iterator() {
-        return sequences;
+    public Iterator<Tuple<String, A>> iterator() {
+        return streamify(sequences.entrySet()).map(Tuple::fromEntry).iterator();
     }
 
-    public Stream<A> toStream() {
-        return Stream.iterableStream(() -> sequences);
+    @Override
+    public int hashCode() {
+        return sequences.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object that) {
+        return that instanceof Fasta
+            && this.sequences.equals(((Fasta<?>) that).sequences);
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "Fasta of {} entries ({})", sequences.size(), hashCode()
+        );
     }
 
 }
