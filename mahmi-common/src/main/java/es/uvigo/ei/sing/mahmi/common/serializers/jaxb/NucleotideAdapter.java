@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleotide;
 
-public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleotide> {
+public final class NucleotideAdapter extends XmlAdapter<Character, Nucleotide> {
 
     @Override
     public Nucleotide unmarshal(final Character code) throws Exception {

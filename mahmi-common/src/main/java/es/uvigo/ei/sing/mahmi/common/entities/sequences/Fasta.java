@@ -2,6 +2,7 @@ package es.uvigo.ei.sing.mahmi.common.entities.sequences;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.utils.Tuple;
@@ -38,6 +39,14 @@ public final class Fasta<A extends CompoundSequence<? extends Compound>> impleme
 
     public static <A extends CompoundSequence<? extends Compound>> Fasta<A> empty() {
         return new Fasta<>(emptyList());
+    }
+
+    public Map<String, A> getSequences() {
+        return sequences;
+    }
+
+    public Optional<A> getSequence(final String key) {
+        return Optional.ofNullable(sequences.get(key));
     }
 
     @Override

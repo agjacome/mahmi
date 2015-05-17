@@ -1,9 +1,5 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.jaxb;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.io.StringWriter;
-
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
@@ -15,17 +11,12 @@ public class NucleotideFastaAdapter extends XmlAdapter<String, Fasta<NucleotideS
 
     @Override
     public Fasta<NucleotideSequence> unmarshal(final String str) throws Exception {
-        return FastaParser.forNucleobase().fromReader(
-            new BufferedReader(new StringReader(str))
-        );
+        return FastaParser.forNucleotideSequences().parseString(str);
     }
 
     @Override
     public String marshal(final Fasta<NucleotideSequence> fasta) throws Exception {
-        try (final StringWriter writer = new StringWriter()) {
-            FastaPrinter.forNucleobase().toWriter(fasta, writer);
-            return writer.toString();
-        }
+        return FastaPrinter.forNucleotideSequences().printString(fasta);
     }
 
 }

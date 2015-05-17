@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.Character.toUpperCase;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.mapify;
@@ -23,8 +24,11 @@ public enum Nucleotide implements Compound {
         final Map<Character, Nucleotide> codeMap = mapify(
             EnumSet.allOf(Nucleotide.class), n -> n.getCode(), identity()
         );
+
+        // special cases and synonyms
         codeMap.put('*', N);
-        codes = codeMap;
+
+        codes = unmodifiableMap(codeMap);
     }
 
     private final String name;

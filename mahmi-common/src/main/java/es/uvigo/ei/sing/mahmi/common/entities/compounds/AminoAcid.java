@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.Character.toUpperCase;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.mapify;
@@ -45,8 +46,12 @@ public enum AminoAcid implements Compound {
         final Map<Character, AminoAcid> codeMap = mapify(
             EnumSet.allOf(AminoAcid.class), aa -> aa.getCode(), identity()
         );
+
+        // special cases and synonyms
         codeMap.put('*', XAA);
-        codes = codeMap;
+        codeMap.put('-', XAA);
+
+        codes = unmodifiableMap(codeMap);
     }
 
     private final String name;
