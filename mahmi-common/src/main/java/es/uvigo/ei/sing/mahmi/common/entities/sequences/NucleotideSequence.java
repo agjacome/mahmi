@@ -12,7 +12,7 @@ import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.listi
 
 public final class NucleotideSequence extends CompoundSequence<Nucleotide> {
 
-    public NucleotideSequence(final List<Nucleotide> residues) {
+    private NucleotideSequence(final List<Nucleotide> residues) {
         super(residues);
     }
 
@@ -50,7 +50,10 @@ public final class NucleotideSequence extends CompoundSequence<Nucleotide> {
 
     @Override
     public boolean equals(final Object that) {
-        return that instanceof NucleotideSequence
+        if (this == that) return true;
+        if (that == null) return false;
+
+        return getClass() == that.getClass()
             && this.residues.equals(((NucleotideSequence) that).residues);
     }
 

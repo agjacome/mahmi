@@ -16,10 +16,18 @@ public final class Fasta<A extends CompoundSequence<? extends Compound>> impleme
 
     private final Map<String, A> sequences;
 
-    public Fasta(final Iterable<Tuple<String, A>> sequences) {
-        this.sequences = unmodifiableMap(
-            mapify(sequences, Tuple::getLeft, Tuple::getRight)
-        );
+    private Fasta(final Map<String, A> sequences) {
+        this.sequences = unmodifiableMap(sequences);
+    }
+
+    private Fasta(final Iterable<Tuple<String, A>> sequences) {
+        this(mapify(sequences, Tuple::getLeft, Tuple::getRight));
+    }
+
+    public static <A extends CompoundSequence<? extends Compound>> Fasta<A> of(
+        final Map<String, A> sequences
+    ) {
+        return new Fasta<>(sequences);
     }
 
     public static <A extends CompoundSequence<? extends Compound>> Fasta<A> of(
@@ -44,7 +52,10 @@ public final class Fasta<A extends CompoundSequence<? extends Compound>> impleme
 
     @Override
     public boolean equals(final Object that) {
-        return that instanceof Fasta
+        if (this == that) return true;
+        if (that == null) return false;
+
+        return getClass() == that.getClass()
             && this.sequences.equals(((Fasta<?>) that).sequences);
     }
 

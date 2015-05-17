@@ -17,7 +17,7 @@ public final class SHA1 {
         this.digest = digest;
     }
 
-    public static SHA1 of(final String str) {
+    public static SHA1 encode(final String str) {
         return new SHA1(DigestUtils.sha1(str));
     }
 
@@ -52,8 +52,16 @@ public final class SHA1 {
 
     @Override
     public boolean equals(final Object that) {
-        return that instanceof SHA1
+        if (this == that) return true;
+        if (that == null) return false;
+
+        return getClass() == that.getClass()
             && Arrays.equals(this.digest, ((SHA1) that).digest);
+    }
+
+    @Override
+    public String toString() {
+        return asHexString();
     }
 
 }

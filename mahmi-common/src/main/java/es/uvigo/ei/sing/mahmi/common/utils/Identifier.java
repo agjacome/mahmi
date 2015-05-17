@@ -6,11 +6,11 @@ public final class Identifier {
 
     private final Optional<Long> value;
 
-    public Identifier() {
+    private Identifier() {
         this.value = Optional.empty();
     }
 
-    public Identifier(final long value) {
+    private Identifier(final long value) {
         this.value = Optional.of(value);
     }
 
@@ -43,8 +43,16 @@ public final class Identifier {
 
     @Override
     public boolean equals(final Object that) {
-        return that instanceof Identifier
+        if (this == that) return true;
+        if (that == null) return false;
+
+        return getClass() == that.getClass()
             && this.value.equals(((Identifier) that).value);
+    }
+
+    @Override
+    public String toString() {
+        return isEmpty() ? "Empty" : value.get().toString();
     }
 
 }

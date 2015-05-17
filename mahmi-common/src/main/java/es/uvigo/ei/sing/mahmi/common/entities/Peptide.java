@@ -4,38 +4,41 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.Wither;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
-import fj.Equal;
-import fj.Hash;
 
-@Getter @Wither
-@AllArgsConstructor(staticName = "peptide")
+import static es.uvigo.ei.sing.mahmi.common.utils.Contracts.requireNonNull;
+
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-public final class Peptide implements Entity<Peptide> {
+public final class Peptide extends Entity {
 
-//    public static final Hash<Peptide>  hash  = CompoundSequence.hash.comap(Peptide::getSequence);
-//    public static final Equal<Peptide> equal = CompoundSequence.equal.comap(Peptide::getSequence);
-	public static final Hash<Peptide> hash =
-		Hash.seqHash(AminoAcid.hash).comap(p -> p.getSequence().getResidues());
-	public static final Equal<Peptide> equal =
-        Equal.seqEqual(AminoAcid.equal).comap(p -> p.getSequence().getResidues());
-
-    private final Identifier        id;
     private final AminoAcidSequence sequence;
 
-    @VisibleForJAXB public Peptide() {
-        this(new Identifier(), AminoAcidSequence.empty());
+    @VisibleForJAXB
+    public Peptide() {
+        this(Identifier.empty(), AminoAcidSequence.empty());
     }
 
-    public static Peptide peptide(final AminoAcidSequence sequence) {
-        return peptide(Identifier.empty(), sequence);
+    private Peptide(final Identifier id, final AminoAcidSequence sequence) {
+        super(id);
+
+        this.sequence = requireNonNull(sequence, "Peptide sequence cannot be NULL");
+    }
+
+    public static Peptide Peptide(
+        final Identifier id, final AminoAcidSequence sequence
+    ) {
+        return new Peptide(id, sequence);
+    }
+
+    public static Peptide Peptide(final AminoAcidSequence sequence) {
+        return new Peptide(Identifier.empty(), sequence);
+    }
+
+    public AminoAcidSequence getSequence() {
+        return sequence;
     }
 
     public SHA1 getSHA1() {

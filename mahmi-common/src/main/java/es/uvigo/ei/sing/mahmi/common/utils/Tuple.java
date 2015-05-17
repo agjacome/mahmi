@@ -14,11 +14,8 @@ public final class Tuple<A, B> {
     public final B right;
 
     public Tuple(final A left, final B right) {
-        requireNonNull(left, "Left value cannot be null");
-        requireNonNull(right, "Right value cannot be null");
-
-        this.left  = left;
-        this.right = right;
+        this.left  = requireNonNull(left, "Left value cannot be null");;
+        this.right = requireNonNull(right, "Right value cannot be null");;
     }
 
     public static <A, B> Tuple<A, B> of(final A left, final B right) {
@@ -81,7 +78,10 @@ public final class Tuple<A, B> {
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof Tuple)) return false;
+        if (this  == other) return true;
+        if (other == null ) return false;
+
+        if (getClass() != other.getClass()) return false;
 
         final Tuple<?, ?> that = (Tuple<?, ?>) other;
         return deepEquals(this.left,  that.left)

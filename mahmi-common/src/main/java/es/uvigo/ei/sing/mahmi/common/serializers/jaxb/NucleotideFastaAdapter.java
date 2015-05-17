@@ -8,14 +8,14 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleotideSequence;
-import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
-import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
+import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaParser;
+import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaPrinter;
 
-public class NucleobaseFastaAdapter extends XmlAdapter<String, Fasta<NucleotideSequence>> {
+public class NucleotideFastaAdapter extends XmlAdapter<String, Fasta<NucleotideSequence>> {
 
     @Override
     public Fasta<NucleotideSequence> unmarshal(final String str) throws Exception {
-        return FastaReader.forNucleobase().fromReader(
+        return FastaParser.forNucleobase().fromReader(
             new BufferedReader(new StringReader(str))
         );
     }
@@ -23,7 +23,7 @@ public class NucleobaseFastaAdapter extends XmlAdapter<String, Fasta<NucleotideS
     @Override
     public String marshal(final Fasta<NucleotideSequence> fasta) throws Exception {
         try (final StringWriter writer = new StringWriter()) {
-            FastaWriter.forNucleobase().toWriter(fasta, writer);
+            FastaPrinter.forNucleobase().toWriter(fasta, writer);
             return writer.toString();
         }
     }

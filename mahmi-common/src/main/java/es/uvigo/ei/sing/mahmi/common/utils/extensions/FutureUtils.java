@@ -10,12 +10,14 @@ public final class FutureUtils {
     @DisallowConstruction
     private FutureUtils() { }
 
-    public static <A> CompletableFuture<Void> sequenceFutures(
+    public static <A> CompletableFuture<Void> combineFutures(
         final Collection<CompletableFuture<A>> futures
     ) {
-        return CompletableFuture.allOf(
-            futures.toArray(new CompletableFuture<?>[futures.size()])
+        final CompletableFuture<?>[ ] fs = futures.toArray(
+            new CompletableFuture<?>[futures.size()]
         );
+
+        return CompletableFuture.allOf(fs);
     }
 
 }

@@ -4,36 +4,53 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.Wither;
-
-import fj.Equal;
-import fj.Hash;
-
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-import static fj.Equal.stringEqual;
-import static fj.Hash.stringHash;
+import static es.uvigo.ei.sing.mahmi.common.utils.Contracts.requireNonNull;
 
-@Getter @Wither
-@AllArgsConstructor(staticName = "enzyme")
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-public final class Enzyme implements Entity<Enzyme> {
+public final class Enzyme extends Entity {
 
-    public static final Hash<Enzyme>  hash  = stringHash.comap(Enzyme::getName);
-    public static final Equal<Enzyme> equal = stringEqual.comap(Enzyme::getName);
+    private final String name;
 
-    private final Identifier id;
-    private final String     name;
-
-    @VisibleForJAXB public Enzyme() {
-        this(new Identifier(), "");
+    @VisibleForJAXB
+    public Enzyme() {
+        this(Identifier.empty(), "");
     }
 
-    public static Enzyme enzyme(final String name) {
-        return enzyme(Identifier.empty(), name);
+    private Enzyme(final Identifier id, final String name) {
+        super(id);
+
+        this.name = requireNonNull(name, "Enzyme name cannot be NULL");
+    }
+
+    public static Enzyme Enzyme(final Identifier id, final String name) {
+        return new Enzyme(id, name);
+    }
+
+    public static Enzyme Enzyme(final String name) {
+        return new Enzyme(Identifier.empty(), name);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int hashCode() {
+        // Entity overridden for special case: case-insensitive name
+        return name.toLowerCase().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object that) {
+        // Entity overridden for special case: case-insensitive name
+        if (this == that) return true;
+        if (that == null) return false;
+
+        return getClass() == that.getClass()
+            && this.name.equalsIgnoreCase(((Enzyme) that).name);
     }
 
 }

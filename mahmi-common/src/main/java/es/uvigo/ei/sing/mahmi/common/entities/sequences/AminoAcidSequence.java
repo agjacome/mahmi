@@ -12,7 +12,7 @@ import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.listi
 
 public final class AminoAcidSequence extends CompoundSequence<AminoAcid> {
 
-    public AminoAcidSequence(final List<AminoAcid> residues) {
+    private AminoAcidSequence(final List<AminoAcid> residues) {
         super(residues);
     }
 
@@ -50,7 +50,10 @@ public final class AminoAcidSequence extends CompoundSequence<AminoAcid> {
 
     @Override
     public boolean equals(final Object that) {
-        return that instanceof AminoAcidSequence
+        if (this == that) return true;
+        if (that == null) return false;
+
+        return getClass() == that.getClass()
             && this.residues.equals(((AminoAcidSequence) that).residues);
     }
 
