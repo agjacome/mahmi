@@ -38,7 +38,7 @@ public final class IterableUtils {
     public static <A, B, C> Map<B, C> mapify(
         final Iterable<A>    it,
         final Function<A, B> keyMapper,
-        final Function<A, C>       valueMapper
+        final Function<A, C> valueMapper
     ) {
         return streamify(it).collect(toMap(keyMapper, valueMapper));
     }

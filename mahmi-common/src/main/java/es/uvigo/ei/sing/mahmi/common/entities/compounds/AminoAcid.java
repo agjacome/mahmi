@@ -39,9 +39,15 @@ public enum AminoAcid implements Compound {
     XLE("Leucine or isoleucine"      , 'J'),
     XAA("Unknown"                    , 'X');
 
-    private static final Map<Character, AminoAcid> codes = mapify(
-        EnumSet.allOf(AminoAcid.class), aa -> aa.getCode(), identity()
-    );
+    private static final Map<Character, AminoAcid> codes;
+
+    static {
+        final Map<Character, AminoAcid> codeMap = mapify(
+            EnumSet.allOf(AminoAcid.class), aa -> aa.getCode(), identity()
+        );
+        codeMap.put('*', XAA);
+        codes = codeMap;
+    }
 
     private final String name;
     private final char   code;

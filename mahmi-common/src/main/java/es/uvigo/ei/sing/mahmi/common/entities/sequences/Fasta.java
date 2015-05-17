@@ -62,7 +62,7 @@ public final class Fasta<A extends CompoundSequence<? extends Compound>> impleme
     @Override
     public String toString() {
         return String.format(
-            "Fasta of {} entries ({})", sequences.size(), hashCode()
+            "Fasta of %d entries (hashCode: %d)", sequences.size(), hashCode()
         );
     }
 

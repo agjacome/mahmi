@@ -18,9 +18,14 @@ public enum Nucleotide implements Compound {
     U("Uracil"  , 'U'),
     N("Unknown" , 'N');
 
-    private static final Map<Character, Nucleotide> codes = mapify(
-        EnumSet.allOf(Nucleotide.class), aa -> aa.getCode(), identity()
-    );
+    private static final Map<Character, Nucleotide> codes;
+    static {
+        final Map<Character, Nucleotide> codeMap = mapify(
+            EnumSet.allOf(Nucleotide.class), n -> n.getCode(), identity()
+        );
+        codeMap.put('*', N);
+        codes = codeMap;
+    }
 
     private final String name;
     private final char   code;
