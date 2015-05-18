@@ -18,12 +18,14 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleotideSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Tuple;
+import es.uvigo.ei.sing.mahmi.common.utils.exceptions.ExceptionWrapper;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IOUtils;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.Contracts.requireNonNull;
+import static es.uvigo.ei.sing.mahmi.common.utils.exceptions.ExceptionWrapper.ExceptionSupplier;
 import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.mapify;
 
 public final class FastaParser<A extends CompoundSequence<? extends Compound>> {
@@ -78,16 +80,16 @@ public final class FastaParser<A extends CompoundSequence<? extends Compound>> {
 
     public static FastaParser<AminoAcidSequence> forAminoAcidSequences() {
         return new FastaParser<>(
-            str -> AminoAcidSequence.fromString(str).orElseThrow(
-                () -> new RuntimeException(new IOException("Could not correctly parse AminoAcid sequence:\n" + str))
+            str -> AminoAcidSequence.fromString(str).<ExceptionWrapper>orElseThrow(
+                ExceptionSupplier(new IOException("Could not correctly parse AminoAcid sequence:\n" + str))
             )
         );
     }
 
     public static FastaParser<NucleotideSequence> forNucleotideSequences() {
         return new FastaParser<>(
-            str -> NucleotideSequence.fromString(str).orElseThrow(
-                () -> new RuntimeException(new IOException("Could not correctly parse Nucleotide sequence:\n" + str))
+            str -> NucleotideSequence.fromString(str).<ExceptionWrapper>orElseThrow(
+                ExceptionSupplier(new IOException("Could not correctly parse Nucleotide sequence:\n" + str))
             )
         );
     }
@@ -101,7 +103,11 @@ public final class FastaParser<A extends CompoundSequence<? extends Compound>> {
     }
 
     public Fasta<A> parseString(final String str) throws IOException {
-        return Fasta.of(parser.parse(str, "Fasta Parser"));
+        try {
+            return Fasta.of(parser.parse(str, "Fasta Parser"));
+        } catch (final ExceptionWrapper wrapped) {
+            throw wrapped.unwrap(IOException.class);
+        }
     }
 
 }
