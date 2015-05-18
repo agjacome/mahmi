@@ -144,85 +144,85 @@ public final class ArrayUtils {
     }
 
     @SafeVarargs
-    public static <A> List<A> asMutableList(final A ... as) {
+    public static <A> List<A> asList(final A ... as) {
         final List<A> result = new ArrayList<>(as.length);
         Collections.addAll(result, as);
         return result;
     }
 
-    public static List<Boolean> asMutableList(final boolean ... bs) {
-        return asMutableList(box(bs));
+    public static List<Boolean> asList(final boolean ... bs) {
+        return asList(box(bs));
     }
 
-    public static List<Byte> asMutableList(final byte ... bs) {
-        return asMutableList(box(bs));
+    public static List<Byte> asList(final byte ... bs) {
+        return asList(box(bs));
     }
 
-    public static List<Character> asMutableList(final char ... cs) {
-        return asMutableList(box(cs));
+    public static List<Character> asList(final char ... cs) {
+        return asList(box(cs));
     }
 
-    public static List<Short> asMutableList(final short ... ss) {
-        return asMutableList(box(ss));
+    public static List<Short> asList(final short ... ss) {
+        return asList(box(ss));
     }
 
-    public static List<Integer> asMutableList(final int ... is) {
-        return asMutableList(box(is));
+    public static List<Integer> asList(final int ... is) {
+        return asList(box(is));
     }
 
-    public static List<Long> asMutableList(final long ... ls) {
-        return asMutableList(box(ls));
+    public static List<Long> asList(final long ... ls) {
+        return asList(box(ls));
     }
 
-    public static List<Float> asMutableList(final float ... fs) {
-        return asMutableList(box(fs));
+    public static List<Float> asList(final float ... fs) {
+        return asList(box(fs));
     }
 
-    public static List<Double> asMutableList(final double ... ds) {
-        return asMutableList(box(ds));
+    public static List<Double> asList(final double ... ds) {
+        return asList(box(ds));
     }
 
     @SafeVarargs
-    public static <A> Set<A> asMutableSet(final A ... as) {
+    public static <A> Set<A> asSet(final A ... as) {
         final Set<A> result = new HashSet<>(as.length);
         Collections.addAll(result, as);
         return result;
     }
 
-    public static Set<Boolean> asMutableSet(final boolean ... bs) {
-        return asMutableSet(box(bs));
+    public static Set<Boolean> asSet(final boolean ... bs) {
+        return asSet(box(bs));
     }
 
-    public static Set<Byte> asMutableSet(final byte ... bs) {
-        return asMutableSet(box(bs));
+    public static Set<Byte> asSet(final byte ... bs) {
+        return asSet(box(bs));
     }
 
-    public static Set<Character> asMutableSet(final char ... cs) {
-        return asMutableSet(box(cs));
+    public static Set<Character> asSet(final char ... cs) {
+        return asSet(box(cs));
     }
 
-    public static Set<Short> asMutableSet(final short ... ss) {
-        return asMutableSet(box(ss));
+    public static Set<Short> asSet(final short ... ss) {
+        return asSet(box(ss));
     }
 
-    public static Set<Integer> asMutableSet(final int ... is) {
-        return asMutableSet(box(is));
+    public static Set<Integer> asSet(final int ... is) {
+        return asSet(box(is));
     }
 
-    public static Set<Long> asMutableSet(final long ... ls) {
-        return asMutableSet(box(ls));
+    public static Set<Long> asSet(final long ... ls) {
+        return asSet(box(ls));
     }
 
-    public static Set<Float> asMutableSet(final float ... fs) {
-        return asMutableSet(box(fs));
+    public static Set<Float> asSet(final float ... fs) {
+        return asSet(box(fs));
     }
 
-    public static Set<Double> asMutableSet(final double ... ds) {
-        return asMutableSet(box(ds));
+    public static Set<Double> asSet(final double ... ds) {
+        return asSet(box(ds));
     }
 
     @SafeVarargs
-    public static <A extends Comparable<? super A>> SortedSet<A> asMutableSortedSet(
+    public static <A extends Comparable<? super A>> SortedSet<A> asSortedSet(
         final A ... as
     ) {
         final SortedSet<A> result = new TreeSet<>();
@@ -230,36 +230,36 @@ public final class ArrayUtils {
         return result;
     }
 
-    public static SortedSet<Boolean> asMutableSortedSet(final boolean ... bs) {
-        return asMutableSortedSet(box(bs));
+    public static SortedSet<Boolean> asSortedSet(final boolean ... bs) {
+        return asSortedSet(box(bs));
     }
 
-    public static SortedSet<Byte> asMutableSortedSet(final byte ... bs) {
-        return asMutableSortedSet(box(bs));
+    public static SortedSet<Byte> asSortedSet(final byte ... bs) {
+        return asSortedSet(box(bs));
     }
 
-    public static SortedSet<Character> asMutableSortedSet(final char ... cs) {
-        return asMutableSortedSet(box(cs));
+    public static SortedSet<Character> asSortedSet(final char ... cs) {
+        return asSortedSet(box(cs));
     }
 
-    public static SortedSet<Short> asMutableSortedSet(final short ... ss) {
-        return asMutableSortedSet(box(ss));
+    public static SortedSet<Short> asSortedSet(final short ... ss) {
+        return asSortedSet(box(ss));
     }
 
-    public static SortedSet<Integer> asMutableSortedSet(final int ... is) {
-        return asMutableSortedSet(box(is));
+    public static SortedSet<Integer> asSortedSet(final int ... is) {
+        return asSortedSet(box(is));
     }
 
-    public static SortedSet<Long> asMutableSortedSet(final long ... ls) {
-        return asMutableSortedSet(box(ls));
+    public static SortedSet<Long> asSortedSet(final long ... ls) {
+        return asSortedSet(box(ls));
     }
 
-    public static SortedSet<Float> asMutableSortedSet(final float ... fs) {
-        return asMutableSortedSet(box(fs));
+    public static SortedSet<Float> asSortedSet(final float ... fs) {
+        return asSortedSet(box(fs));
     }
 
-    public static SortedSet<Double> asMutableSortedSet(final double ... ds) {
-        return asMutableSortedSet(box(ds));
+    public static SortedSet<Double> asSortedSet(final double ... ds) {
+        return asSortedSet(box(ds));
     }
 
     @SafeVarargs

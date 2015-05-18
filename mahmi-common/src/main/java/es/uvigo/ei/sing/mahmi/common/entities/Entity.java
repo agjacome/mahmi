@@ -3,12 +3,12 @@ package es.uvigo.ei.sing.mahmi.common.entities;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.Tuple;
 
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
@@ -16,6 +16,8 @@ import static java.util.Collections.sort;
 import static java.util.Collections.unmodifiableList;
 
 import static es.uvigo.ei.sing.mahmi.common.utils.Contracts.requireNonNull;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.ArrayUtils.asList;
+import static es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableUtils.zip;
 
 public abstract class Entity {
 
@@ -35,7 +37,7 @@ public abstract class Entity {
         if (type == Entity.class) return new Field[0];
 
         final List<Field> fieldList = new ArrayList<>();
-        fieldList.addAll(Arrays.asList(introspectEntityFields(type.getSuperclass())));
+        fieldList.addAll(asList(introspectEntityFields(type.getSuperclass())));
 
         final List<Field> myFields = fieldList.subList(fieldList.size(), fieldList.size());
         for (final Field field : type.getDeclaredFields()) {
@@ -63,6 +65,7 @@ public abstract class Entity {
         return list;
     }
 
+    // ---------------------------
 
     protected final Identifier id;
 
@@ -102,12 +105,15 @@ public abstract class Entity {
         final StringBuilder sb = new StringBuilder(getClass().getSimpleName());
         sb.append("(").append("id = ").append(id);
 
-        final List<Object> values = valueList();
-        final Field[ ]     fields = getEntityFields(getClass());
+        final Iterable<Tuple<Field, Object>> fieldValues = zip(
+            asList(getEntityFields(getClass())), valueList()
+        );
 
-        for (int i = 0; i < fields.length; ++i) {
-            sb.append(", ");
-            sb.append(fields[i].getName()).append(" = ").append(values.get(i));
+        for (final Tuple<Field, Object> fieldValue : fieldValues) {
+            sb.append(", ")
+              .append(fieldValue.left.getName())
+              .append(" = ")
+              .append(fieldValue.right.toString());
         }
 
         sb.append(")");
