@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>mahmi-aligner</module>
         <module>mahmi-common</module>
         <module>mahmi-cutter</module>
         <module>mahmi-database</module>
@@ -18,6 +17,10 @@
         <module>mahmi-psort</module>
         <module>mahmi-translator</module>
     </modules>
+
+    <prerequisites>
+        <maven>3.3.3</maven>
+    </prerequisites>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
