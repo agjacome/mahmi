@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project
     xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -9,25 +10,19 @@
         <artifactId>mahmi</artifactId>
         <version>0.0.1</version>
     </parent>
-    <artifactId>mahmi.calculator</artifactId>
-    <name>MAHMI - PEPTIDE CALCULATOR</name>
+    <artifactId>mahmi.translator</artifactId>
+    <name>MAHMI - Protein translator</name>
     <packaging>jar</packaging>
     <dependencies>
 	    <dependency>
-	      <groupId>junit</groupId>
-	      <artifactId>junit</artifactId>
-	      <version>3.8.1</version>
-	      <scope>test</scope>
+	          <groupId>junit</groupId>
+	      	  <artifactId>junit</artifactId>
+	          <version>3.8.1</version>
+	          <scope>test</scope>
 	    </dependency>
-	    
-        <dependency>
+	    <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mahmi.common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mahmi.database</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

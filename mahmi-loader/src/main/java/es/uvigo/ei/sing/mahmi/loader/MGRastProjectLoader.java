@@ -1,6 +1,8 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
 import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Extracellular;
+import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.Cytoplasmic;
+import static es.uvigo.ei.sing.mahmi.psort.PSortFilterType.CytoplasmicMembrane;
 import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
 import static fj.P.p;
 
@@ -32,11 +34,11 @@ import fj.data.Stream;
 public final class MGRastProjectLoader implements ProjectLoader {
 
     private static final FastaReader<NucleobaseSequence> genomeReader = FastaReader.forNucleobase();
-    private static final FastaReader<AminoAcidSequence> proteinReader = FastaReader.forAminoAcid();
+//    private static final FastaReader<AminoAcidSequence> proteinReader = FastaReader.forAminoAcid();
 
     // TODO: receive in constructor
     private final PSortFastaFilter psort = PSortFastaFilter.of(
-        Positive, Extracellular.single()
+        Positive, Cytoplasmic.or(CytoplasmicMembrane)//Extracellular.single()
     );
 
     public static ProjectLoader mgRastLoader() {
@@ -63,7 +65,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     ) {
         log.info("Reading genome fasta file {} and protein fasta file {}", paths._1(), paths._2());
         val genomes  = readFasta(genomeReader , paths._1());
-        val proteins = readFasta(proteinReader, paths._2());//filterFasta(paths._2());
+        val proteins = /*readFasta(proteinReader, paths._2());*/filterFasta(paths._2());
 
         return p(genomes, proteins);
     }
