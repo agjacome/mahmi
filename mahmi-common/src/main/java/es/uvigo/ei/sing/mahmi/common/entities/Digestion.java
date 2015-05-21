@@ -10,12 +10,14 @@ import lombok.experimental.Wither;
 
 import fj.Equal;
 import fj.Hash;
+import fj.Ord;
 
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
 import static fj.Equal.p3Equal;
 import static fj.Hash.p3Hash;
+import static fj.Ord.p3Ord;
 import static fj.P.p;
 
 @Getter @Wither
@@ -28,6 +30,9 @@ public final class Digestion implements Entity<Digestion> {
 
     public static final Equal<Digestion> equal =
         p3Equal(Protein.equal, Peptide.equal, Enzyme.equal).comap(d -> p(d.protein, d.peptide, d.enzyme));
+
+    public static final Ord<Digestion> ord =
+        p3Ord(Protein.ord, Peptide.ord, Enzyme.ord).comap(d -> p(d.protein, d.peptide, d.enzyme));
 
     private final Identifier id;
     private final Protein    protein;

@@ -10,6 +10,7 @@ import lombok.experimental.Wither;
 
 import fj.Equal;
 import fj.Hash;
+import fj.Ord;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
@@ -24,6 +25,7 @@ public final class Protein implements Entity<Protein> {
 
     public static final Hash<Protein>  hash  = CompoundSequence.hash.comap(Protein::getSequence);
     public static final Equal<Protein> equal = CompoundSequence.equal.comap(Protein::getSequence);
+    public static final Ord<Protein>   ord   = CompoundSequence.ord.comap(Protein::getSequence);
 
     private final Identifier        id;
     private final AminoAcidSequence sequence;

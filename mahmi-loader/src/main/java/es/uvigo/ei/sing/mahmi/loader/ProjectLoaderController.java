@@ -20,7 +20,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
@@ -38,7 +37,7 @@ import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
 
 @Slf4j
 @AllArgsConstructor(staticName = "projectLoaderCtrl")
-@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class })
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class ProjectLoaderController {
 
     private final ProjectLoader  loader;
@@ -78,7 +77,7 @@ public final class ProjectLoaderController {
         tableStatsDAO.update(tableStat(Identifier.of(1),"", projectsDAO.count()));
         tableStatsDAO.update(tableStat(Identifier.of(2),"", metaGenomesDAO.count()));
         tableStatsDAO.update(tableStat(Identifier.of(3),"", proteinsDAO.count()));
-        
+
         log.info("Finished loading Fasta files of {} from {}", project, path);
     }
 
@@ -89,7 +88,7 @@ public final class ProjectLoaderController {
             .map(Protein::protein)
             .frequencies(Protein.equal, Protein.hash);
 
-        final Set<Protein> toInsert = frequencies.keys().toSet(Protein.hash.toOrd());
+        final Set<Protein> toInsert = frequencies.keys().toSet(Protein.ord);
         final HashMap<Protein, Long> inserted = insertProteins(toInsert).toIdentityMap(
             Protein.equal, Protein.hash
         ).mapValues(p -> frequencies.get(p).some());

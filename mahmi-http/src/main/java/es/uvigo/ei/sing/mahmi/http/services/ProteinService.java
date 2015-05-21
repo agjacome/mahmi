@@ -26,24 +26,23 @@ import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+
 import static fj.P.lazy;
 import static fj.data.Set.iterableSet;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 @Path("/protein")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-@ExtensionMethod({ HashExtensionMethods.class, OptionExtensionMethods.class })
+@ExtensionMethod(OptionExtensionMethods.class)
 public final class ProteinService extends DatabaseEntityAbstractService<Protein, ProteinsDAO> {
 
     private ProteinService(final ProteinsDAO dao) {
@@ -103,7 +102,7 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
     @POST
     @Path("/all")
     public Response insertAll(final List<Protein> proteins) {
-        return buildInsertAll(iterableSet(Protein.hash.toOrd(), proteins));
+        return buildInsertAll(iterableSet(Protein.ord, proteins));
     }
 
     @DELETE

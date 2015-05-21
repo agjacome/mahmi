@@ -20,6 +20,8 @@ import fj.data.List;
 import fj.data.List.Buffer;
 import fj.function.Try1;
 
+import org.slf4j.LoggerFactory;
+
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;

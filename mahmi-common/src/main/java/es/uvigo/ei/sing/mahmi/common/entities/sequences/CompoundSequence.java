@@ -6,6 +6,7 @@ import lombok.experimental.ExtensionMethod;
 
 import fj.Equal;
 import fj.Hash;
+import fj.Ord;
 import fj.P1;
 import fj.data.Seq;
 
@@ -18,22 +19,20 @@ import static fj.P.lazy;
 @ExtensionMethod({ SeqExtensionMethods.class, Objects.class })
 public abstract class CompoundSequence<A extends Compound> {
 
-    public static final Hash<CompoundSequence<? extends Compound>> hash =
-        SHA1.hash.comap(CompoundSequence::getSHA1);
+    public static final Hash<CompoundSequence<? extends Compound>>  hash  = SHA1.hash.comap(CompoundSequence::getSHA1);
+    public static final Equal<CompoundSequence<? extends Compound>> equal = SHA1.equal.comap(CompoundSequence::getSHA1);
+    public static final Ord<CompoundSequence<? extends Compound>>   ord   = SHA1.ord.comap(CompoundSequence::getSHA1);
 
-    public static final Equal<CompoundSequence<? extends Compound>> equal =
-        SHA1.equal.comap(CompoundSequence::getSHA1);
+    private final P1<String> asString = lazy(() -> getResidues().map(Compound::getCode).buildString()).memo();
 
-    private final P1<String> asString = lazy(
-        () -> getResidues().map(Compound::getCode).buildString()
-    ).memo();
+    private final P1<SHA1> sha = lazy(() -> SHA1.of(asString())).memo();
 
     public boolean isEmpty() {
         return getResidues().isEmpty();
     }
 
     public SHA1 getSHA1() {
-        return SHA1.of(asString());
+        return sha._1();
     }
 
     public String asString() {

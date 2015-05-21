@@ -33,12 +33,11 @@ public interface ProteinsDAO extends DAO<Protein> {
         final MetaGenome            metaGenome,
         final Effect1<Set<Protein>> effect
     ) throws DAOException {
-        val pageSize = 1000; // TODO: configurable pageSize
+        val pageSize = 250; // TODO: configurable pageSize
         val numPages = countByMetaGenome(metaGenome);
 
-        for (int pageNum = 0; pageNum < numPages; pageNum += pageSize) {
+        for (int pageNum = 0; pageNum < numPages; pageNum += pageSize)
             effect.f(getByMetaGenome(metaGenome, pageNum, pageSize));
-        }
     }
 
 }

@@ -18,6 +18,7 @@ DROP SCHEMA IF EXISTS `mahmi` ;
 CREATE SCHEMA IF NOT EXISTS `mahmi` DEFAULT CHARACTER SET utf8mb4 ;
 USE `mahmi` ;
 
+
 -- -----------------------------------------------------
 -- Table `projects`
 -- -----------------------------------------------------

@@ -10,12 +10,14 @@ import lombok.experimental.Wither;
 
 import fj.Equal;
 import fj.Hash;
+import fj.Ord;
 
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
 import static fj.Equal.stringEqual;
 import static fj.Hash.stringHash;
+import static fj.Ord.stringOrd;
 
 @Getter @Wither
 @AllArgsConstructor(staticName = "enzyme")
@@ -24,6 +26,7 @@ public final class Enzyme implements Entity<Enzyme> {
 
     public static final Hash<Enzyme>  hash  = stringHash.comap(Enzyme::getName);
     public static final Equal<Enzyme> equal = stringEqual.comap(Enzyme::getName);
+    public static final Ord<Enzyme>   ord   = stringOrd.comap(Enzyme::getName);
 
     private final Identifier id;
     private final String     name;

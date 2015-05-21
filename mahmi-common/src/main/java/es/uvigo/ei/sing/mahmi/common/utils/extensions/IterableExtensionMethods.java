@@ -24,7 +24,7 @@ public final class IterableExtensionMethods {
         final Iterable<A> as, final Equal<A> equal, final Hash<A> hash
     ) {
         val map = HashMap.<A, Long>from(List.nil(), equal, hash);
-        as.forEach(a -> map.set(a, map.get(a).orSome(1L)));
+        as.forEach(a -> map.set(a, map.get(a).orSome(0L) + 1L));
         return map;
     }
 

@@ -1,6 +1,5 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 import lombok.AllArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 
 import fj.F;
+import fj.data.HashMap;
 import fj.data.Set;
 import fj.function.Try0;
 
@@ -19,8 +19,8 @@ import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
+import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
@@ -34,7 +34,7 @@ import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutterCtrl")
-@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class })
+@ExtensionMethod({ IterableExtensionMethods.class, OptionExtensionMethods.class })
 public final class ProteinCutterController {
 
     private final ProteinCutter  cutter;
@@ -89,7 +89,7 @@ public final class ProteinCutterController {
 
     private void insertCuts(final Set<Digestion> digestions) {
         final Set<Peptide> peptides = digestions.map(
-            Peptide.hash.toOrd(),
+            Peptide.ord,
             d -> d.getPeptide()
         );
 
@@ -112,34 +112,17 @@ public final class ProteinCutterController {
         databaseAction(() -> digestionsDAO.insertAll(updated));
     }
 
-    // FIXME: quickfixed, commented error-causing code
     private Set<Digestion> updateReferences(
         final Set<Digestion> digestions,
         final Set<Peptide>   peptides
     ) {
-        final java.util.List<Peptide> ps = new ArrayList<>(peptides.toCollection());
+        final HashMap<Peptide, Peptide> peptideMap = peptides.toIdentityMap(
+            Peptide.equal, Peptide.hash
+        );
 
-        Set<Digestion> set = Set.empty(Digestion.hash.toOrd());
-
-        for (final Digestion dig: digestions) {
-            final Peptide peptideWithID = ps.stream().filter(
-                p -> Peptide.equal.eq(dig.getPeptide(), p)
-            ).findFirst().get();
-
-            final Digestion digestionWithPeptideID = dig.withPeptide(peptideWithID);
-            set = set.insert(digestionWithPeptideID);
-        }
-
-        return set;
-
-        // final HashMap<Peptide, Peptide> peptideMap = peptides.toIdentityMap(
-        //     Peptide.equal, Peptide.hash
-        // );
-        //
-        // return digestions.map(digestions.ord(), dig -> {
-        //     val p = peptideMap.get(dig.getPeptide()).some();
-        //     return dig.withPeptide(p);
-        // });
+        return digestions.map(Digestion.ord, d -> d.withPeptide(
+            peptideMap.get(d.getPeptide()).some()
+        ));
     }
 
     private <A> A databaseAction(final Try0<A, DAOException> f) {

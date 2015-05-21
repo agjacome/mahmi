@@ -19,7 +19,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 
@@ -31,7 +30,7 @@ import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withMessage;
 
 @Slf4j
 @AllArgsConstructor(staticName = "proteinCutter")
-@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class, OptionExtensionMethods.class })
+@ExtensionMethod({ IterableExtensionMethods.class, OptionExtensionMethods.class })
 public final class ProteinCutter {
 
     public Set<Digestion> cutProtein(
@@ -41,11 +40,10 @@ public final class ProteinCutter {
     ) throws CutterException {
         val digestions = new HashSet<>(Digestion.equal, Digestion.hash);
 
-        for (val enzyme : enzymes) {
+        for (val enzyme : enzymes)
             digest(protein, enzyme, sizeFilter).forEach(digestions::set);
-        }
 
-        return digestions.toSet(Digestion.hash.toOrd());
+        return digestions.toSet(Digestion.ord);
     }
 
     public Set<Digestion> cutProteins(
@@ -55,11 +53,10 @@ public final class ProteinCutter {
     ) throws CutterException {
         val digestions = new HashSet<>(Digestion.equal, Digestion.hash);
 
-        for (val protein : proteins) {
+        for (val protein : proteins)
             cutProtein(protein, enzymes, sizeFilter).forEach(digestions::set);
-        }
 
-        return digestions.toSet(Digestion.hash.toOrd());
+        return digestions.toSet(Digestion.ord);
     }
 
     private Set<Digestion> digest(
@@ -111,7 +108,7 @@ public final class ProteinCutter {
             digestions.set(digestion);
         }
 
-        return digestions.toSet(Digestion.hash.toOrd());
+        return digestions.toSet(Digestion.ord);
     }
 
     private org.expasy.mzjava.proteomics.mol.Protein toMzProtein(

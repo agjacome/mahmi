@@ -23,12 +23,13 @@ import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import static fj.P.lazy;
 import static fj.data.Set.iterableSet;
@@ -38,12 +39,10 @@ import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 @Path("/peptide")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-@ExtensionMethod({ HashExtensionMethods.class, OptionExtensionMethods.class })
+@ExtensionMethod(OptionExtensionMethods.class)
 public final class PeptideService extends DatabaseEntityAbstractService<Peptide, PeptidesDAO> {
 
     private PeptideService(final PeptidesDAO dao) {
@@ -107,8 +106,7 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
     @POST
     @Path("/all")
     public Response insertAll(final java.util.List<Peptide> peptides) {
-        val ord = Peptide.hash.toOrd();
-        return buildInsertAll(iterableSet(ord, peptides));
+        return buildInsertAll(iterableSet(Peptide.ord, peptides));
     }
 
     @DELETE

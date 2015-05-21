@@ -25,14 +25,17 @@ import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
-import es.uvigo.ei.sing.mahmi.common.utils.extensions.HashExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.CutProteinsWrapper;
 
 import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.ACCEPTED;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.OK;
+
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
@@ -41,13 +44,11 @@ import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
 
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
 @Slf4j
 @Path("/digestion")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-@ExtensionMethod({ HashExtensionMethods.class, IterableExtensionMethods.class })
+@ExtensionMethod(IterableExtensionMethods.class)
 public final class DigestionService extends DatabaseEntityAbstractService<Digestion, DigestionsDAO> {
 
     private final ProteinCutterController cutter;
@@ -137,7 +138,7 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
 
             val future = cutter.cutProjectProteins(
                 project,
-                enzymes.toSet(Enzyme.hash.toOrd()),
+                enzymes.toSet(Enzyme.ord),
                 between(minSize, maxSize)
             );
 
