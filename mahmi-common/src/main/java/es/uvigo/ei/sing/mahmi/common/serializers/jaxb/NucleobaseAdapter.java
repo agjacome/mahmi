@@ -1,15 +1,13 @@
 package es.uvigo.ei.sing.mahmi.common.serializers.jaxb;
 
+import java.util.function.Supplier;
+
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.experimental.ExtensionMethod;
 
-import fj.P1;
-
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
-
-import static fj.P.lazy;
 
 @ExtensionMethod(OptionExtensionMethods.class)
 public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleobase> {
@@ -24,10 +22,10 @@ public final class NucleobaseAdapter extends XmlAdapter<Character, Nucleobase> {
         return nucleobase.getCode();
     }
 
-    private P1<IllegalArgumentException> invalidCode(final char code) {
-        return lazy(u -> new IllegalArgumentException(
+    private Supplier<IllegalArgumentException> invalidCode(final char code) {
+        return () -> new IllegalArgumentException(
             String.format("Invalid nucleobase code %c", code)
-        ));
+        );
     }
 
 }

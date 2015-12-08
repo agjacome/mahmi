@@ -4,12 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
-
 import fj.F;
 import fj.Ord;
 import fj.control.db.DB;
@@ -17,6 +11,11 @@ import fj.data.List;
 import fj.data.Option;
 import fj.data.Set;
 import fj.function.Try0;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import lombok.experimental.ExtensionMethod;
+import lombok.extern.slf4j.Slf4j;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Entity;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -34,7 +33,7 @@ abstract class MySQLAbstractDAO<A extends Entity<A>> implements DAO<A> {
 
     protected final ConnectionPool connectionPool;
 
-    protected final Ord<A> ordering = Identifier.ord.comap(a -> a.getId());
+    protected final Ord<A> ordering = Identifier.ord.contramap(a -> a.getId());
 
     protected final F<ResultSet, DB<List<A>>> get = getWith(this::parse);
 

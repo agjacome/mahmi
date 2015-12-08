@@ -14,9 +14,8 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import lombok.val;
-
 import fj.data.Set;
+import lombok.val;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -28,7 +27,6 @@ import static javax.ws.rs.core.Response.Status.OK;
 
 import static fj.Ord.stringOrd;
 import static fj.data.Set.iterableSet;
-
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Path("/enzyme")
@@ -66,7 +64,7 @@ public final class EnzymeService extends DatabaseEntityAbstractService<Enzyme, E
     @POST
     @Path("/all")
     public Response insertAll(final java.util.List<Enzyme> enzymes) {
-        val ord = stringOrd.comap(Enzyme::getName);
+        val ord = stringOrd.contramap(Enzyme::getName);
         return buildInsertAll(iterableSet(ord, enzymes));
     }
 

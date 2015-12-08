@@ -16,10 +16,10 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import fj.data.Option;
+import fj.data.Set;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
-
-import fj.data.Set;
 
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -29,14 +29,12 @@ import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 
-import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 
+import static fj.data.Set.iterableSet;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
-import static fj.P.lazy;
-import static fj.data.Set.iterableSet;
-
+import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 
 @Path("/protein")
@@ -78,13 +76,18 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
+        final MetaGenome mg = metagenome(
+            Identifier.of(metagenomeId),
+            project(Identifier.of(projectId), projectName, projectRepo),
+            Fasta.empty()
+        );
+
+        final Option<AminoAcidSequence> aas = AminoAcidSequence.fromString(sequence);
+        if (aas.isNone()) throw new IllegalArgumentException();
+
         return respond(
-                () -> dao.search(MetaGenome.metagenome(Identifier.of(metagenomeId),
-                project(Identifier.of(projectId),projectName,projectRepo),
-                Fasta.empty()),
-                AminoAcidSequence.fromString(sequence).orThrow(lazy(u -> new IllegalArgumentException())),
-                (page - 1) * size, size),
-            as -> status(OK).entity(toGenericEntity(as))
+            () -> dao.search(mg, aas.some(), (page - 1) * size, size),
+            as -> Response.status(OK).entity(toGenericEntity(as))
         );
     }
 

@@ -2,12 +2,11 @@ package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
 import java.util.EnumSet;
 
+import fj.data.HashMap;
+import fj.data.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import fj.data.HashMap;
-import fj.data.Option;
 
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
 
@@ -53,8 +52,8 @@ public enum AminoAcid implements Compound {
     @VisibleForTesting
     static final HashMap<Character, AminoAcid> codes = HashMap.from(
         iterableStream(EnumSet.allOf(AminoAcid.class)).map(aa -> p(aa.code, aa)).cons(p('*', XAA)),
-        charEqual.comap(toUpperCase),
-        charHash.comap(toUpperCase)
+        charEqual.contramap(toUpperCase),
+        charHash.contramap(toUpperCase)
     );
 
     private final String fullName;

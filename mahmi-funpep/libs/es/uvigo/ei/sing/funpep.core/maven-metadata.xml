@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>es.uvigo.ei.sing</groupId>
+  <artifactId>funpep.core</artifactId>
+  <versioning>
+    <versions>
+      <version>0.1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20151208182514</lastUpdated>
+  </versioning>
+</metadata>

@@ -16,10 +16,9 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import fj.data.Set;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-
-import fj.data.Set;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -28,14 +27,15 @@ import es.uvigo.ei.sing.mahmi.http.wrappers.LoadProjectWrapper;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
 
 import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.OK;
 
 import static fj.Ord.stringOrd;
 import static fj.data.Set.iterableSet;
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 @Slf4j
 @Path("/project")
@@ -100,7 +100,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     @POST
     @Path("/all")
     public Response insertAll(final java.util.List<Project> projects) {
-        val ord = stringOrd.comap(Project::getName);
+        val ord = stringOrd.contramap(Project::getName);
         return buildInsertAll(iterableSet(ord, projects));
     }
 

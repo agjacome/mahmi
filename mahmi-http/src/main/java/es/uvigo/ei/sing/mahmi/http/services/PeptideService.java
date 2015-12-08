@@ -14,12 +14,15 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import fj.data.Option;
+import fj.data.Set;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 
-import fj.data.Set;
-
+import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -29,10 +32,8 @@ import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.OK;
 
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import static fj.P.lazy;
 import static fj.data.Set.iterableSet;
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
 import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
@@ -80,14 +81,19 @@ public final class PeptideService extends DatabaseEntityAbstractService<Peptide,
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
-        return respond(() ->
-            dao.search(
-                protein(Identifier.of(proteinId), AminoAcidSequence.empty()),
-                metagenome(Identifier.of(metagenomeId), project(Identifier.of(projectId),projectName,projectRepo), Fasta.empty()),
-                AminoAcidSequence.fromString(sequence).orThrow(lazy(u -> new IllegalArgumentException())),
-                enzyme(Identifier.of(enzymeId),""),
-                (page - 1) * size, size
-            ),
+        final Option<AminoAcidSequence> aas = AminoAcidSequence.fromString(sequence);
+        if (aas.isNone()) throw new IllegalArgumentException();
+
+        final Protein    p  = protein(Identifier.of(proteinId), AminoAcidSequence.empty());
+        final Enzyme     e  = enzyme(Identifier.of(enzymeId),"");
+        final MetaGenome mg = metagenome(
+            Identifier.of(metagenomeId),
+            project(Identifier.of(projectId), projectName, projectRepo),
+            Fasta.empty()
+        );
+
+        return respond(
+            () -> dao.search(p, mg, aas.some(), e, (page - 1) * size, size),
             as -> status(OK).entity(toGenericEntity(as))
         );
     }

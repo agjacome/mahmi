@@ -1,19 +1,18 @@
 package es.uvigo.ei.sing.mahmi.common.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import fj.Equal;
 import fj.Hash;
 import fj.Ord;
 import fj.data.Array;
 import fj.data.Option;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.ExtensionMethod;
+import lombok.extern.slf4j.Slf4j;
 
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.ArrayExtensionMethods;
 
@@ -28,9 +27,9 @@ import static fj.data.Array.array;
 @ExtensionMethod(ArrayExtensionMethods.class)
 public final class SHA1 {
 
-    public static final Hash<SHA1>  hash  = stringHash.comap(SHA1::asHexString);
-    public static final Equal<SHA1> equal = stringEqual.comap(SHA1::asHexString);
-    public static final Ord<SHA1>   ord   = stringOrd.comap(SHA1::asHexString);
+    public static final Hash<SHA1>  hash  = stringHash.contramap(SHA1::asHexString);
+    public static final Equal<SHA1> equal = stringEqual.contramap(SHA1::asHexString);
+    public static final Ord<SHA1>   ord   = stringOrd.contramap(SHA1::asHexString);
 
     private final Array<Byte> digest;
 

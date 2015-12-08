@@ -8,10 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
-
 import fj.F;
 import fj.control.db.Connector;
 import fj.control.db.DB;
@@ -19,8 +15,9 @@ import fj.control.db.DbState;
 import fj.data.List;
 import fj.data.List.Buffer;
 import fj.function.Try1;
-
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.val;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
@@ -33,7 +30,6 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.text.MessageFormat.format;
 
-import static fj.P.lazy;
 import static fj.data.Array.array;
 
 import static es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter.fastaWriter;
@@ -56,9 +52,8 @@ public final class FunctionalJDBC {
     public static <A> DB<Iterable<A>> sequence(final Iterable<DB<A>> dbs) {
         return db(connection -> {
             final java.util.List<A> buffer = new java.util.LinkedList<A>();
-            for (final DB<A> db : dbs) {
+            for (final DB<A> db : dbs)
                 buffer.add(db.run(connection));
-            }
             return buffer;
         });
     }
@@ -100,16 +95,10 @@ public final class FunctionalJDBC {
         final int index, final Identifier id
     ) {
         return statement -> db(connection -> {
-            // Cannot use @ExtensionMethod because lombok compilation with
-            // Maven throws a StackOverflowError (see github issue #6)
-            //
-            //     val value = id.getValue().orThrow(
-            //         lazy(u -> error("Empty Identifier on index {0}", index))
-            //     ).longValue();
-            //
-            final long value = OptionExtensionMethods.orThrow(id.getValue(), lazy(
-                u -> error("Empty Identifier on index {0}", index)
-            )).longValue();
+            final long value = OptionExtensionMethods.orThrow(
+                id.getValue(),
+                () -> error("Empty Identifier on index {0}", index)
+            ).longValue();
 
             statement.setLong(index, value);
             return statement;
@@ -175,17 +164,9 @@ public final class FunctionalJDBC {
         final ResultSet results, final String column
     ) throws SQLException {
         val str = parseString(results, column);
-        // Cannot use @ExtensionMethod because lombok compilation with
-        // Maven throws a StackOverflowError (see github issue #6)
-        //
-        //     return AminoAcidSequence.fromString(str).orThrow(
-        //         lazy(u -> error("Invalid AminoAcid sequence at {0}: {1}", column, str))
-        //     );
-        //
-
         return OptionExtensionMethods.orThrow(
             AminoAcidSequence.fromString(str),
-            lazy(u -> error("Invalid AminoAcid sequence at {0}: {1}", column, str))
+            () -> error("Invalid AminoAcid sequence at {0}: {1}", column, str)
         );
     }
 

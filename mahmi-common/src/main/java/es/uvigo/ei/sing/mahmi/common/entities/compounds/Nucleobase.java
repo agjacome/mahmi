@@ -2,13 +2,12 @@ package es.uvigo.ei.sing.mahmi.common.entities.compounds;
 
 import java.util.EnumSet;
 
+import fj.data.HashMap;
+import fj.data.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
-
-import fj.data.HashMap;
-import fj.data.Option;
 
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForTesting;
 
@@ -36,8 +35,8 @@ public enum Nucleobase implements Compound {
         val all = iterableStream(EnumSet.allOf(Nucleobase.class));
         codes = HashMap.from(
             all.map(nb -> p(nb.code, nb)),
-            charEqual.comap(toLowerCase),
-            charHash.comap(toLowerCase)
+            charEqual.contramap(toLowerCase),
+            charHash.contramap(toLowerCase)
         );
     }
 

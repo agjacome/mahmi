@@ -4,12 +4,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import fj.Equal;
+import fj.Hash;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
-
-import fj.Equal;
-import fj.Hash;
 
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
@@ -26,10 +25,10 @@ import static fj.P.p;
 public final class Project implements Entity<Project> {
 
     public static final Hash<Project> hash =
-        p2Hash(stringHash, stringHash).comap(p -> p(p.name, p.repository));
+        p2Hash(stringHash, stringHash).contramap(p -> p(p.name, p.repository));
 
     public static final Equal<Project> equal =
-        p2Equal(stringEqual, stringEqual).comap(p -> p(p.name, p.repository));
+        p2Equal(stringEqual, stringEqual).contramap(p -> p(p.name, p.repository));
 
     private final Identifier id;
     private final String     name;

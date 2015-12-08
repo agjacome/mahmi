@@ -1,18 +1,18 @@
 package es.uvigo.ei.sing.mahmi.cutter;
 
-import lombok.AllArgsConstructor;
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
+import org.expasy.mzjava.proteomics.mol.digest.CleavageSiteMatcher;
+import org.expasy.mzjava.proteomics.mol.digest.Protease;
+import org.expasy.mzjava.proteomics.mol.digest.ProteinDigester;
 
 import fj.F;
 import fj.data.HashMap;
 import fj.data.HashSet;
+import fj.data.Option;
 import fj.data.Set;
-
-import org.expasy.mzjava.proteomics.mol.digest.CleavageSiteMatcher;
-import org.expasy.mzjava.proteomics.mol.digest.Protease;
-import org.expasy.mzjava.proteomics.mol.digest.ProteinDigester;
+import lombok.AllArgsConstructor;
+import lombok.val;
+import lombok.experimental.ExtensionMethod;
+import lombok.extern.slf4j.Slf4j;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
@@ -21,8 +21,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
-
-import static fj.P.lazy;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Digestion.digestion;
 import static es.uvigo.ei.sing.mahmi.cutter.CutterException.withCause;
@@ -123,9 +121,11 @@ public final class ProteinCutter {
         final org.expasy.mzjava.proteomics.mol.Peptide mzPeptide
     ) {
         val sequence = mzPeptide.toSymbolString();
-        return AminoAcidSequence.fromString(sequence).orThrow(
-            lazy(u -> withMessage("Illegal aminoacid sequence produced by MZJava: " + sequence))
-        );
+
+        final Option<AminoAcidSequence> aa = AminoAcidSequence.fromString(sequence);
+        if (aa.isSome()) return aa.some();
+
+        throw withMessage("Illegal aminoacid sequence produced by MZJava: " + sequence);
     }
 
     private CleavageSiteMatcher getMatcherByName(final String name) {

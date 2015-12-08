@@ -10,16 +10,15 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
+import fj.F;
+import fj.Monoid;
+import fj.data.Option;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
-
-import fj.F;
-import fj.Monoid;
-import fj.P1;
-import fj.data.Option;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.Compound;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
@@ -28,7 +27,6 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 
-import static fj.P.lazy;
 import static fj.data.Option.none;
 import static fj.data.Option.some;
 
@@ -111,12 +109,11 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
         String line = null;
         A sequence = monoid.zero();
 
-        while ((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null)
             if  (!line.startsWith(">"))
                 sequence = monoid.sum(sequence, parseLine(line, lineNumber));
             else if (!sequence.isEmpty())
                 return some(sequence);
-        }
 
         return Option.iif(!sequence.isEmpty(), sequence);
     }
@@ -129,18 +126,18 @@ public final class FastaReader<A extends CompoundSequence<? extends Compound>> {
         );
     }
 
-    private P1<NoSuchElementException> nextError(final int lineNumber) {
-        return lazy(u -> new NoSuchElementException(String.format(
+    private Supplier<NoSuchElementException> nextError(final int lineNumber) {
+        return () -> new NoSuchElementException(String.format(
             "No more sequences found after line %d", lineNumber
-        )));
+        ));
     }
 
-    private P1<IOException> parseError(
+    private Supplier<IOException> parseError(
         final String line, final int lineNumber
     ) {
-        return lazy(u -> new IOException(String.format(
+        return () -> new IOException(String.format(
             "Could not parse sequence before line %d: %s", lineNumber, line
-        )));
+        ));
     }
 
 }

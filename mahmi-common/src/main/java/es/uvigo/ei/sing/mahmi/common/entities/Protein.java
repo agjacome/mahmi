@@ -4,13 +4,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.Wither;
-
 import fj.Equal;
 import fj.Hash;
 import fj.Ord;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Wither;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.CompoundSequence;
@@ -23,9 +22,9 @@ import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
 public final class Protein implements Entity<Protein> {
 
-    public static final Hash<Protein>  hash  = CompoundSequence.hash.comap(Protein::getSequence);
-    public static final Equal<Protein> equal = CompoundSequence.equal.comap(Protein::getSequence);
-    public static final Ord<Protein>   ord   = CompoundSequence.ord.comap(Protein::getSequence);
+    public static final Hash<Protein>  hash  = CompoundSequence.hash.contramap(Protein::getSequence);
+    public static final Equal<Protein> equal = CompoundSequence.equal.contramap(Protein::getSequence);
+    public static final Ord<Protein>   ord   = CompoundSequence.ord.contramap(Protein::getSequence);
 
     private final Identifier        id;
     private final AminoAcidSequence sequence;

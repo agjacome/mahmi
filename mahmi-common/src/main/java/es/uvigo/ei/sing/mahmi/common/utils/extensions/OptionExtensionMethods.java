@@ -1,10 +1,11 @@
 package es.uvigo.ei.sing.mahmi.common.utils.extensions;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.function.Supplier;
 
 import fj.F0;
 import fj.data.Option;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import static fj.P.lazy;
 
@@ -39,10 +40,17 @@ public final class OptionExtensionMethods {
         return opt.orSome(lazy(a));
     }
 
+     public static <A, B extends Throwable> A orThrow(
+         final Option<A> opt, final Supplier<B> err
+     ) throws B {
+         if (opt.isSome()) return opt.some(); else throw err.get();
+     }
+
     public static <A, B extends Throwable> A orThrow(
-        final Option<A> opt, final F0<B> err
+        final Option<A> opt, final B err
     ) throws B {
-        if (opt.isSome()) return opt.some(); else throw err.f();
+        if (opt.isSome()) return opt.some();
+        else throw err;
     }
 
 }

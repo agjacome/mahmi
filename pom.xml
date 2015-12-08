@@ -9,14 +9,14 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>mahmi-aligner</module>
         <module>mahmi-common</module>
         <module>mahmi-cutter</module>
         <module>mahmi-database</module>
+        <module>mahmi-funpep</module>
         <module>mahmi-http</module>
         <module>mahmi-loader</module>
-     	<module>mahmi-psort</module>
-     	<module>mahmi-translator</module>
+        <module>mahmi-psort</module>
+        <module>mahmi-translator</module>
     </modules>
 
     <properties>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.2</version>
+            <version>1.16.6</version>
         </dependency>
     </dependencies>
 

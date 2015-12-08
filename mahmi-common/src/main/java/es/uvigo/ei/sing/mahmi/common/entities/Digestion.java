@@ -4,13 +4,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.Wither;
-
 import fj.Equal;
 import fj.Hash;
 import fj.Ord;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Wither;
 
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
@@ -26,13 +25,13 @@ import static fj.P.p;
 public final class Digestion implements Entity<Digestion> {
 
     public static final Hash<Digestion> hash =
-        p3Hash(Protein.hash, Peptide.hash, Enzyme.hash).comap(d -> p(d.protein, d.peptide, d.enzyme));
+        p3Hash(Protein.hash, Peptide.hash, Enzyme.hash).contramap(d -> p(d.protein, d.peptide, d.enzyme));
 
     public static final Equal<Digestion> equal =
-        p3Equal(Protein.equal, Peptide.equal, Enzyme.equal).comap(d -> p(d.protein, d.peptide, d.enzyme));
+        p3Equal(Protein.equal, Peptide.equal, Enzyme.equal).contramap(d -> p(d.protein, d.peptide, d.enzyme));
 
     public static final Ord<Digestion> ord =
-        p3Ord(Protein.ord, Peptide.ord, Enzyme.ord).comap(d -> p(d.protein, d.peptide, d.enzyme));
+        p3Ord(Protein.ord, Peptide.ord, Enzyme.ord).contramap(d -> p(d.protein, d.peptide, d.enzyme));
 
     private final Identifier id;
     private final Protein    protein;

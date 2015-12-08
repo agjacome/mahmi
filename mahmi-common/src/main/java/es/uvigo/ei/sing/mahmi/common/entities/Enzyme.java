@@ -4,13 +4,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.Wither;
-
 import fj.Equal;
 import fj.Hash;
 import fj.Ord;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Wither;
 
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
@@ -24,9 +23,9 @@ import static fj.Ord.stringOrd;
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
 public final class Enzyme implements Entity<Enzyme> {
 
-    public static final Hash<Enzyme>  hash  = stringHash.comap(Enzyme::getName);
-    public static final Equal<Enzyme> equal = stringEqual.comap(Enzyme::getName);
-    public static final Ord<Enzyme>   ord   = stringOrd.comap(Enzyme::getName);
+    public static final Hash<Enzyme>  hash  = stringHash.contramap(Enzyme::getName);
+    public static final Equal<Enzyme> equal = stringEqual.contramap(Enzyme::getName);
+    public static final Ord<Enzyme>   ord   = stringOrd.contramap(Enzyme::getName);
 
     private final Identifier id;
     private final String     name;
