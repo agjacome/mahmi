@@ -1,8 +1,14 @@
 package es.uvigo.ei.sing.mahmi.funpep;
 
+import static funpep.data.AminoAcid.AminoAcidParser;
+
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.concurrent.Executors;
+
+import static java.util.Collections.emptyMap;
+
+import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
+import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScalaz;
 
 import funpep.Analyzer;
 import funpep.data.Analysis;
@@ -10,15 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import scalaz.concurrent.Task;
 import scalaz.stream.Process;
-
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-
-import static funpep.data.AminoAcid.AminoAcidParser;
-
-import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
-import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScalaz;
-import static es.uvigo.ei.sing.mahmi.funpep.util.MahmiToFunpep.asFunpep;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 @AllArgsConstructor(staticName = "funpepAnalyzer")
@@ -44,17 +41,17 @@ final class FunpepAnalyzer {
     }
 
     public Process<Task, Analysis> create(
-        final Fasta<AminoAcidSequence> reference,
-        final Fasta<AminoAcidSequence> comparing,
-        final double                   threshold,
-        final Map<String, String>      annotations
+        final Path reference,
+        final Path comparing,
+        final double threshold
     ) {
-        return analyzer().create(
-            asFunpep(reference),
-            asFunpep(comparing),
-            threshold,
-            asScalaz(annotations)
-        );
+        val ref = funpep.data.FastaParser$.MODULE$.fromFileW(reference, AminoAcidParser(), asScala(aa -> aa));
+        val cmp = funpep.data.FastaParser$.MODULE$.fromFileW(comparing, AminoAcidParser(), asScala(aa -> aa));
+
+        return ref.<Task, Analysis>flatMap(
+            asScala(r -> cmp.<Task, Analysis>flatMap(
+                asScala(c -> analyzer().create(r, c, threshold, asScalaz(emptyMap()))
+        ))));
     }
 
     public Process<Task, Analysis> clear(final Analysis analysis) {
