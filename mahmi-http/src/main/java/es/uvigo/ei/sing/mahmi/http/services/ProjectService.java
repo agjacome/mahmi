@@ -145,6 +145,7 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
         }
     }
 
+
     @Override
     protected GenericEntity<java.util.List<Project>> toGenericEntity(
         final Set<Project> projects

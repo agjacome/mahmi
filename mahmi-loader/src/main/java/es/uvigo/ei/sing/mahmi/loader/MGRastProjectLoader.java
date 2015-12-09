@@ -34,8 +34,8 @@ import static es.uvigo.ei.sing.mahmi.psort.PSortGramMode.Positive;
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class MGRastProjectLoader implements ProjectLoader {
 
-    private static final FastaReader<NucleobaseSequence> genomeReader = FastaReader.forNucleobase();
-//    private static final FastaReader<AminoAcidSequence> proteinReader = FastaReader.forAminoAcid();
+    private static final FastaReader<NucleobaseSequence> genomeReader  = FastaReader.forNucleobase();
+    private static final FastaReader<AminoAcidSequence>  proteinReader = FastaReader.forAminoAcid();
 
     // TODO: receive in constructor
     private final PSortFastaFilter psort = PSortFastaFilter.of(
@@ -66,7 +66,7 @@ public final class MGRastProjectLoader implements ProjectLoader {
     ) {
         log.info("Reading genome fasta file {} and protein fasta file {}", paths._1(), paths._2());
         val genomes  = readFasta(genomeReader , paths._1());
-        val proteins = /*readFasta(proteinReader, paths._2());*/filterFasta(paths._2());
+        val proteins = readFasta(proteinReader, paths._2()); //filterFasta(paths._2());
 
         return p(genomes, proteins);
     }

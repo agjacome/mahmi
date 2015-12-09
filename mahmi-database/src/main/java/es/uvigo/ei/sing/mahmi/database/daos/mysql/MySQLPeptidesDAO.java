@@ -4,12 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-
 import fj.control.db.DB;
 import fj.data.Option;
 import fj.data.Set;
+import lombok.val;
+import lombok.experimental.ExtensionMethod;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
@@ -57,6 +56,37 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
             "WHERE protein_id = ? "                  +
             "ORDER BY peptide_id LIMIT ? OFFSET ?",
             protein.getId()
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toSet(ordering);
+    }
+
+    @Override
+    public long countByMetagenome(
+        final MetaGenome metagenome
+    ) throws DAOException {
+        val sql = sql(
+            "SELECT COUNT(DISTINCT peptide_id) " +
+            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins " +
+            "WHERE metagenome_id = ? ",
+            metagenome.getId()
+        );
+
+        val statement = sql.bind(query).bind(count);
+        return read(statement);
+    }
+
+    @Override
+    public Set<Peptide> getByMetagenome(
+        final MetaGenome metagenome, final int start, final int count
+    ) {
+        val sql = sql(
+            "SELECT DISTINCT peptide_id, peptide_sequence " +
+            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins " +
+            "WHERE metagenome_id = ? " +
+            "ORDER BY peptide_id LIMIT ? OFFSET ?",
+            metagenome.getId()
         ).bind(integer(2, count)).bind(integer(3, start));
 
         val statement = sql.bind(query).bind(get);

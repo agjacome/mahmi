@@ -34,6 +34,11 @@
             <artifactId>mahmi.cutter</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mahmi.funpep</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- service-related dependencies -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>

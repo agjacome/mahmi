@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -42,7 +41,7 @@ final class PSortRunner implements Runnable {
 
     private void checkExitValue(final int value) throws IOException {
         if (value != 0) throw new IOException(
-            MessageFormat.format("PSORT exited anormally ({})", value)
+            String.format("PSORT exited anormally (%d)", value)
         );
     }
 

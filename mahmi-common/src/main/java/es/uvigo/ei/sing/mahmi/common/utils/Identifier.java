@@ -52,4 +52,9 @@ public final class Identifier {
         return value.isNone();
     }
 
+    @Override
+    public String toString() {
+        return value.option("NULL", n -> "" + n.intValue());
+    }
+
 }
