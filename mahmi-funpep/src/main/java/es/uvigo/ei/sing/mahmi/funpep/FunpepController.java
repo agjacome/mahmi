@@ -1,25 +1,15 @@
 package es.uvigo.ei.sing.mahmi.funpep;
 
-import static scalaz.concurrent.Task.taskInstance;
-
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.UUID;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-
-import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
-import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
-import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
-import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
-
-import static es.uvigo.ei.sing.mahmi.funpep.FunpepAnalyzer.funpepAnalyzer;
-import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
 
 import funpep.data.Analysis;
 import lombok.AllArgsConstructor;
@@ -30,75 +20,105 @@ import scalaz.MonadError;
 import scalaz.concurrent.Task;
 import scalaz.stream.Process;
 
+import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
+import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
+import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter;
+import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
+import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
+import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
+
+import static java.lang.String.format;
+
+import static scalaz.concurrent.Task.taskInstance;
+
+import static es.uvigo.ei.sing.mahmi.funpep.FunpepAnalyzer.funpepAnalyzer;
+import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
+
 @Slf4j
 @AllArgsConstructor(staticName = "funpepCtrl")
 public final class FunpepController {
 
     private static final Config config = ConfigFactory.load("funpep").getConfig("funpep");
 
-    private static final double threshold = config.getDouble("threshold");
+    private static final Path   clustalo  = Paths.get(config.getString("clustalo"));
+    private static final Path   funpepDB  = Paths.get(config.getString("database"));
+    private static final double threshold =           config.getDouble("threshold");
     private static final Path   reference = Paths.get(config.getString("reference"));
-
-    private static final FunpepAnalyzer analyzer = funpepAnalyzer(
-        Paths.get(config.getString("clustalo")),
-        Paths.get(config.getString("database"))
-    );
 
     private final PeptidesDAO peptides;
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Analysis analyze(final MetaGenome metagenome) {
-        val comparing = getComparingFasta(metagenome);
-
         log.info("FUNPEP: Starting Funpep Process for metagenome " + metagenome.getId().toString() + "...");
-        final Process<Task, Analysis> proc = analyzer
-            .create(reference, comparing, threshold)
-            .map(asScala(a -> {
-                log.info("FUNPEP: Assigned ID " + a.id().toString() + " to metagenome " + metagenome.getId().toString());
-                return a;
-            }))
-            .flatMap(asScala(analyzer::analyze));
 
-        final Task<Analysis> task = proc.<Task, Analysis>runLog(
+        val comparing = getComparingFasta(metagenome);
+        val analyzer  = funpepAnalyzer(clustalo, funpepDB);
+
+        final Process<Task, Analysis> proc = analyzer.create(
+            reference, comparing, threshold
+        ).map(asScala(a -> {
+            log.info("FUNPEP: Assigned ID " + a.id().toString() + " to metagenome " + metagenome.getId().toString());
+            return a;
+        })).flatMap(asScala(analyzer::analyze));
+
+        final Task<Analysis> task = proc.<Task>run(
             (MonadError) taskInstance(), (Catchable) taskInstance()
         );
 
         final Analysis finished = task.run();
         log.info("FUNPEP: Finished analysis " + finished.id() + " for metagenome " + metagenome.getId().toString());
 
-        try (final PrintWriter w = new PrintWriter(finished.directory().resolve("metagenome.info").toFile())) {
-            w.println("MAHMI METAGENOME ID: " + metagenome.getId().toString());
-        } catch (IOException e) {
-            log.error("FUNPEP: Could not write metagenome.info in " + finished.directory() + " => " + metagenome.getId().toString());
-        }
+        writeMetagenomeInfo(metagenome.getId(), finished);
+        deleteTemporalFiles(comparing);
 
         return finished;
     }
 
-    // private Fasta<AminoAcidSequence> getReferenceFasta() {
-    //     try {
-    //         log.info("FUNPEP: Reading reference fasta from " + reference.toString());
-    //         return FastaReader.forAminoAcid().fromPath(reference);
-    //     } catch (final IOException ioe) {
-    //         throw new RuntimeException("Could not parse reference fasta", ioe);
-    //     }
-    // }
+    private void deleteTemporalFiles(final Path ... files) {
+        Arrays.stream(files).forEach(file -> {
+            try {
+                Files.deleteIfExists(file);
+            } catch (final IOException e) {
+                log.error("FUNPEP: could not deletefile " + file.toString());
+            }
+        });
+    }
+
+    private void writeMetagenomeInfo(
+        final Identifier metagenomeId, final Analysis analysis
+    ) {
+        val mgInfoFile = analysis.directory().resolve("metagenome.info");
+
+        try (final PrintWriter writer = new PrintWriter(mgInfoFile.toFile())) {
+
+            writer.print("MAHMI METAGENOME ID: ");
+            writer.print(metagenomeId.toString());
+            writer.println();
+
+        } catch (IOException e) {
+            log.error("FUNPEP: Could not write metagenome.info in " + analysis.directory() + " => " + metagenomeId.toString());
+        }
+    }
 
     private Path getComparingFasta(final MetaGenome metagenome) {
-        log.info("FUNPEP: Reading comparing fasta from metagenome " + metagenome.getId().toString());
-
-        final Set<Peptide> ps = new LinkedHashSet<Peptide>();
-
-        peptides.forEachPeptideOfMetagenome(
-            metagenome, pss -> ps.addAll(ps)
+        val mgId = metagenome.getId().toString();
+        val uuid = UUID.randomUUID().toString();
+        val path = funpepDB.resolve("tmp").resolve(
+            format("mg%s-%s.fasta", mgId, uuid)
         );
 
-        val fasta = Fasta.of(ps.stream().map(Peptide::getSequence).iterator());
-        val path  = Paths.get(config.getString("database")).resolve("tmp.fasta");
+        val mgPeptides = peptides.getAllPeptidesFromMetagenome(metagenome);
+        val fasta  = Fasta.of(mgPeptides.map(
+            SHA1.ord.contramap(AminoAcidSequence::getSHA1),
+            Peptide::getSequence
+        ).iterator());
+
         try {
             FastaWriter.forAminoAcid().toPath(fasta, path);
             return path;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             log.error("Error writing comparing fasta: ", e);
             throw new RuntimeException("Error writing comparing fasta", e);
         }

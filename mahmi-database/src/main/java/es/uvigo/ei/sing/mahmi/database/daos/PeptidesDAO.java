@@ -2,7 +2,6 @@ package es.uvigo.ei.sing.mahmi.database.daos;
 
 import fj.data.Option;
 import fj.data.Set;
-import fj.function.Effect1;
 import lombok.val;
 
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
@@ -29,14 +28,18 @@ public interface PeptidesDAO extends DAO<Peptide> {
         final MetaGenome metagenome, final int start, final int count
     ) throws DAOException;
 
-    public default void forEachPeptideOfMetagenome(
-        final MetaGenome metagenome, final Effect1<Set<Peptide>> effect
+    public default Set<Peptide> getAllPeptidesFromMetagenome(
+        final MetaGenome metagenome
     ) throws DAOException {
-        val pageSize = 2000; // TODO: configurable pageSize
-        val numPages = countByMetagenome(metagenome);
+        val count = 2000;
+        val total = countByMetagenome(metagenome);
 
-        for (int pageNum = 0; pageNum < numPages; pageNum += pageSize)
-            effect.f(getByMetagenome(metagenome, pageNum, pageSize));
+        Set<Peptide> ps = Set.empty(getByMetagenome(metagenome, 0, 1).ord());
+
+        for (int start = 0; start < total; start += count)
+            ps = ps.union(getByMetagenome(metagenome, start, count));
+
+        return ps;
     }
 
     public Set<Peptide> search(
