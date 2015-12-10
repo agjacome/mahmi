@@ -1,23 +1,19 @@
 package es.uvigo.ei.sing.mahmi.funpep;
 
-import static funpep.data.AminoAcid.AminoAcidParser;
-
 import java.nio.file.Path;
 import java.util.concurrent.Executors;
-
-import static java.util.Collections.emptyMap;
-
-import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
-import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScalaz;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import funpep.Analyzer;
 import funpep.data.Analysis;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import scalaz.concurrent.Task;
-import scalaz.stream.Process;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+import static funpep.data.AminoAcid.AminoAcidParser;
+
+import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
+
 @AllArgsConstructor(staticName = "funpepAnalyzer")
 final class FunpepAnalyzer {
 
@@ -40,26 +36,17 @@ final class FunpepAnalyzer {
         );
     }
 
-    public Process<Task, Analysis> create(
+    public void unsafeRunFunpep(
         final Path reference,
         final Path comparing,
-        final double threshold
+        final double threshold,
+        final Function<Analysis, Analysis> onCreated,
+        final Runnable onComplete,
+        final Consumer<Throwable> onError
     ) {
-        val ref = funpep.data.FastaParser$.MODULE$.fromFileW(reference, AminoAcidParser(), asScala(aa -> aa));
-        val cmp = funpep.data.FastaParser$.MODULE$.fromFileW(comparing, AminoAcidParser(), asScala(aa -> aa));
-
-        return ref.<Task, Analysis>flatMap(
-            asScala(r -> cmp.<Task, Analysis>flatMap(
-                asScala(c -> analyzer().create(r, c, threshold, asScalaz(emptyMap()))
-        ))));
-    }
-
-    public Process<Task, Analysis> clear(final Analysis analysis) {
-        return analyzer().clear(analysis);
-    }
-
-    public Process<Task, Analysis> analyze(final Analysis analysis) {
-        return analyzer().analyze(analysis).run().apply(clustalO);
+        analyzer().mahmiUnsafeRun(
+            reference, comparing, threshold, clustalO, onCreated, onComplete, onError
+        );
     }
 
 }

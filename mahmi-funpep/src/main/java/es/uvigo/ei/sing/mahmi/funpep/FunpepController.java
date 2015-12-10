@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -15,10 +17,6 @@ import funpep.data.Analysis;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import scalaz.Catchable;
-import scalaz.MonadError;
-import scalaz.concurrent.Task;
-import scalaz.stream.Process;
 
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
@@ -31,10 +29,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 
 import static java.lang.String.format;
 
-import static scalaz.concurrent.Task.taskInstance;
-
 import static es.uvigo.ei.sing.mahmi.funpep.FunpepAnalyzer.funpepAnalyzer;
-import static es.uvigo.ei.sing.mahmi.funpep.util.JavaToScala.asScala;
 
 @Slf4j
 @AllArgsConstructor(staticName = "funpepCtrl")
@@ -49,31 +44,29 @@ public final class FunpepController {
 
     private final PeptidesDAO peptides;
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Analysis analyze(final MetaGenome metagenome) {
-        log.info("FUNPEP: Starting Funpep Process for metagenome " + metagenome.getId().toString() + "...");
+    public void analyze(final MetaGenome metagenome) {
+        val mgId = metagenome.getId();
+        log.info("FUNPEP: Starting funpep analysis for metagenome " + mgId);
 
         val comparing = getComparingFasta(metagenome);
         val analyzer  = funpepAnalyzer(clustalo, funpepDB);
 
-        final Process<Task, Analysis> proc = analyzer.create(
-            reference, comparing, threshold
-        ).map(asScala(a -> {
-            log.info("FUNPEP: Assigned ID " + a.id().toString() + " to metagenome " + metagenome.getId().toString());
-            return a;
-        })).flatMap(asScala(analyzer::analyze));
+        final Function<Analysis, Analysis> onCreated = analysis -> {
+            log.info("FUNPEP: Assigned ID " + analysis.id() + " to metagenome " + mgId);
+            writeMetagenomeInfo(mgId, analysis);
+            return analysis;
+        };
 
-        final Task<Analysis> task = proc.<Task>run(
-            (MonadError) taskInstance(), (Catchable) taskInstance()
+        final Runnable onComplete = () -> {
+            deleteTemporalFiles(comparing);
+            log.info("FUNPEP: Finished analysis for metagenome " + mgId);
+        };
+
+        final Consumer<Throwable> onError = t -> log.error("FUNPEP: error while analyzing", t);
+
+        analyzer.unsafeRunFunpep(
+            reference, comparing, threshold, onCreated, onComplete, onError
         );
-
-        final Analysis finished = task.run();
-        log.info("FUNPEP: Finished analysis " + finished.id() + " for metagenome " + metagenome.getId().toString());
-
-        writeMetagenomeInfo(metagenome.getId(), finished);
-        deleteTemporalFiles(comparing);
-
-        return finished;
     }
 
     private void deleteTemporalFiles(final Path ... files) {
@@ -81,24 +74,24 @@ public final class FunpepController {
             try {
                 Files.deleteIfExists(file);
             } catch (final IOException e) {
-                log.error("FUNPEP: could not deletefile " + file.toString());
+                log.error("FUNPEP: could not delete file " + file.toString());
             }
         });
     }
 
     private void writeMetagenomeInfo(
-        final Identifier metagenomeId, final Analysis analysis
+        final Identifier mgId, final Analysis analysis
     ) {
         val mgInfoFile = analysis.directory().resolve("metagenome.info");
 
         try (final PrintWriter writer = new PrintWriter(mgInfoFile.toFile())) {
 
             writer.print("MAHMI METAGENOME ID: ");
-            writer.print(metagenomeId.toString());
+            writer.print(mgId.toString());
             writer.println();
 
         } catch (IOException e) {
-            log.error("FUNPEP: Could not write metagenome.info in " + analysis.directory() + " => " + metagenomeId.toString());
+            log.error("FUNPEP: Could not write metagenome.info in " + analysis.directory() + " => " + mgId);
         }
     }
 
