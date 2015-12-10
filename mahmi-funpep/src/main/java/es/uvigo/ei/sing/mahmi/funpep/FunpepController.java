@@ -103,6 +103,12 @@ public final class FunpepController {
     }
 
     private Path getComparingFasta(final MetaGenome metagenome) {
+        try {
+            Files.createDirectories(funpepDB.resolve("tmp"));
+        } catch (IOException e1) {
+            log.error("FUNPEP: Could not create temporal dir " + funpepDB.resolve("tmp").toString());
+        }
+
         val mgId = metagenome.getId().toString();
         val uuid = UUID.randomUUID().toString();
         val path = funpepDB.resolve("tmp").resolve(
