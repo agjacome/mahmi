@@ -73,7 +73,7 @@ public final class FastaWriter<A extends CompoundSequence<? extends Compound>> {
 
         for (int i = 0; i < cs.length; ++i) {
             writer.append(cs[i]);
-            if (i % MAX_LINE_LENGTH == 0)
+            if ((i + 1) % MAX_LINE_LENGTH == 0)
                 writer.append(lineSeparator());
         }
 
