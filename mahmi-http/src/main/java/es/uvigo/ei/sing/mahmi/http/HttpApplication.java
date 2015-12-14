@@ -18,7 +18,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
-import es.uvigo.ei.sing.mahmi.funpep.FunpepController;
+import es.uvigo.ei.sing.mahmi.funpep.FunpepAnalyzer;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
 
 import static es.uvigo.ei.sing.mahmi.cutter.ProteinCutter.proteinCutter;
@@ -32,9 +32,10 @@ import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlP
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLTableStatsDAO.mysqlTableStatsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLUsersDAO.mysqlUsersDAO;
-import static es.uvigo.ei.sing.mahmi.funpep.FunpepController.funpepCtrl;
+import static es.uvigo.ei.sing.mahmi.funpep.FunpepAnalyzer.funpep;
 import static es.uvigo.ei.sing.mahmi.http.services.DigestionService.digestionService;
 import static es.uvigo.ei.sing.mahmi.http.services.EnzymeService.enzymeService;
+import static es.uvigo.ei.sing.mahmi.http.services.FunpepService.funpepService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeProteinsService.metaGenomeProteinsService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeService.metaGenomeService;
 import static es.uvigo.ei.sing.mahmi.http.services.PeptideService.peptideService;
@@ -70,18 +71,19 @@ public final class HttpApplication extends Application {
             proteinCutter(), metaGenomesDAO, proteinsDAO, peptidesDAO, digestionsDAO, tableStatsDAO
         );
 
-        final FunpepController funpepController = funpepCtrl(peptidesDAO);
+        final FunpepAnalyzer funpep = funpep(peptidesDAO);
 
         return Sets.newHashSet(
-            (Object) digestionService(digestionsDAO, cutterController),
-            (Object) enzymeService(enzymesDAO),
-            (Object) metaGenomeService(metaGenomesDAO, funpepController),
-            (Object) metaGenomeProteinsService(metaGenomeProteinsDAO),
-            (Object) peptideService(peptidesDAO),
-            (Object) projectService(projectsDAO, loaderController),
-            (Object) proteinService(proteinsDAO),
-            (Object) tableStatService(tableStatsDAO),
-            (Object) userService(usersDAO)
+            digestionService(digestionsDAO, cutterController),
+            enzymeService(enzymesDAO),
+            metaGenomeService(metaGenomesDAO),
+            metaGenomeProteinsService(metaGenomeProteinsDAO),
+            peptideService(peptidesDAO),
+            projectService(projectsDAO, loaderController),
+            proteinService(proteinsDAO),
+            tableStatService(tableStatsDAO),
+            userService(usersDAO),
+            funpepService(funpep)
         );
     }
 

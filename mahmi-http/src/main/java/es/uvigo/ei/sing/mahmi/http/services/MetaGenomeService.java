@@ -14,20 +14,15 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import fj.data.Option;
 import fj.data.Set;
 import lombok.val;
 
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
-import es.uvigo.ei.sing.mahmi.funpep.FunpepController;
-
-import static java.util.concurrent.CompletableFuture.runAsync;
 
 import static javax.ws.rs.core.Response.status;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static javax.ws.rs.core.Response.Status.OK;
 
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
@@ -39,20 +34,12 @@ import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaGenome, MetaGenomesDAO> {
 
-    private final FunpepController funpep;
-
-    private MetaGenomeService(
-        final MetaGenomesDAO dao,
-        final FunpepController funpep
-    ) {
+    private MetaGenomeService(final MetaGenomesDAO dao) {
         super(dao);
-        this.funpep = funpep;
     }
 
-    public static MetaGenomeService metaGenomeService(
-        final MetaGenomesDAO dao, final FunpepController funpep
-    ) {
-        return new MetaGenomeService(dao, funpep);
+    public static MetaGenomeService metaGenomeService(final MetaGenomesDAO dao) {
+        return new MetaGenomeService(dao);
     }
 
     @GET
@@ -120,19 +107,6 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
     ) {
         val toUpdate = metaGenome.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
-    }
-
-    @POST
-    @Path("/{id}/analyze")
-    public Response analyze(
-        @PathParam("id") final int id
-    ) {
-        final Option<MetaGenome> mg = dao.get(Identifier.of(id));
-        if (mg.isNone()) return status(NOT_FOUND).build();
-
-        runAsync(() -> funpep.analyze(mg.some()));
-
-        return status(NO_CONTENT).build();
     }
 
     @Override

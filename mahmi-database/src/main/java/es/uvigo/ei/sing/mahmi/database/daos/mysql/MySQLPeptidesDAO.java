@@ -63,37 +63,6 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
     }
 
     @Override
-    public long countByMetagenome(
-        final MetaGenome metagenome
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT COUNT(DISTINCT peptide_id) " +
-            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins " +
-            "WHERE metagenome_id = ? ",
-            metagenome.getId()
-        );
-
-        val statement = sql.bind(query).bind(count);
-        return read(statement);
-    }
-
-    @Override
-    public Set<Peptide> getByMetagenome(
-        final MetaGenome metagenome, final int start, final int count
-    ) {
-        val sql = sql(
-            "SELECT DISTINCT peptide_id, peptide_sequence " +
-            "FROM peptides NATURAL JOIN digestions NATURAL JOIN metagenome_proteins " +
-            "WHERE metagenome_id = ? " +
-            "ORDER BY peptide_id LIMIT ? OFFSET ?",
-            metagenome.getId()
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toSet(ordering);
-    }
-
-    @Override
     public Set<Peptide> search(
         final Protein protein,
         final MetaGenome metagenome,
