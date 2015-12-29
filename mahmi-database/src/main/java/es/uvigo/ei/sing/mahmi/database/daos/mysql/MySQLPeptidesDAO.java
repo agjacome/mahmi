@@ -132,7 +132,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
 
     @Override
     public DB<PreparedStatement> prepareCount() {
-        return prepare("SELECT COUNT(peptide_hash) FROM peptides");
+        return prepare("SELECT COUNT(peptide_id) FROM peptides");
     }
 
     @Override

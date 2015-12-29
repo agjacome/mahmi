@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import fj.F;
+import fj.Unit;
 import fj.control.db.Connector;
 import fj.control.db.DB;
 import fj.control.db.DbState;
@@ -30,6 +31,7 @@ import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.text.MessageFormat.format;
 
+import static fj.Unit.unit;
 import static fj.data.Array.array;
 
 import static es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaWriter.fastaWriter;
@@ -91,6 +93,15 @@ public final class FunctionalJDBC {
         });
     }
 
+    public static F<PreparedStatement, DB<PreparedStatement>> doubleFloat(
+        final int index, final double value
+    ) {
+        return statement -> db(connection -> {
+            statement.setDouble(index, value);
+            return statement;
+        });
+    }
+
     public static F<PreparedStatement, DB<PreparedStatement>> identifier(
         final int index, final Identifier id
     ) {
@@ -148,6 +159,12 @@ public final class FunctionalJDBC {
         return results.getLong(column);
     }
 
+    public static double parseDouble(
+        final ResultSet results, final String column
+    ) throws SQLException {
+        return results.getDouble(column);
+    }
+
     public static Identifier parseIdentifier(
         final ResultSet results, final String column
     ) throws SQLException {
@@ -202,6 +219,12 @@ public final class FunctionalJDBC {
             statement.executeUpdate();
             return statement.getGeneratedKeys();
         });
+
+    public static final F<PreparedStatement, DB<Unit>> updateNoKeys =
+       statement -> db(connection -> {
+           statement.executeUpdate();
+           return unit();
+       });
 
     public static <A> F<ResultSet, DB<List<A>>> getWith(
         final Try1<ResultSet, A, SQLException> parser
