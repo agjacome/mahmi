@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.translator;
+package es.uvigo.ei.sing.mahmi.browser.runners;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,10 +11,10 @@ import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@AllArgsConstructor(staticName = "blastdbcmd")
-final public class BlastDbCmdRunner implements Runnable {
+@AllArgsConstructor(staticName = "blastp")
+final public class BlastpRunner implements Runnable {
 
-    private final String input;
+    private final Path input;
     private final Path output;
     private final String db;
 
@@ -25,24 +25,24 @@ final public class BlastDbCmdRunner implements Runnable {
             redirectErrorToLogs(process);
             checkExitValue(process.waitFor());
         } catch (final IOException | InterruptedException ie){
-            log.error("BlastDbCmd error", ie);
+            log.error("BlastP error", ie);
             throw new RuntimeException(ie);
         }
     }
 
     private ProcessBuilder buildProcess() {
         return new ProcessBuilder(
-            "blastdbcmd",
+            "blastp",
             "-db",
             db,
-            "-entry",
-            input
+            "-query",
+            input.toString()
         ).redirectOutput(output.toFile());
     }
 
     private void checkExitValue(final int value) throws IOException {
         if (value != 0) throw new IOException(
-            MessageFormat.format("BlastDbCmd exited anormally ({})", value)
+            MessageFormat.format("BlastP exited anormally ({})", value)
         );
     }
 

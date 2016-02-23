@@ -1,4 +1,4 @@
-package es.uvigo.ei.sing.mahmi.translator;
+package es.uvigo.ei.sing.mahmi.browser.runners;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor(staticName = "blastdbcmd")
 final public class BlastDbCmdRunner implements Runnable {
 
-    private final String input;
+    private final Path input;
     private final Path output;
     private final String db;
 
@@ -35,8 +35,10 @@ final public class BlastDbCmdRunner implements Runnable {
             "blastdbcmd",
             "-db",
             db,
-            "-entry",
-            input
+            "-dbtype",
+            "prot",
+            "-entry_batch",
+            input.toString()
         ).redirectOutput(output.toFile());
     }
 
