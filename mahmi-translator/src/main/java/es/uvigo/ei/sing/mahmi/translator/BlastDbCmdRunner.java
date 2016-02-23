@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor(staticName = "blastdbcmd")
-final public class BlastDbCmdRunner implements Runnable {
+final class BlastDbCmdRunner implements Runnable {
 
     private final String input;
     private final Path output;

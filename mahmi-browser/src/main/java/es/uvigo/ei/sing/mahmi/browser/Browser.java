@@ -31,28 +31,18 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 public class Browser {
 	private final Config blastConf = ConfigFactory.load("blast");
 
-	public List<BlastAligment> search(final AminoAcidSequence sequence,
-			final String[] databases, final int threshold,
-			final String[] bioactivity, final Path path) {
-		
-		createAuxiliarFolders(path);		
-		
-		if (databases.length == 2) {
-			return filter(
-					threshold, bioactivity,
-					runBlastP(Paths.get(path.toString()+"/ref"), sequence, blastConf.getString("refdb")),
-					runBlastP(Paths.get(path.toString()+"/pos"), sequence, blastConf.getString("posdb")));
+	public List<BlastAligment> search( final AminoAcidSequence sequence,
+									   final List<String> databases, final int threshold,
+									   final List<String> bioactivity, final Path path ) {		
+		createAuxiliarFolders(path);
+		final List<BlastAligment> aligments = new LinkedList<BlastAligment>();
+		if(databases.contains("refdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/ref"), sequence, blastConf.getString("refdb"))).forEach(ba -> aligments.add(ba));
+		if(databases.contains("posdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/pos"), sequence, blastConf.getString("posdb"))).forEach(ba -> aligments.add(ba));		
+		return filter(aligments, threshold, bioactivity, path);
+	}
 
-		} else {
-			if (databases[0].equals("refdb"))
-				return filter(
-						threshold, bioactivity,
-						runBlastP(Paths.get(path.toString()+"/ref"), sequence, blastConf.getString("refdb")));
-			else
-				return filter(
-						threshold, bioactivity,
-						runBlastP(Paths.get(path.toString()+"/pos"), sequence, blastConf.getString("posdb")));
-		}
+	public void getAligment(final BlastAligment aligment) {
+		// TODO
 	}
 	
 	private void createAuxiliarFolders(final Path path){
@@ -61,22 +51,11 @@ public class Browser {
 		final File posFile = new File(path.toString()+"/pos");
 		posFile.mkdir();
 	}
-
-	private List<BlastAligment> filter(final int threshold, final String[] bioactivity, final Path ... paths) {
-		final List<BlastAligment> aligments = new LinkedList<BlastAligment>();
-		if (paths.length == 2) {
-			blastOutParser(paths[0]).forEach(ba -> aligments.add(ba));
-			blastOutParser(paths[1]).forEach(ba -> aligments.add(ba));
-		} else {
-			blastOutParser(paths[0]).forEach(ba -> aligments.add(ba));
-		}
-		return filterAligments(aligments, bioactivity, threshold, paths[0].getParent().getParent());
-	}
 	
-	private List<BlastAligment> filterAligments(final List<BlastAligment> aligments, 
-												final String[] bioactivity, 
-												final int threshold, 
-												final Path path){
+	private List<BlastAligment> filter( final List<BlastAligment> aligments, 
+									    final int threshold, 
+									    final List<String> bioactivity, 
+									    final Path path ){
 		final List<BlastAligment> filterAligments = new LinkedList<BlastAligment>();		
 		getAligmentsWithSequences(aligments, path).forEach(a -> {
 			if(hasBioactivity(a, bioactivity) && passThreshold(a, threshold)){
@@ -86,70 +65,78 @@ public class Browser {
 		return filterAligments;
 	}
 	
-	private List<BlastAligment> getAligmentsWithSequences(final List<BlastAligment> aligments, final Path path){
-		final List<BlastAligment> aligmentsWithSequences = new LinkedList<BlastAligment>();
-		final List<BlastAligment> references = new LinkedList<BlastAligment>();
-		final List<BlastAligment> posibles = new LinkedList<BlastAligment>();
+	private List<BlastAligment> getAligmentsWithSequences( final List<BlastAligment> aligments, 
+														   final Path path ){
+		final List<BlastAligment> aligmentsWithSequences = new LinkedList<BlastAligment>();		
+		final List<BlastAligment> references             = new LinkedList<BlastAligment>();
+		final List<BlastAligment> posibles               = new LinkedList<BlastAligment>();
+		
 		aligments.forEach(a -> {
 			if(a.getDescription().startsWith("MHM_POS")) posibles.add(a);
 			else references.add(a);
 		});
-		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), blastConf.getString("refdb"));
-		if(!posibles.isEmpty()) runBlastDbCmd(posibles, Paths.get(path.toString()+"/pos"), blastConf.getString("posdb"));
-		final Map<String, AminoAcidSequence> sequences = getSequencesMap(path, !references.isEmpty(), !posibles.isEmpty());
-		references.forEach(a-> {
-			a.setSequence(sequences.get(a.getDescription()));
-			aligmentsWithSequences.add(a);
-		});
-		posibles.forEach(a-> {
-			a.setSequence(sequences.get(a.getDescription()));
-			aligmentsWithSequences.add(a);
-		});
 		
+		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), blastConf.getString("refdb"));
+		if(!posibles.isEmpty())   runBlastDbCmd(posibles, Paths.get(path.toString()+"/pos"), blastConf.getString("posdb"));
+		
+		Map<String, AminoAcidSequence> map = getSequencesMap(path, !references.isEmpty(), !posibles.isEmpty());
+		
+		addSequences(references, aligmentsWithSequences, map);
+		addSequences(posibles,   aligmentsWithSequences, map);		
 		return aligmentsWithSequences;
 	}
 	
-	private Map<String, AminoAcidSequence> getSequencesMap(final Path path, final boolean references, final boolean posibles){
-		Map<String, AminoAcidSequence> sequences = new HashMap<String, AminoAcidSequence>();		
-		if(references) sequences = populateMap(Paths.get(path.toString()+"/ref/blastdbcmd.out"), sequences);		
-		if(posibles)   sequences = populateMap(Paths.get(path.toString()+"/pos/blastdbcmd.out"), sequences);		
+	private void addSequences( final List<BlastAligment> aligments, 
+							   final List<BlastAligment> aligmentsWithSequence, 
+							   final Map<String, AminoAcidSequence> map) {
+		aligments.forEach(a-> {
+			a.setSequence(map.get(a.getDescription()));
+			aligmentsWithSequence.add(a);
+		});
+	}
+	
+	private Map<String, AminoAcidSequence> getSequencesMap( final Path path, 
+															final boolean references, 
+															final boolean posibles ){
+		final Map<String, AminoAcidSequence> sequences = new HashMap<String, AminoAcidSequence>();		
+		if(references) populateMap(Paths.get(path.toString()+"/ref/blastdbcmd.out"), sequences);		
+		if(posibles)   populateMap(Paths.get(path.toString()+"/pos/blastdbcmd.out"), sequences);		
 		return sequences;
 	}
 	
-	private Map<String, AminoAcidSequence> populateMap(final Path path, final Map<String, AminoAcidSequence> map){
+	private void populateMap( final Path path, 
+							  final Map<String, AminoAcidSequence> map ){
 		try {
-			final List<String> refs = Files.readAllLines(path);
-			Iterator<String> iterator = refs.iterator();
+			final Iterator<String> iterator = Files.readAllLines(path).iterator();
 			while(iterator.hasNext()){
-				final String line = iterator.next();
-				final String key = line.substring(5, line.length());
-				final AminoAcidSequence value = AminoAcidSequence.fromString(iterator.next()).some();
-				map.put(key, value);
+				final String description = iterator.next();
+				map.put( description.substring(5, description.length()), 
+						 AminoAcidSequence.fromString(iterator.next()).some() );
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
-		return map;
 	}
 	
-	//TODO
-	private boolean passThreshold(final BlastAligment aligment, final int threshold){
+	private boolean passThreshold( final BlastAligment aligment, 
+								   final int threshold ){
 		if(aligment.getDescription().startsWith("MHM_POS")){
-			
-			return true;
+			if(Integer.parseInt(aligment.getDescription().split(" ")[3].split("%")[0]) >= threshold)
+				return true;
+			else
+				return false;
 		}else{
 			return true;
 		}
 		
 	}
 	
-	//TODO
-	private boolean hasBioactivity(final BlastAligment aligment, final String[] bioactivity){
-		if(bioactivity.length != 8){
-			
+	private boolean hasBioactivity( final BlastAligment aligment,
+									final List<String> bioactivity ){
+		if(bioactivity.contains(aligment.getDescription().split(" ")[2])){			
 			return true;
 		}else{
-			return true;
+			return false;
 		}
 	}
 	
@@ -181,12 +168,9 @@ public class Browser {
 		return aligments;
 	}
 
-	public void getAligment(final BlastAligment aligment) {
-		// TODO
-	}
-
-	private Path runBlastP(final Path input, final AminoAcidSequence aas,
-			final String db) {
+	private Path runBlastP( final Path input,
+							final AminoAcidSequence aas,
+							final String db) {
 		final Path output = Paths.get(input.toString()+"/blastp.out");
 		final Path readPath = Paths.get(input.toString()+"/read.faa");
 		try (final PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(readPath.toString(), false)))) {
@@ -195,15 +179,12 @@ public class Browser {
 			log.error("Error creating blast auxiliar file:\n" + e.getMessage());
 		}
 		blastp(readPath, output, db).run();
-		try {
-			Files.deleteIfExists(readPath);
-		} catch (IOException e) {
-			log.error("Error deleting blast auxiliar file:\n" + e.getMessage());
-		}
 		return output;
 	}
 	
-	private Path runBlastDbCmd(final List<BlastAligment> aligments, final Path path, final String db) {
+	private Path runBlastDbCmd( final List<BlastAligment> aligments,
+								final Path path, 
+								final String db ) {
 		final Path readPath = Paths.get(path.toString()+"/hits.txt");
 		final Path output = Paths.get(path.toString()+"/blastdbcmd.out");
 		try (final PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(readPath.toString(), false)))) {
@@ -212,11 +193,6 @@ public class Browser {
 			log.error("Error creating blastdbmd auxiliar file:\n" + e.getMessage());
 		}		
         blastdbcmd(readPath, output, db).run();
-        try {
-			Files.deleteIfExists(readPath);
-		} catch (IOException e) {
-			log.error("Error deleting blastdbcmd auxiliar file:\n" + e.getMessage());
-		}
         return output;
     }
 }
