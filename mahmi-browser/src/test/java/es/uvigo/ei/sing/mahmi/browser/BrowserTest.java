@@ -1,5 +1,7 @@
 package es.uvigo.ei.sing.mahmi.browser;
 
+import static es.uvigo.ei.sing.mahmi.browser.Browser.browser;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -40,25 +42,29 @@ public class BrowserTest
      */
     public void testApp()
     {
-		final Browser browser = new Browser();
+		final Browser browser = browser();
 		final List<String> dbs = new LinkedList<String>();
 		dbs.add("refdb");
-		dbs.add("posdb");
+		//dbs.add("posdb");
 		final List<String> bioactivity = new LinkedList<String>();
 		bioactivity.add("ANT");
-		final Path path = Paths.get("/home/mahmi/test");
+		final Path path = Paths.get("/srv/http/mahmi_tmp");
 		
 		final List<BlastAligment> aligments = browser.search(AminoAcidSequence.fromString("MRLGEKIMRLGKKTSRAISIADKD").some(), dbs, 60, bioactivity, path);
 		
 		aligments.forEach(a -> { 
 			System.out.println(a.getDescription());
-			System.out.println(a.getSequence().asString());
+			System.out.println(a.getSequence());
 			System.out.println(a.getScore());
 			System.out.println(a.geteValue());
 			System.out.println(a.getIdentities());
 			System.out.println(a.getPositives());
 			System.out.println(a.getGaps());
 			System.out.println(a.getLength());
+			System.out.println(a.getQuery());
+			System.out.println(a.getComparation());
+			System.out.println(a.getSubject());
+			System.out.println(a.getPath());
 		});
     	    	
         assertTrue( true );

@@ -6,7 +6,6 @@ import javax.ws.rs.core.Application;
 
 import jersey.repackaged.com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
-
 import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
@@ -19,7 +18,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
-
+import static es.uvigo.ei.sing.mahmi.browser.Browser.browser;
 import static es.uvigo.ei.sing.mahmi.cutter.ProteinCutter.proteinCutter;
 import static es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController.proteinCutterCtrl;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLDigestionsDAO.mysqlDigestionsDAO;
@@ -31,6 +30,7 @@ import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlP
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLTableStatsDAO.mysqlTableStatsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLUsersDAO.mysqlUsersDAO;
+import static es.uvigo.ei.sing.mahmi.http.services.BrowserService.browserService;
 import static es.uvigo.ei.sing.mahmi.http.services.DigestionService.digestionService;
 import static es.uvigo.ei.sing.mahmi.http.services.EnzymeService.enzymeService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeProteinsService.metaGenomeProteinsService;
@@ -77,7 +77,8 @@ public final class HttpApplication extends Application {
             projectService(projectsDAO, loaderController),
             proteinService(proteinsDAO),
             tableStatService(tableStatsDAO),
-            userService(usersDAO)
+            userService(usersDAO),
+            browserService(peptidesDAO, browser())
         );
     }
 

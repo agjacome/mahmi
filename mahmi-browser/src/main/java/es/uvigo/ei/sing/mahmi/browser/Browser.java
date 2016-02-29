@@ -24,16 +24,20 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastAligment;
+import es.uvigo.ei.sing.mahmi.browser.utils.PeptideCalculator;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 
 @Slf4j
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "browser")
 public class Browser {
-	private final Config blastConf = ConfigFactory.load("blast");
+	private final Config blastConf     = ConfigFactory.load("blast");
+	private final PeptideCalculator pc = new PeptideCalculator();
 
 	public List<BlastAligment> search( final AminoAcidSequence sequence,
-									   final List<String> databases, final int threshold,
-									   final List<String> bioactivity, final Path path ) {		
+									   final List<String> databases, 
+									   final int threshold,
+									   final List<String> bioactivity, 
+									   final Path path ) {
 		createAuxiliarFolders(path);
 		final List<BlastAligment> aligments = new LinkedList<BlastAligment>();
 		if(databases.contains("refdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/ref"), sequence, blastConf.getString("refdb"))).forEach(ba -> aligments.add(ba));
@@ -41,11 +45,16 @@ public class Browser {
 		return filter(aligments, threshold, bioactivity, path);
 	}
 
-	public void getAligment(final BlastAligment aligment) {
-		// TODO
+	public BlastAligment getAligment(final BlastAligment aligment) {
+		final double pI = pc.calculatePI(aligment.getSequence());
+		aligment.setpI(pI);
+		aligment.setSubLocation("Unknown");
+		return aligment;
 	}
 	
 	private void createAuxiliarFolders(final Path path){
+		final File searchFile = new File(path.toString());
+		searchFile.mkdir();		
 		final File refFile = new File(path.toString()+"/ref");
 		refFile.mkdir();
 		final File posFile = new File(path.toString()+"/pos");
@@ -77,7 +86,7 @@ public class Browser {
 		});
 		
 		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), blastConf.getString("refdb"));
-		if(!posibles.isEmpty())   runBlastDbCmd(posibles, Paths.get(path.toString()+"/pos"), blastConf.getString("posdb"));
+		if(!posibles.isEmpty())   runBlastDbCmd(posibles,   Paths.get(path.toString()+"/pos"), blastConf.getString("posdb"));
 		
 		Map<String, AminoAcidSequence> map = getSequencesMap(path, !references.isEmpty(), !posibles.isEmpty());
 		
@@ -90,7 +99,7 @@ public class Browser {
 							   final List<BlastAligment> aligmentsWithSequence, 
 							   final Map<String, AminoAcidSequence> map) {
 		aligments.forEach(a-> {
-			a.setSequence(map.get(a.getDescription()));
+			a.setSequence(map.get(a.getDescription()).asString());
 			aligmentsWithSequence.add(a);
 		});
 	}
@@ -152,6 +161,7 @@ public class Browser {
 					iterator.next();
 					final String[] thirdLine = iterator.next().split(",");					
 					final String[] fourthLine = iterator.next().split(",");
+					iterator.next();
 					aligments.add( new BlastAligment(
 							firsLine.substring(1, firsLine.length()),
 							Double.parseDouble(thirdLine[0].split(" ")[3]),
@@ -159,7 +169,11 @@ public class Browser {
 							Integer.parseInt(fourthLine[0].split("\\(")[1].substring(0, fourthLine[0].split("\\(")[1].length()-2)),
 							Integer.parseInt(fourthLine[1].split("\\(")[1].substring(0, fourthLine[1].split("\\(")[1].length()-2)),
 							Integer.parseInt(fourthLine[2].split("\\(")[1].substring(0, fourthLine[2].split("\\(")[1].length()-2)),
-							Integer.parseInt(secondLine.substring(7, secondLine.length())) ));
+							Integer.parseInt(secondLine.substring(7, secondLine.length())),
+							iterator.next().substring(5).replace(" " , "").replaceAll("\\d",""),
+							iterator.next().replaceAll("^\\s*",""),
+							iterator.next().substring(5).replace(" " , "").replaceAll("\\d",""),
+							path.getParent().getParent().toString()));
 				}
 			}			
 		} catch (IOException e) {
@@ -167,7 +181,7 @@ public class Browser {
 		}		
 		return aligments;
 	}
-
+	
 	private Path runBlastP( final Path input,
 							final AminoAcidSequence aas,
 							final String db) {
