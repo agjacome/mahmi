@@ -22,40 +22,52 @@ public class BlastAligment {
 	private String comparation;
 	private String subject;
 	private String path;
+	private int queryStart;
+	private int queryEnd;
+	private int subjectStart;
+	private int subjectEnd;
 	
 	@VisibleForJAXB public BlastAligment(){
 		super();
-		this.description = "";
-		this.sequence    = "";
-		this.score		 = 0.0;
-		this.eValue		 = 0.0;
-		this.identities  = 0;
-		this.positives   = 0;
-		this.gaps  		 = 0;
-		this.length	  	 = 0;
-		this.subLocation = "Unknown";
-		this.pI			 = 0.0;
-		this.query       = "";
-		this.comparation = "";
-		this.subject     = "";
-		this.path 		 = "";
+		this.description  = "";
+		this.sequence     = "";
+		this.score		  = 0.0;
+		this.eValue		  = 0.0;
+		this.identities   = 0;
+		this.positives    = 0;
+		this.gaps  		  = 0;
+		this.length	  	  = 0;
+		this.subLocation  = "Unknown";
+		this.pI			  = 0.0;
+		this.query        = "";
+		this.comparation  = "";
+		this.subject      = "";
+		this.path 		  = "";
+		this.queryStart   = 0;
+		this.queryEnd     = 0;
+		this.subjectStart = 0;
+		this.subjectEnd   = 0;
 	}
 	
-	public BlastAligment (final BlastAligment aligment){
-		this.description = aligment.getDescription();
-		this.sequence    = aligment.getSequence();
-		this.score       = aligment.getScore();
-		this.eValue      = aligment.geteValue();
-		this.identities  = aligment.getIdentities();
-		this.positives   = aligment.getPositives();
-		this.gaps 		 = aligment.getGaps();
-		this.length      = aligment.getLength();
-		this.subLocation = aligment.getSubLocation();
-		this.pI          = aligment.getpI();
-		this.query       = aligment.getQuery();
-		this.comparation = aligment.getComparation();
-		this.subject     = aligment.getSubject();
-		this.path 		 = aligment.getPath();
+	public BlastAligment (final BlastAligment alignment){
+		this.description  = alignment.getDescription();
+		this.sequence     = alignment.getSequence();
+		this.score        = alignment.getScore();
+		this.eValue       = alignment.geteValue();
+		this.identities   = alignment.getIdentities();
+		this.positives    = alignment.getPositives();
+		this.gaps 		  = alignment.getGaps();
+		this.length       = alignment.getLength();
+		this.subLocation  = alignment.getSubLocation();
+		this.pI           = alignment.getpI();
+		this.query        = alignment.getQuery();
+		this.comparation  = alignment.getComparation();
+		this.subject      = alignment.getSubject();
+		this.path 		  = alignment.getPath();
+		this.queryStart   = alignment.getQueryStart();
+		this.queryEnd     = alignment.getQueryEnd();
+		this.subjectStart = alignment.getSubjectStart();
+		this.subjectEnd   = alignment.getSubjectEnd();
 	}
 	
 	public BlastAligment( final String description, 
@@ -71,22 +83,30 @@ public class BlastAligment {
 						  final String query,
 						  final String comparation,
 						  final String subject,
-						  final String path ){
+						  final String path,
+						  final int queryStart,
+						  final int queryEnd,
+						  final int subjectStart,
+						  final int subjectEnd ){
 		super();
-		this.description = description;
-		this.sequence    = sequence;
-		this.score       = score;
-		this.eValue      = eValue;
-		this.identities  = identities;
-		this.positives   = positives;
-		this.gaps        = gaps;
-		this.length      = length;
-		this.subLocation = subLocation;
-		this.pI          = pI;
-		this.query       = query;
-		this.comparation = comparation;
-		this.subject     = subject;
-		this.path        = path;
+		this.description  = description;
+		this.sequence     = sequence;
+		this.score        = score;
+		this.eValue       = eValue;
+		this.identities   = identities;
+		this.positives    = positives;
+		this.gaps         = gaps;
+		this.length       = length;
+		this.subLocation  = subLocation;
+		this.pI           = pI;
+		this.query        = query;
+		this.comparation  = comparation;
+		this.subject      = subject;
+		this.path         = path;
+		this.queryStart   = queryStart;
+		this.queryEnd     = queryEnd;
+		this.subjectStart = subjectStart;
+		this.subjectEnd   = subjectEnd;
 	}
 	
 	public BlastAligment( final String description, 
@@ -99,22 +119,30 @@ public class BlastAligment {
 			  final String query,
 			  final String comparation,
 			  final String subject,
-			  final String path ){
+			  final String path,
+			  final int queryStart,
+			  final int queryEnd,
+			  final int subjectStart,
+			  final int subjectEnd ){
 		super();
-		this.description = description;
-		this.sequence    = "";
-		this.score       = score;
-		this.eValue      = eValue;
-		this.identities  = identities;
-		this.positives   = positives;
-		this.gaps        = gaps;
-		this.length      = length;
-		this.subLocation = "Unknown";
-		this.pI          = 0.0;
-		this.query       = query;
-		this.comparation = comparation;
-		this.subject     = subject;
-		this.path        = path;
+		this.description  = description;
+		this.sequence     = "";
+		this.score        = score;
+		this.eValue       = eValue;
+		this.identities   = identities;
+		this.positives    = positives;
+		this.gaps         = gaps;
+		this.length       = length;
+		this.subLocation  = "Unknown";
+		this.pI           = 0.0;
+		this.query        = query;
+		this.comparation  = comparation;
+		this.subject      = subject;
+		this.path         = path;
+		this.queryStart   = queryStart;
+		this.queryEnd     = queryEnd;
+		this.subjectStart = subjectStart;
+		this.subjectEnd   = subjectEnd;
 	}
 	
 	public String getDescription() {
@@ -227,6 +255,39 @@ public class BlastAligment {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public int getQueryStart() {
+		return queryStart;
+	}
+
+	public void setQueryStart(int queryStart) {
+		this.queryStart = queryStart;
+	}
+
+	public int getQueryEnd() {
+		return queryEnd;
+	}
+
+	public void setQueryEnd(int queryEnd) {
+		this.queryEnd = queryEnd;
+	}
+
+	public int getSubjectStart() {
+		return subjectStart;
+	}
+
+	public void setSubjectStart(int subjectStart) {
+		this.subjectStart = subjectStart;
+	}
+
+	public int getSubjectEnd() {
+		return subjectEnd;
+	}
+
+	public void setSubjectEnd(int subjectEnd) {
+		this.subjectEnd = subjectEnd;
 	}	
+	
 	
 }

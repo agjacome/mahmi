@@ -65,6 +65,8 @@ public class BrowserTest
 			System.out.println(a.getComparation());
 			System.out.println(a.getSubject());
 			System.out.println(a.getPath());
+			System.out.println(a.getQueryStart());
+			System.out.println(a.getQueryEnd());
 		});
     	    	
         assertTrue( true );

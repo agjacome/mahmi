@@ -162,6 +162,9 @@ public class Browser {
 					final String[] thirdLine = iterator.next().split(",");					
 					final String[] fourthLine = iterator.next().split(",");
 					iterator.next();
+					final String fiveLine   = iterator.next().substring(5);
+					final String sixLine = iterator.next();
+					final String sevenLine   = iterator.next().substring(5);
 					aligments.add( new BlastAligment(
 							firsLine.substring(1, firsLine.length()),
 							Double.parseDouble(thirdLine[0].split(" ")[3]),
@@ -170,10 +173,14 @@ public class Browser {
 							Integer.parseInt(fourthLine[1].split("\\(")[1].substring(0, fourthLine[1].split("\\(")[1].length()-2)),
 							Integer.parseInt(fourthLine[2].split("\\(")[1].substring(0, fourthLine[2].split("\\(")[1].length()-2)),
 							Integer.parseInt(secondLine.substring(7, secondLine.length())),
-							iterator.next().substring(5).replace(" " , "").replaceAll("\\d",""),
-							iterator.next().replaceAll("^\\s*",""),
-							iterator.next().substring(5).replace(" " , "").replaceAll("\\d",""),
-							path.getParent().getParent().toString()));
+							fiveLine.replace(" " , "").replaceAll("\\d",""),
+							sixLine.replaceAll("^\\s*",""),
+							sevenLine.replace(" " , "").replaceAll("\\d",""),
+							path.getParent().getParent().toString(),
+							Integer.parseInt(fiveLine.replaceAll("^\\s*","").split(" ")[0]),
+							Integer.parseInt(fiveLine.replaceAll("^\\s*","").split(" ")[fiveLine.replaceAll("^\\s*","").split(" ").length-1]),
+							Integer.parseInt(sevenLine.replaceAll("^\\s*","").split(" ")[0]),
+							Integer.parseInt(sevenLine.replaceAll("^\\s*","").split(" ")[sevenLine.replaceAll("^\\s*","").split(" ").length-1])  ));
 				}
 			}			
 		} catch (IOException e) {
