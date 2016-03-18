@@ -16,7 +16,7 @@ import static es.uvigo.ei.sing.mahmi.http.server.GrizzlyServer.grizzlyServer;
 
 @Slf4j
 @NoArgsConstructor(staticName = "launcher")
-final class Launcher {
+public final class Launcher {
 
     private final Application app = httpApplication(hikariCP());
     private final URI         uri = configuration().getServerURI();

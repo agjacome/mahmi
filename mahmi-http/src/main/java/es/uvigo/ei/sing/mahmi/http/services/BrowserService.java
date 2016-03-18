@@ -18,12 +18,14 @@ import javax.ws.rs.core.Response;
 import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.browser.Browser;
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastAligment;
+import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.SearchWrapper;
 import fj.data.Set;
+
 import java.util.UUID;
 
 @Path("/browser")
@@ -45,19 +47,30 @@ public final class BrowserService extends DatabaseEntityAbstractService<Peptide,
     
     @POST
     @Path("/search")
-    public Response search(final SearchWrapper search){   
+    public Response search(final SearchWrapper search){
+    	final BlastOptions blastOptions = new BlastOptions(search.getNum_alignments(),
+				 search.getEvalue(),
+				 search.getBlast_threshold(),
+				 search.getWindow_size(),
+				 search.getWord_size(),
+				 search.getBest_hit_overhang(),
+				 search.getBest_hit_score_edge(),
+				 search.getGapextend(),
+				 search.getGapopen(),
+				 search.isUngapped());
     	return respond(() -> browser.search( AminoAcidSequence.fromString(search.getSequence()).some(),
     					search.getDatabases(),
     					search.getThreshold(),
     					search.getBioactivity(),
-    					Paths.get(search.getPath()+"/"+UUID.randomUUID().toString()) ), al -> status(OK).entity(toGenericEntity(al)));	
+    					Paths.get(search.getPath()+"/"+UUID.randomUUID().toString()),
+    					blastOptions), al -> status(OK).entity(toGenericEntity(al)));	
     }  
 
-    @POST
-    @Path("/aligment")
-    public Response getAligment(final BlastAligment aligment){    	
-    	return respond(() -> browser.getAligment(aligment), al -> status(OK).entity(al));	
-    } 
+//    @POST
+//    @Path("/aligment")
+//    public Response getAligment(final BlastAligment aligment){    	
+//    	return respond(() -> browser.getAligment(aligment), al -> status(OK).entity(al));	
+//    } 
     
     @Override
     protected GenericEntity<java.util.List<Peptide>> toGenericEntity(

@@ -16,7 +16,7 @@ public class BlastAligment {
 	private int positives;
 	private int gaps;
 	private int length;
-	private String subLocation;
+	private double mW;
 	private double pI;
 	private String query;
 	private String comparation;
@@ -37,7 +37,7 @@ public class BlastAligment {
 		this.positives    = 0;
 		this.gaps  		  = 0;
 		this.length	  	  = 0;
-		this.subLocation  = "Unknown";
+		this.mW           = 0.0;
 		this.pI			  = 0.0;
 		this.query        = "";
 		this.comparation  = "";
@@ -58,7 +58,7 @@ public class BlastAligment {
 		this.positives    = alignment.getPositives();
 		this.gaps 		  = alignment.getGaps();
 		this.length       = alignment.getLength();
-		this.subLocation  = alignment.getSubLocation();
+		this.mW           = alignment.getmW();
 		this.pI           = alignment.getpI();
 		this.query        = alignment.getQuery();
 		this.comparation  = alignment.getComparation();
@@ -78,7 +78,7 @@ public class BlastAligment {
 						  final int positives,
 						  final int gaps, 
 						  final int length, 
-						  final String subLocation, 
+						  final double mW, 
 						  final double pI,
 						  final String query,
 						  final String comparation,
@@ -97,7 +97,7 @@ public class BlastAligment {
 		this.positives    = positives;
 		this.gaps         = gaps;
 		this.length       = length;
-		this.subLocation  = subLocation;
+		this.mW			  = mW;
 		this.pI           = pI;
 		this.query        = query;
 		this.comparation  = comparation;
@@ -133,7 +133,7 @@ public class BlastAligment {
 		this.positives    = positives;
 		this.gaps         = gaps;
 		this.length       = length;
-		this.subLocation  = "Unknown";
+		this.mW    		  = 0.0;
 		this.pI           = 0.0;
 		this.query        = query;
 		this.comparation  = comparation;
@@ -209,14 +209,14 @@ public class BlastAligment {
 		this.length = length;
 	}
 	
-	public String getSubLocation() {
-		return subLocation;
+	public double getmW() {
+		return mW;
 	}
-	
-	public void setSubLocation(String subLocation) {
-		this.subLocation = subLocation;
+
+	public void setmW(double mW) {
+		this.mW = mW;
 	}
-	
+
 	public double getpI() {
 		return pI;
 	}
@@ -287,7 +287,21 @@ public class BlastAligment {
 
 	public void setSubjectEnd(int subjectEnd) {
 		this.subjectEnd = subjectEnd;
+	}
+
+	@Override
+	public String toString() {
+		return "BlastAligment [description=" + description + ", sequence="
+				+ sequence + ", score=" + score + ", eValue=" + eValue
+				+ ", identities=" + identities + ", positives=" + positives
+				+ ", gaps=" + gaps + ", length=" + length + ", mW=" + mW
+				+ ", pI=" + pI + ", query=" + query + ", comparation="
+				+ comparation + ", subject=" + subject + ", path=" + path
+				+ ", queryStart=" + queryStart + ", queryEnd=" + queryEnd
+				+ ", subjectStart=" + subjectStart + ", subjectEnd="
+				+ subjectEnd + "]";
 	}	
+	
 	
 	
 }

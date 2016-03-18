@@ -32,6 +32,18 @@ public final class SearchWrapper {
     private final List<String> bioactivity;
     
     private final String path;
+    
+    private final int num_alignments;
+    private final double evalue;
+    private final int blast_threshold;
+    private final int window_size;
+    private final int word_size;
+    private final double best_hit_overhang;
+    private final double best_hit_score_edge;
+    private final int gapextend;
+    private final int gapopen;
+    private final boolean ungapped;    
+    
 
     @VisibleForJAXB
     public SearchWrapper() {
@@ -40,6 +52,16 @@ public final class SearchWrapper {
     	this.threshold = 60;
     	this.bioactivity = new LinkedList<String>();
     	this.path = "";
+    	this.num_alignments = 250;
+    	this.evalue = 10.0;
+    	this.blast_threshold = 11;
+    	this.window_size = 3;
+    	this.word_size = 40;
+    	this.best_hit_overhang = 0.1;
+    	this.best_hit_score_edge = 0.1;
+    	this.gapextend = 1;
+    	this.gapopen = 11;
+    	this.ungapped = true;
     }
 
 }
