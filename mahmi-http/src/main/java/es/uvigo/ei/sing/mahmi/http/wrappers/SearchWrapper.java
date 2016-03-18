@@ -31,8 +31,7 @@ public final class SearchWrapper {
     @XmlElements({@XmlElement(name = "bioactivity", type = String.class)})
     private final List<String> bioactivity;
     
-    private final String path;
-    
+    private final String path;    
     private final int num_alignments;
     private final double evalue;
     private final int blast_threshold;
@@ -44,7 +43,6 @@ public final class SearchWrapper {
     private final int gapopen;
     private final boolean ungapped;    
     
-
     @VisibleForJAXB
     public SearchWrapper() {
     	this.sequence = "";
@@ -63,5 +61,4 @@ public final class SearchWrapper {
     	this.gapopen = 11;
     	this.ungapped = true;
     }
-
 }

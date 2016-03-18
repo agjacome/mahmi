@@ -1,23 +1,5 @@
 package es.uvigo.ei.sing.mahmi.http;
 
-import java.util.Set;
-
-import javax.ws.rs.core.Application;
-
-import jersey.repackaged.com.google.common.collect.Sets;
-import lombok.AllArgsConstructor;
-import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
-import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
-import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
-import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
 import static es.uvigo.ei.sing.mahmi.browser.Browser.browser;
 import static es.uvigo.ei.sing.mahmi.cutter.ProteinCutter.proteinCutter;
 import static es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController.proteinCutterCtrl;
@@ -42,6 +24,26 @@ import static es.uvigo.ei.sing.mahmi.http.services.TableStatService.tableStatSer
 import static es.uvigo.ei.sing.mahmi.http.services.UserService.userService;
 import static es.uvigo.ei.sing.mahmi.loader.MGRastProjectLoader.mgRastLoader;
 import static es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController.projectLoaderCtrl;
+
+import java.util.Set;
+
+import javax.ws.rs.core.Application;
+
+import jersey.repackaged.com.google.common.collect.Sets;
+import lombok.AllArgsConstructor;
+import es.uvigo.ei.sing.mahmi.common.utils.mail.MailSender;
+import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
+import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
+import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.EnzymesDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomeProteinsDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
+import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
 
 @AllArgsConstructor(staticName = "httpApplication")
 public final class HttpApplication extends Application {
@@ -68,6 +70,9 @@ public final class HttpApplication extends Application {
             proteinCutter(), metaGenomesDAO, proteinsDAO, peptidesDAO, digestionsDAO, tableStatsDAO
         );
 
+        final MailSender mailSender = new MailSender();
+        mailSender.init();
+        
         return Sets.newHashSet(
             digestionService(digestionsDAO, cutterController),
             enzymeService(enzymesDAO),
@@ -78,7 +83,7 @@ public final class HttpApplication extends Application {
             proteinService(proteinsDAO),
             tableStatService(tableStatsDAO),
             userService(usersDAO),
-            browserService(peptidesDAO, browser())
+            browserService(peptidesDAO, browser(), mailSender)
         );
     }
 

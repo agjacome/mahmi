@@ -96,10 +96,8 @@ public class Browser {
 	}
 
 	private BlastAligment calculateMWandPI(final BlastAligment aligment) {
-		final double pI = pc.calculatePI(aligment.getSequence());
-		final double mW = pc.calculateMW(aligment.getSequence());
-		aligment .setpI(pI);
-		aligment.setmW(mW);
+		aligment.setpI(pc.calculatePI(aligment.getSequence()));
+		aligment.setmW(pc.calculateMW(aligment.getSequence()));
 		return aligment;
 	}
 	
@@ -180,10 +178,9 @@ public class Browser {
 					final String[] thirdLine = iterator.next().split(",");					
 					final String[] fourthLine = iterator.next().split(",");
 					iterator.next();
-					final String fiveLine   = iterator.next().substring(5);
-					
+					final String fiveLine = iterator.next().substring(5);					
 					final String sixLine = iterator.next();
-					final String sevenLine   = iterator.next().substring(5);
+					final String sevenLine = iterator.next().substring(5);
 					aligments.add( new BlastAligment(
 							firstLine,
 							Double.parseDouble(thirdLine[0].split(" ")[3]),

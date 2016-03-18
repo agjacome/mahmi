@@ -287,21 +287,5 @@ public class BlastAligment {
 
 	public void setSubjectEnd(int subjectEnd) {
 		this.subjectEnd = subjectEnd;
-	}
-
-	@Override
-	public String toString() {
-		return "BlastAligment [description=" + description + ", sequence="
-				+ sequence + ", score=" + score + ", eValue=" + eValue
-				+ ", identities=" + identities + ", positives=" + positives
-				+ ", gaps=" + gaps + ", length=" + length + ", mW=" + mW
-				+ ", pI=" + pI + ", query=" + query + ", comparation="
-				+ comparation + ", subject=" + subject + ", path=" + path
-				+ ", queryStart=" + queryStart + ", queryEnd=" + queryEnd
-				+ ", subjectStart=" + subjectStart + ", subjectEnd="
-				+ subjectEnd + "]";
 	}	
-	
-	
-	
 }

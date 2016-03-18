@@ -50,44 +50,40 @@ public class BlastOptions {
 	public int getNum_alignments() {
 		return num_alignments;
 	}
+	
 	public double getEvalue() {
 		return evalue;
 	}
+	
 	public int getBlast_threshold() {
 		return blast_threshold;
 	}
+	
 	public int getWindow_size() {
 		return window_size;
 	}
+	
 	public int getWord_size() {
 		return word_size;
 	}
+	
 	public double getBest_hit_overhang() {
 		return best_hit_overhang;
 	}
+	
 	public double getBest_hit_score_edge() {
 		return best_hit_score_edge;
 	}
+	
 	public int getGapextend() {
 		return gapextend;
 	}
+	
 	public int getGapopen() {
 		return gapopen;
 	}
+	
 	public boolean isUngapped() {
 		return ungapped;
 	}
-
-	@Override
-	public String toString() {
-		return "BlastOptions [num_alignments=" + num_alignments + ", evalue="
-				+ evalue + ", blast_threshold=" + blast_threshold
-				+ ", window_size=" + window_size + ", word_size=" + word_size
-				+ ", best_hit_overhang=" + best_hit_overhang
-				+ ", best_hit_score_edge=" + best_hit_score_edge
-				+ ", gapextend=" + gapextend + ", gapopen=" + gapopen
-				+ ", ungapped=" + ungapped + "]";
-	}
-    
-    
 }
