@@ -18,7 +18,7 @@ import javax.ws.rs.core.Response;
 
 import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.browser.Browser;
-import es.uvigo.ei.sing.mahmi.browser.utils.BlastAligment;
+import es.uvigo.ei.sing.mahmi.browser.utils.BlastAlignment;
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
@@ -35,7 +35,7 @@ import fj.data.Set;
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class BrowserService extends DatabaseEntityAbstractService<Peptide, PeptidesDAO> {
 
-	private Browser browser;
+	private Browser    browser;
 	private MailSender mailSender;
 	
     private BrowserService( final PeptidesDAO dao, final Browser browser, final MailSender mailSender) {
@@ -90,10 +90,10 @@ public final class BrowserService extends DatabaseEntityAbstractService<Peptide,
         ) { };
     }
     
-    private GenericEntity<java.util.List<BlastAligment>> toGenericEntity(
-    		final List<BlastAligment> aligments
+    private GenericEntity<java.util.List<BlastAlignment>> toGenericEntity(
+    		final List<BlastAlignment> aligments
     ) {
-        return new GenericEntity<java.util.List<BlastAligment>>(
+        return new GenericEntity<java.util.List<BlastAlignment>>(
             newArrayList(aligments)
         ) { };
     }

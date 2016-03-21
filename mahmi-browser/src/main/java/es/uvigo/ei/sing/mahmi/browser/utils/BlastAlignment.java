@@ -6,28 +6,28 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@XmlRootElement(name = "blastAligment") @XmlAccessorType(XmlAccessType.FIELD)
-public class BlastAligment {
+@XmlRootElement(name = "blastAlignment") @XmlAccessorType(XmlAccessType.FIELD)
+public class BlastAlignment {
 	private String description;
 	private String sequence;
 	private double score;
 	private double eValue;
-	private int identities;
-	private int positives;
-	private int gaps;
-	private int length;
+	private int    identities;
+	private int    positives;
+	private int    gaps;
+	private int    length;
 	private double mW;
 	private double pI;
 	private String query;
 	private String comparation;
 	private String subject;
 	private String path;
-	private int queryStart;
-	private int queryEnd;
-	private int subjectStart;
-	private int subjectEnd;
+	private int    queryStart;
+	private int    queryEnd;
+	private int    subjectStart;
+	private int    subjectEnd;
 	
-	@VisibleForJAXB public BlastAligment(){
+	@VisibleForJAXB public BlastAlignment(){
 		super();
 		this.description  = "";
 		this.sequence     = "";
@@ -49,7 +49,7 @@ public class BlastAligment {
 		this.subjectEnd   = 0;
 	}
 	
-	public BlastAligment (final BlastAligment alignment){
+	public BlastAlignment (final BlastAlignment alignment){
 		this.description  = alignment.getDescription();
 		this.sequence     = alignment.getSequence();
 		this.score        = alignment.getScore();
@@ -70,24 +70,24 @@ public class BlastAligment {
 		this.subjectEnd   = alignment.getSubjectEnd();
 	}
 	
-	public BlastAligment( final String description, 
-						  final String sequence,
-						  final double score, 
-						  final double eValue, 
-						  final int identities, 
-						  final int positives,
-						  final int gaps, 
-						  final int length, 
-						  final double mW, 
-						  final double pI,
-						  final String query,
-						  final String comparation,
-						  final String subject,
-						  final String path,
-						  final int queryStart,
-						  final int queryEnd,
-						  final int subjectStart,
-						  final int subjectEnd ){
+	public BlastAlignment( final String description, 
+						   final String sequence,
+						   final double score, 
+						   final double eValue, 
+						   final int identities, 
+						   final int positives,
+						   final int gaps, 
+						   final int length, 
+						   final double mW, 
+						   final double pI,
+						   final String query,
+						   final String comparation,
+						   final String subject,
+						   final String path,
+						   final int queryStart,
+						   final int queryEnd,
+						   final int subjectStart,
+						   final int subjectEnd ){
 		super();
 		this.description  = description;
 		this.sequence     = sequence;
@@ -109,21 +109,21 @@ public class BlastAligment {
 		this.subjectEnd   = subjectEnd;
 	}
 	
-	public BlastAligment( final String description, 
-			  final double score, 
-			  final double eValue, 
-			  final int identities, 
-			  final int positives,
-			  final int gaps, 
-			  final int length,
-			  final String query,
-			  final String comparation,
-			  final String subject,
-			  final String path,
-			  final int queryStart,
-			  final int queryEnd,
-			  final int subjectStart,
-			  final int subjectEnd ){
+	public BlastAlignment( final String description, 
+						   final double score, 
+						   final double eValue, 
+						   final int identities, 
+						   final int positives,
+						   final int gaps, 
+						   final int length,
+						   final String query,
+						   final String comparation,
+						   final String subject,
+						   final String path,
+						   final int queryStart,
+						   final int queryEnd,
+						   final int subjectStart,
+						   final int subjectEnd ){
 		super();
 		this.description  = description;
 		this.sequence     = "";

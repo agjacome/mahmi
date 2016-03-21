@@ -1,28 +1,28 @@
 package es.uvigo.ei.sing.mahmi.browser.utils;
 
 public class BlastOptions {
-	private final int num_alignments;
-    private final double evalue;
-    private final int blast_threshold;
-    private final int window_size;
-    private final int word_size;
-    private final double best_hit_overhang;
-    private final double best_hit_score_edge;
-    private final int gapextend;
-    private final int gapopen;
+	private final int     num_alignments;
+    private final double  evalue;
+    private final int     blast_threshold;
+    private final int     window_size;
+    private final int     word_size;
+    private final double  best_hit_overhang;
+    private final double  best_hit_score_edge;
+    private final int     gapextend;
+    private final int     gapopen;
     private final boolean ungapped;
     
     public BlastOptions(){
-    	this.num_alignments = 250;
-    	this.evalue = 10.0;
-    	this.blast_threshold = 11;
-    	this.window_size = 3;
-    	this.word_size = 40;
-    	this.best_hit_overhang = 0.1;
+    	this.num_alignments      = 250;
+    	this.evalue              = 10.0;
+    	this.blast_threshold     = 11;
+    	this.window_size         = 3;
+    	this.word_size           = 40;
+    	this.best_hit_overhang   = 0.1;
     	this.best_hit_score_edge = 0.1;
-    	this.gapextend = 1;
-    	this.gapopen = 11;
-    	this.ungapped = true;
+    	this.gapextend           = 1;
+    	this.gapopen             = 11;
+    	this.ungapped            = true;
     }
     
     public BlastOptions( final int num_alignments,
@@ -35,16 +35,16 @@ public class BlastOptions {
     					 final int gapextend,
     					 final int gapopen,
     					 final boolean ungapped ){
-    	this.num_alignments = num_alignments;
-    	this.evalue = evalue;
-    	this.blast_threshold = blast_threshold;
-    	this.window_size = window_size;
-    	this.word_size = word_size;
-    	this.best_hit_overhang = best_hit_overhang;
+    	this.num_alignments 	 = num_alignments;
+    	this.evalue 		 	 = evalue;
+    	this.blast_threshold 	 = blast_threshold;
+    	this.window_size 		 = window_size;
+    	this.word_size 			 = word_size;
+    	this.best_hit_overhang   = best_hit_overhang;
     	this.best_hit_score_edge = best_hit_score_edge;
-    	this.gapextend = gapextend;
-    	this.gapopen = gapopen;
-    	this.ungapped = ungapped;
+    	this.gapextend 			 = gapextend;
+    	this.gapopen 			 = gapopen;
+    	this.ungapped 			 = ungapped;
     }
     
 	public int getNum_alignments() {

@@ -17,32 +17,34 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import es.uvigo.ei.sing.mahmi.browser.utils.BlastAligment;
+import es.uvigo.ei.sing.mahmi.browser.utils.BlastAlignment;
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
 import es.uvigo.ei.sing.mahmi.browser.utils.PeptideCalculator;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 
 @Slf4j
-@AllArgsConstructor(staticName = "browser")
 public class Browser {
 //	private final Config blastConf     = ConfigFactory.load("blast");
 	private final PeptideCalculator pc = new PeptideCalculator();
+	
+	private Browser() { }
+	
+	public static Browser browser(){
+		return new Browser();
+	}
 
-	public List<BlastAligment> search( final AminoAcidSequence sequence,
-									   final List<String> databases, 
-									   final int threshold,
-									   final List<String> bioactivity, 
-									   final Path path,
-									   final BlastOptions blastOptions) {
+	public List<BlastAlignment> search( final AminoAcidSequence sequence,
+									    final List<String> databases, 
+									    final int threshold,
+									    final List<String> bioactivity, 
+									    final Path path,
+									    final BlastOptions blastOptions) {
 		createAuxiliarFolders(path);
-		final List<BlastAligment> aligments = new LinkedList<BlastAligment>();
-		if(databases.contains("refdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/ref"), sequence,"/home/abmiguez/blast_db/mahmiReference", blastOptions)).forEach(ba -> aligments.add(ba));
-		if(databases.contains("posdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/pos"), sequence,"/home/abmiguez/blast_db/mahmiPosible", blastOptions)).forEach(ba -> aligments.add(ba));
-		List<BlastAligment> al = filter(aligments, threshold, bioactivity, path);
-		
-		return al;
+		final List<BlastAlignment> alignments = new LinkedList<BlastAlignment>();
+		if(databases.contains("refdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/ref"), sequence,"/home/mahmi/blast_db/mahmiReference", blastOptions)).forEach(ba -> alignments.add(ba));
+		if(databases.contains("posdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/pos"), sequence,"/home/mahmi/blast_db/mahmiPosible", blastOptions)).forEach(ba -> alignments.add(ba));
+		return filter(alignments, threshold, bioactivity, path);
 	}
 	
 	private void createAuxiliarFolders(final Path path){
@@ -54,51 +56,50 @@ public class Browser {
 		posFile.mkdir();
 	}
 	
-	private List<BlastAligment> filter( final List<BlastAligment> aligments, 
-									    final int threshold, 
-									    final List<String> bioactivity, 
-									    final Path path ){		
-		final List<BlastAligment> filterAligments = new LinkedList<BlastAligment>();		
-		getAligmentsWithSequences(aligments, path).forEach(a -> {
+	private List<BlastAlignment> filter( final List<BlastAlignment> alignments, 
+									     final int threshold, 
+									     final List<String> bioactivity, 
+									     final Path path ){		
+		final List<BlastAlignment> filterAlignments = new LinkedList<BlastAlignment>();		
+		getAlignmentsWithSequences(alignments, path).forEach(a -> {
 			if(hasBioactivity(a, bioactivity) && passThreshold(a, threshold)){
-				filterAligments.add(a);
+				filterAlignments.add(a);
 			}
-		});
-		
-		return filterAligments;
+		});		
+		return filterAlignments;
 	}
 	
-	private List<BlastAligment> getAligmentsWithSequences( final List<BlastAligment> aligments, 
-														   final Path path ){
-		final List<BlastAligment> aligmentsWithSequences = new LinkedList<BlastAligment>();		
-		final List<BlastAligment> references             = new LinkedList<BlastAligment>();
-		final List<BlastAligment> posibles               = new LinkedList<BlastAligment>();
+	private List<BlastAlignment> getAlignmentsWithSequences( final List<BlastAlignment> alignments, 
+														     final Path path ){
+		final List<BlastAlignment> alignmentsWithSequences = new LinkedList<BlastAlignment>();		
+		final List<BlastAlignment> references              = new LinkedList<BlastAlignment>();
+		final List<BlastAlignment> posibles                = new LinkedList<BlastAlignment>();
 		
-		aligments.forEach(a -> {
+		alignments.forEach(a -> {
 			if(a.getDescription().startsWith("MHM_POS")) posibles.add(a);
 			else references.add(a);
 		});
-		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), "/home/abmiguez/blast_db/mahmiReference");
-		if(!posibles.isEmpty())   runBlastDbCmd(posibles,   Paths.get(path.toString()+"/pos"), "/home/abmiguez/blast_db/mahmiPosible");
+		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), "/home/mahmi/blast_db/mahmiReference");
+		if(!posibles.isEmpty())   runBlastDbCmd(posibles,   Paths.get(path.toString()+"/pos"), "/home/mahmi/blast_db/mahmiPosible");
 		Map<String, AminoAcidSequence> map = getSequencesMap(path, !references.isEmpty(), !posibles.isEmpty());
-		addSequences(references, aligmentsWithSequences, map);
-		addSequences(posibles,   aligmentsWithSequences, map);
-		return aligmentsWithSequences;
+		addSequences(references, alignmentsWithSequences, map);
+		addSequences(posibles,   alignmentsWithSequences, map);
+		return alignmentsWithSequences;
 	}
 	
-	private void addSequences( final List<BlastAligment> aligments, 
-							   final List<BlastAligment> aligmentsWithSequence, 
+	private void addSequences( final List<BlastAlignment> alignments, 
+							   final List<BlastAlignment> alignmentsWithSequence, 
 							   final Map<String, AminoAcidSequence> map) {
-		aligments.forEach(a-> {
+		alignments.forEach(a-> {
 			a.setSequence(map.get(a.getDescription()).asString());
-			aligmentsWithSequence.add(calculateMWandPI(a));
+			alignmentsWithSequence.add(calculateMWandPI(a));
 		});
 	}
 
-	private BlastAligment calculateMWandPI(final BlastAligment aligment) {
-		aligment.setpI(pc.calculatePI(aligment.getSequence()));
-		aligment.setmW(pc.calculateMW(aligment.getSequence()));
-		return aligment;
+	private BlastAlignment calculateMWandPI(final BlastAlignment alignment) {
+		alignment.setpI(pc.calculatePI(alignment.getSequence()));
+		alignment.setmW(pc.calculateMW(alignment.getSequence()));
+		return alignment;
 	}
 	
 	private Map<String, AminoAcidSequence> getSequencesMap( final Path path, 
@@ -134,10 +135,10 @@ public class Browser {
 		}
 	}
 	
-	private boolean passThreshold( final BlastAligment aligment, 
+	private boolean passThreshold( final BlastAlignment alignment, 
 								   final int threshold ){
-		if(aligment.getDescription().startsWith("MHM_POS")){
-			if(Double.parseDouble(aligment.getDescription().split(" ")[3].split("%")[0]) >= threshold)
+		if(alignment.getDescription().startsWith("MHM_POS")){
+			if(Double.parseDouble(alignment.getDescription().split(" ")[3].split("%")[0]) >= threshold)
 				return true;
 			else
 				return false;
@@ -147,24 +148,24 @@ public class Browser {
 		
 	}
 	
-	private boolean hasBioactivity( final BlastAligment aligment,
+	private boolean hasBioactivity( final BlastAlignment alignment,
 									final List<String> bioactivity ){
-		if(bioactivity.contains(aligment.getDescription().split(" ")[2])){			
+		if(bioactivity.contains(alignment.getDescription().split(" ")[2])){			
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	private List<BlastAligment> blastOutParser(final Path path){
-		final List<BlastAligment> aligments = new LinkedList<BlastAligment>();
+	private List<BlastAlignment> blastOutParser(final Path path){
+		final List<BlastAlignment> alignments = new LinkedList<BlastAlignment>();
 		try {
 			final List<String> lines = Files.readAllLines(path);
 			final Iterator<String> iterator = lines.iterator();
 			while(iterator.hasNext()){
 				final String realFirstLine = iterator.next();
 				if(realFirstLine.startsWith(">")){	
-					String firstLine = realFirstLine.substring(5/*1*/, realFirstLine.length());
+					String firstLine = realFirstLine.substring(1/*5*/, realFirstLine.length());
 					String secondLine="";
 					while(secondLine == ""){
 						final String perhapsSecond = iterator.next();
@@ -181,7 +182,7 @@ public class Browser {
 					final String fiveLine = iterator.next().substring(5);					
 					final String sixLine = iterator.next();
 					final String sevenLine = iterator.next().substring(5);
-					aligments.add( new BlastAligment(
+					alignments.add( new BlastAlignment(
 							firstLine,
 							Double.parseDouble(thirdLine[0].split(" ")[3]),
 							Double.parseDouble(thirdLine[1].split(" ")[4]),
@@ -202,14 +203,14 @@ public class Browser {
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}		
-		return aligments;
+		return alignments;
 	}
 	
 	private Path runBlastP( final Path input,
 							final AminoAcidSequence aas,
 							final String db,
 							final BlastOptions blastOptions) {
-		final Path output = Paths.get(input.toString()+"/blastp.out");
+		final Path output   = Paths.get(input.toString()+"/blastp.out");
 		final Path readPath = Paths.get(input.toString()+"/read.faa");
 		try (final PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(readPath.toString(), false)))) {
 			pw.println(aas.asString());
@@ -220,13 +221,13 @@ public class Browser {
 		return output;
 	}
 	
-	private Path runBlastDbCmd( final List<BlastAligment> aligments,
+	private Path runBlastDbCmd( final List<BlastAlignment> alignments,
 								final Path path, 
 								final String db ) {
 		final Path readPath = Paths.get(path.toString()+"/hits.txt");
-		final Path output = Paths.get(path.toString()+"/blastdbcmd.out");
+		final Path output   = Paths.get(path.toString()+"/blastdbcmd.out");
 		try (final PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(readPath.toString(), false)))) {
-			aligments.forEach(a -> pw.println(a.getDescription()));
+			alignments.forEach(a -> pw.println(a.getDescription()));
 		} catch (IOException e) {
 			log.error("Error creating blastdbmd auxiliar file:\n" + e.getMessage());
 		}		

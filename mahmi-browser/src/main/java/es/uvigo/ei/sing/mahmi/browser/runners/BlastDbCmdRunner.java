@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor(staticName = "blastdbcmd")
 final public class BlastDbCmdRunner implements Runnable {
 
-    private final Path input;
-    private final Path output;
+    private final Path   input;
+    private final Path   output;
     private final String db;
 
     @Override

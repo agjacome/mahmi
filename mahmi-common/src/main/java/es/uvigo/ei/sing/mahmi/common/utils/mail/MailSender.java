@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MailSender{
 	private final Properties properties = new Properties();
-	private final String username = "noreplyp4p@gmail.com";
-	private final String password = "p4psing33$";
+	private final String username       = "noreplyp4p@gmail.com";
+	private final String password       = "p4psing33$";
 	
 	public boolean init(){
 		this.properties.put("mail.smtp.auth", "true");

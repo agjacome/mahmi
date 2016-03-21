@@ -17,9 +17,9 @@ import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
 @AllArgsConstructor(staticName = "blastp")
 final public class BlastpRunner implements Runnable {
 
-    private final Path input;
-    private final Path output;
-    private final String db;
+    private final Path         input;
+    private final Path         output;
+    private final String       db;
     private final BlastOptions blastOptions;
 
     @Override
