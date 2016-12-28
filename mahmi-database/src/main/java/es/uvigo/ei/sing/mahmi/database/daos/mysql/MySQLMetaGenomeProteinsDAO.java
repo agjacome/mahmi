@@ -191,7 +191,8 @@ public final class MySQLMetaGenomeProteinsDAO extends MySQLAbstractDAO<MetaGenom
     private Protein parseProtein(final ResultSet results) throws SQLException {
         val id  = parseIdentifier(results, "protein_id");
         val seq = parseAASequence(results, "protein_sequence");
-        return protein(id, seq);
+        val name = parseString(results, "protein_name");
+        return protein(id, seq, name);
     }
 
     private Project parseProject(final ResultSet results) throws SQLException {

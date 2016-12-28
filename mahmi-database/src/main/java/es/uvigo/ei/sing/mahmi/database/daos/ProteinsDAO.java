@@ -1,12 +1,11 @@
 package es.uvigo.ei.sing.mahmi.database.daos;
 
 import lombok.val;
-
 import fj.data.Option;
 import fj.data.Set;
 import fj.function.Effect1;
-
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 
@@ -39,5 +38,9 @@ public interface ProteinsDAO extends DAO<Protein> {
         for (int pageNum = 0; pageNum < numPages; pageNum += pageSize)
             effect.f(getByMetaGenome(metaGenome, pageNum, pageSize));
     }
+    
+    public Set<Protein> getByPeptide(
+    		final Peptide peptide
+    ) throws DAOException;
 
 }

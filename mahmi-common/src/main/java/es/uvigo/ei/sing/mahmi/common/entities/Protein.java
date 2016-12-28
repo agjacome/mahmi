@@ -28,14 +28,15 @@ public final class Protein implements Entity<Protein> {
 
     private final Identifier        id;
     private final AminoAcidSequence sequence;
+    private final String            name;
 
     @VisibleForJAXB
     public Protein() {
-        this(new Identifier(), AminoAcidSequence.empty());
+        this(new Identifier(), AminoAcidSequence.empty(), "");
     }
 
     public static Protein protein(final AminoAcidSequence sequence) {
-        return protein(Identifier.empty(), sequence);
+        return protein(Identifier.empty(), sequence, "");
     }
 
     public SHA1 getSHA1() {

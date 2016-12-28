@@ -1,5 +1,10 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.OK;
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -14,20 +19,11 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import fj.data.Set;
-import lombok.val;
-
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.MetaGenomesDAO;
-
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
-import static javax.ws.rs.core.Response.Status.OK;
-
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import fj.data.Set;
+import lombok.val;
 
 @Path("/metagenome")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -56,23 +52,6 @@ public final class MetaGenomeService extends DatabaseEntityAbstractService<MetaG
                 status(OK)::entity,
                 status(NOT_FOUND)
             );
-    }
-
-    @GET
-    @Path("/search")
-    public Response search(
-        @QueryParam("projectId") @DefaultValue("0") final int projectId,
-        @QueryParam("projectName") @DefaultValue("") final String projectName,
-        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-           ()  -> dao.search(
-                project(Identifier.of(projectId), projectName, projectRepo),
-                (page - 1) * size, size),
-            mgs -> status(OK).entity(toGenericEntity(mgs))
-        );
     }
 
     @GET

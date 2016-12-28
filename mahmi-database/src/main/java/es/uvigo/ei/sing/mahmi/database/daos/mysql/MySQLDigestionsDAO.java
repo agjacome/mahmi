@@ -208,7 +208,8 @@ public final class MySQLDigestionsDAO extends MySQLAbstractDAO<Digestion> implem
     private Protein parseProtein(final ResultSet results) throws SQLException {
         return protein(
             parseIdentifier(results, "protein_id"),
-            parseAASequence(results, "protein_sequence")
+            parseAASequence(results, "protein_sequence"),
+            parseString(results, "protein_name")
         );
     }
 

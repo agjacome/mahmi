@@ -42,8 +42,8 @@ public class Browser {
 									    final BlastOptions blastOptions) {
 		createAuxiliarFolders(path);
 		final List<BlastAlignment> alignments = new LinkedList<BlastAlignment>();
-		if(databases.contains("refdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/ref"), sequence,"/home/mahmi/blast_db/mahmiReference", blastOptions)).forEach(ba -> alignments.add(ba));
-		if(databases.contains("posdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/pos"), sequence,"/home/mahmi/blast_db/mahmiPosible", blastOptions)).forEach(ba -> alignments.add(ba));
+		if(databases.contains("refdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/ref"), sequence,"/home/abmiguez/blast_db/mahmiReference", blastOptions)).forEach(ba -> alignments.add(ba));
+		if(databases.contains("posdb")) blastOutParser(runBlastP(Paths.get(path.toString()+"/pos"), sequence,"/home/abmiguez/blast_db/mahmiPosible", blastOptions)).forEach(ba -> alignments.add(ba));
 		return filter(alignments, threshold, bioactivity, path);
 	}
 	
@@ -79,8 +79,8 @@ public class Browser {
 			if(a.getDescription().startsWith("MHM_POS")) posibles.add(a);
 			else references.add(a);
 		});
-		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), "/home/mahmi/blast_db/mahmiReference");
-		if(!posibles.isEmpty())   runBlastDbCmd(posibles,   Paths.get(path.toString()+"/pos"), "/home/mahmi/blast_db/mahmiPosible");
+		if(!references.isEmpty()) runBlastDbCmd(references, Paths.get(path.toString()+"/ref"), "/home/abmiguez/blast_db/mahmiReference");
+		if(!posibles.isEmpty())   runBlastDbCmd(posibles,   Paths.get(path.toString()+"/pos"), "/home/abmiguez/blast_db/mahmiPosible");
 		Map<String, AminoAcidSequence> map = getSequencesMap(path, !references.isEmpty(), !posibles.isEmpty());
 		addSequences(references, alignmentsWithSequences, map);
 		addSequences(posibles,   alignmentsWithSequences, map);
@@ -165,7 +165,7 @@ public class Browser {
 			while(iterator.hasNext()){
 				final String realFirstLine = iterator.next();
 				if(realFirstLine.startsWith(">")){	
-					String firstLine = realFirstLine.substring(1/*5*/, realFirstLine.length());
+					String firstLine = realFirstLine.substring(5/*1*/, realFirstLine.length());
 					String secondLine="";
 					while(secondLine == ""){
 						final String perhapsSecond = iterator.next();

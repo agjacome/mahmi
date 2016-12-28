@@ -6,12 +6,11 @@ import java.sql.SQLException;
 
 import lombok.val;
 import lombok.experimental.ExtensionMethod;
-
 import fj.control.db.DB;
 import fj.data.Option;
 import fj.data.Set;
-
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
+import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
@@ -19,7 +18,6 @@ import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-
 import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
 
@@ -102,8 +100,9 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
     protected Protein parse(final ResultSet results) throws SQLException {
         val id  = parseIdentifier(results, "protein_id");
         val seq = parseAASequence(results, "protein_sequence");
+        val name = parseString(results, "protein_name");
 
-        return protein(id, seq);
+        return protein(id, seq, name);
     }
 
     @Override
@@ -157,14 +156,26 @@ public final class MySQLProteinsDAO extends MySQLAbstractDAO<Protein> implements
 
     @Override
     protected DB<PreparedStatement> prepareUpdate(final Protein protein) {
-      val id  = protein.getId();
-      val seq = protein.getSequence().asString();
-      val sha = protein.getSHA1().asHexString();
+      val id   = protein.getId();
+      val seq  = protein.getSequence().asString();
+      val name = protein.getName();
+      val sha  = protein.getSHA1().asHexString();
 
       return sql(
-          "UPDATE proteins SET protein_hash = ?, protein_sequence = ? WHERE protein_id = ?",
+          "UPDATE proteins SET protein_hash = ?, protein_sequence = ?, protein_name = ? WHERE protein_id = ?",
           sha, seq
-      ).bind(identifier(3, id));
+      ).bind(string(3, name)).bind(identifier(4, id));
     }
+    
+    @Override
+    public Set<Protein> getByPeptide(final Peptide peptide){
+    	val sql = sql(
+            "SELECT protein_id, protein_sequence, protein_name FROM digestions NATURAL JOIN "
+            + "proteins WHERE peptide_id = ?",
+            peptide.getId()
+        );
+        val statement = sql.bind(query).bind(get);
+        return read(statement).toSet(ordering);
+	}
 
 }

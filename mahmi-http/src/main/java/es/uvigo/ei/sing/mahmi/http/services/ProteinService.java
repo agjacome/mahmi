@@ -1,5 +1,8 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static fj.data.Set.iterableSet;
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -16,26 +19,13 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import fj.data.Option;
-import fj.data.Set;
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-
-import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
-
-import static javax.ws.rs.core.Response.Status.OK;
-
-import static fj.data.Set.iterableSet;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import fj.data.Set;
+import lombok.val;
+import lombok.experimental.ExtensionMethod;
 
 @Path("/protein")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -63,32 +53,6 @@ public final class ProteinService extends DatabaseEntityAbstractService<Protein,
         @QueryParam("size") @DefaultValue("50") final int size
     ) {
         return buildGetAll(page, size);
-    }
-
-    @GET
-    @Path("/search")
-    public Response getMetagenomeId(
-        @QueryParam("metagenomeId") @DefaultValue("0") final int metagenomeId,
-        @QueryParam("projectId") @DefaultValue("0") final int projectId,
-        @QueryParam("projectName") @DefaultValue("") final String projectName,
-        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
-        @QueryParam("sequence") @DefaultValue("") final String sequence,
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        final MetaGenome mg = metagenome(
-            Identifier.of(metagenomeId),
-            project(Identifier.of(projectId), projectName, projectRepo),
-            Fasta.empty()
-        );
-
-        final Option<AminoAcidSequence> aas = AminoAcidSequence.fromString(sequence);
-        if (aas.isNone()) throw new IllegalArgumentException();
-
-        return respond(
-            () -> dao.search(mg, aas.some(), (page - 1) * size, size),
-            as -> Response.status(OK).entity(toGenericEntity(as))
-        );
     }
 
     @GET

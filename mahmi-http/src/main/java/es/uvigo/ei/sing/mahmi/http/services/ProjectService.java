@@ -1,5 +1,12 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static fj.Ord.stringOrd;
+import static fj.data.Set.iterableSet;
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+
 import java.nio.file.Paths;
 
 import javax.ws.rs.Consumes;
@@ -16,26 +23,14 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import fj.data.Set;
-import lombok.val;
-import lombok.extern.slf4j.Slf4j;
-
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.LoadProjectWrapper;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
-
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.CREATED;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.OK;
-
-import static fj.Ord.stringOrd;
-import static fj.data.Set.iterableSet;
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
+import fj.data.Set;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Path("/project")
@@ -62,20 +57,6 @@ public final class ProjectService extends DatabaseEntityAbstractService<Project,
     @Path("/{id}")
     public Response get(@PathParam("id") final int id) {
         return buildGet(Identifier.of(id));
-    }
-
-    @GET
-    @Path("/search")
-    public Response getName(
-        @QueryParam("name") @DefaultValue("") final String name,
-        @QueryParam("repo") @DefaultValue("") final String repo,
-        @QueryParam("page") @DefaultValue("1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size
-    ) {
-        return respond(
-            () -> dao.search(project(Identifier.empty(),name,repo), (page - 1) * size, size),
-            as -> status(OK).entity(toGenericEntity(as))
-        );
     }
 
     @GET

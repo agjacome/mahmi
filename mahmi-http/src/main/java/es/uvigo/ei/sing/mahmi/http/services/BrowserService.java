@@ -16,35 +16,35 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import lombok.experimental.ExtensionMethod;
 import es.uvigo.ei.sing.mahmi.browser.Browser;
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastAlignment;
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
-import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
+import es.uvigo.ei.sing.mahmi.common.entities.ProteinInformation;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.common.utils.mail.MailSender;
-import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
+import es.uvigo.ei.sing.mahmi.database.daos.ProteinInformationsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.FeedbackWrapper;
 import es.uvigo.ei.sing.mahmi.http.wrappers.SearchWrapper;
 import fj.data.Set;
+import lombok.experimental.ExtensionMethod;
 
 @Path("/browser")
 @Produces({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @ExtensionMethod(IterableExtensionMethods.class)
-public final class BrowserService extends DatabaseEntityAbstractService<Peptide, PeptidesDAO> {
+public final class BrowserService extends DatabaseEntityAbstractService<ProteinInformation, ProteinInformationsDAO> {
 
 	private Browser    browser;
 	private MailSender mailSender;
 	
-    private BrowserService( final PeptidesDAO dao, final Browser browser, final MailSender mailSender) {
+    private BrowserService( final ProteinInformationsDAO dao, final Browser browser, final MailSender mailSender) {
         super(dao);
         this.browser = browser;
         this.mailSender = mailSender;
     }
 
-    public static BrowserService browserService( final PeptidesDAO dao , final Browser browser, final MailSender mailSender) {
+    public static BrowserService browserService( final ProteinInformationsDAO dao , final Browser browser, final MailSender mailSender) {
         return new BrowserService(dao, browser, mailSender);
     }
     
@@ -68,7 +68,7 @@ public final class BrowserService extends DatabaseEntityAbstractService<Peptide,
 					    					 search.getBioactivity(),
 					    					 Paths.get(search.getPath()+"/"+UUID.randomUUID().toString()),
 					    					 blastOptions ), al -> status(OK).entity(toGenericEntity(al)));	
-    }   
+    }  
     
     @POST
     @Path("/feedback")
@@ -81,12 +81,23 @@ public final class BrowserService extends DatabaseEntityAbstractService<Peptide,
     	return Response.ok().build();
     }
     
+    @POST
+    @Path("/blasterjs")
+    public Response blasterjs(final FeedbackWrapper feedback){
+    	final String text = "Name: "+feedback.getName()+
+    						"\nEmail: "+feedback.getEmail()+
+    						"\nSubject: "+feedback.getSubject()+
+    						"\n\n"+feedback.getText();
+    	mailSender.send("aiblanco@uvigo.es", "BLASTERJS Feedback: "+feedback.getSubject(), text);    	
+    	return Response.ok().build();
+    }
+    
     @Override
-    protected GenericEntity<java.util.List<Peptide>> toGenericEntity(
-        final Set<Peptide>peptides
+    protected GenericEntity<java.util.List<ProteinInformation>> toGenericEntity(
+        final Set<ProteinInformation>proteinInformation
     ) {
-        return new GenericEntity<java.util.List<Peptide>>(
-            newArrayList(peptides)
+        return new GenericEntity<java.util.List<ProteinInformation>>(
+            newArrayList(proteinInformation)
         ) { };
     }
     

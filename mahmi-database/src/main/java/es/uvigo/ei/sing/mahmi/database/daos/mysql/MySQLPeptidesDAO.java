@@ -1,32 +1,49 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.BioactivePeptide.bioactivePeptide;
+import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
+import static es.uvigo.ei.sing.mahmi.common.entities.ReferencePeptide.referencePeptide;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.getWith;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.integer;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseAASequence;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseDouble;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.query;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.string;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import fj.control.db.DB;
-import fj.data.Option;
-import fj.data.Set;
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-
+import es.uvigo.ei.sing.mahmi.common.entities.BioactivePeptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Peptide;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
+import es.uvigo.ei.sing.mahmi.common.entities.ReferencePeptide;
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.DAOException;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
+import fj.Ord;
+import fj.control.db.DB;
+import fj.data.Option;
+import fj.data.Set;
+import lombok.val;
+import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements PeptidesDAO {
 
+	private final Ord<ReferencePeptide> orderRef = Identifier.ord.contramap(a -> a.getId());
+	private final Ord<BioactivePeptide> orderBio = Identifier.ord.contramap(a -> a.getId());
+	
     private MySQLPeptidesDAO(final ConnectionPool connectionPool) {
         super(connectionPool);
     }
@@ -36,8 +53,7 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
     ) {
         return new MySQLPeptidesDAO(connectionPool);
     }
-
-
+    
     @Override
     public Option<Peptide> getBySequence(
         final AminoAcidSequence sequence
@@ -60,6 +76,91 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
 
         val statement = sql.bind(query).bind(get);
         return read(statement).toSet(ordering);
+    }
+    
+    @Override
+    public Set<BioactivePeptide> getBioactives (final int start, final int count
+    		) throws DAOException {
+    	val sql = sql(
+            "SELECT DISTINCT peptide_id, peptide_sequence, bioactive_similarity, " + 
+            "reference_id, reference_sequence, reference_type "   +
+            "FROM bioactive_peptides NATURAL JOIN peptides NATURAL JOIN reference_peptides " +
+            "LIMIT ? OFFSET ?",count, start
+        );
+
+        val statement = sql.bind(query).bind(getWith(this::parseBioactive));
+        return read(statement).toSet(orderBio);
+    }
+    
+    @Override
+    public Set<BioactivePeptide> getBioactivesByOrganism (final int start, final int count, final String organism
+    		) throws DAOException {
+    	val sql = sql(
+            "SELECT DISTINCT peptide_id, peptide_sequence, bioactive_similarity, " + 
+            "reference_id, reference_sequence, reference_type "   +
+            "FROM bioactive_peptides NATURAL JOIN peptides NATURAL JOIN reference_peptides NATURAL JOIN digestions " +
+            "NATURAL JOIN protein_information WHERE uniprot_organism like ? " +
+            "LIMIT ? OFFSET ?",organism
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(getWith(this::parseBioactive));
+        return read(statement).toSet(orderBio);
+    }
+    
+    @Override
+    public Set<BioactivePeptide> getBioactivesByGene (final int start, final int count, final String gene
+    		) throws DAOException {
+    	val sql = sql(
+            "SELECT DISTINCT peptide_id, peptide_sequence, bioactive_similarity, " + 
+            "reference_id, reference_sequence, reference_type "   +
+            "FROM bioactive_peptides NATURAL JOIN peptides NATURAL JOIN reference_peptides NATURAL JOIN digestions " +
+            "NATURAL JOIN protein_information WHERE uniprot_gene like ? " +
+            "LIMIT ? OFFSET ?",gene
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(getWith(this::parseBioactive));
+        return read(statement).toSet(orderBio);
+    }
+    
+    @Override
+    public Set<BioactivePeptide> getBioactivesByProtein (final int start, final int count, final String protein
+    		) throws DAOException {
+    	val sql = sql(
+            "SELECT DISTINCT peptide_id, peptide_sequence, bioactive_similarity, " + 
+            "reference_id, reference_sequence, reference_type "   +
+            "FROM bioactive_peptides NATURAL JOIN peptides NATURAL JOIN reference_peptides NATURAL JOIN digestions " +
+            "NATURAL JOIN protein_information WHERE uniprot_protein like ? " +
+            "LIMIT ? OFFSET ?",protein
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(getWith(this::parseBioactive));
+        return read(statement).toSet(orderBio);
+    }
+    
+    @Override
+    public Set<BioactivePeptide> getBioactivesByLength (final int start, final int count, final String length
+    		) throws DAOException {
+    	val sql = sql(
+            "SELECT DISTINCT peptide_id, peptide_sequence, bioactive_similarity, " + 
+            "reference_id, reference_sequence, reference_type "   +
+            "FROM bioactive_peptides NATURAL JOIN peptides NATURAL JOIN reference_peptides " +
+            "WHERE LENGTH(CONVERT(peptide_sequence USING utf8)) = ? " +
+            "LIMIT ? OFFSET ?",length
+        ).bind(integer(2, count)).bind(integer(3, start));
+
+        val statement = sql.bind(query).bind(getWith(this::parseBioactive));
+        return read(statement).toSet(orderBio);
+    }
+    
+    @Override
+    public Set<ReferencePeptide> getReferences() throws DAOException{
+    	val sql = prepare(
+            "SELECT reference_id, reference_sequence, reference_type "   +
+            "FROM reference_peptides"
+        );
+
+        val statement = sql.bind(query).bind(getWith(this::parseReference));
+        return read(statement).toSet(orderRef);
     }
 
     @Override
@@ -101,6 +202,23 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
         val seq = parseAASequence(results, "peptide_sequence");
 
         return peptide(id, seq);
+    }
+    
+    private ReferencePeptide parseReference(final ResultSet results) throws SQLException {
+        val id   = parseIdentifier(results, "reference_id");
+        val seq  = parseAASequence(results, "reference_sequence");
+        val type = parseString(results, "reference_type");
+
+        return referencePeptide(id, seq, type);
+    }
+    
+    private BioactivePeptide parseBioactive(final ResultSet results) throws SQLException {
+        val id   	   = parseIdentifier(results, "peptide_id");
+        val seq 	   = parseAASequence(results, "peptide_sequence");
+        val similarity = parseDouble(results, "bioactive_similarity");
+        val reference  = parseReference(results);
+
+        return bioactivePeptide(id, seq, similarity, reference);
     }
 
     @Override
@@ -162,5 +280,4 @@ public final class MySQLPeptidesDAO extends MySQLAbstractDAO<Peptide> implements
           sha, seq
       ).bind(identifier(3, id));
     }
-
 }

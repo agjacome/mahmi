@@ -1,5 +1,11 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
+import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
+import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.Status.ACCEPTED;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -14,35 +20,17 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-import lombok.extern.slf4j.Slf4j;
-
-import fj.data.Set;
-
 import es.uvigo.ei.sing.mahmi.common.entities.Digestion;
 import es.uvigo.ei.sing.mahmi.common.entities.Enzyme;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
-import es.uvigo.ei.sing.mahmi.common.entities.sequences.Fasta;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.cutter.ProteinCutterController;
 import es.uvigo.ei.sing.mahmi.database.daos.DigestionsDAO;
 import es.uvigo.ei.sing.mahmi.http.wrappers.CutProteinsWrapper;
-
-import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.ACCEPTED;
-import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static javax.ws.rs.core.Response.Status.OK;
-
-import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.Enzyme.enzyme;
-import static es.uvigo.ei.sing.mahmi.common.entities.MetaGenome.metagenome;
-import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
-import static es.uvigo.ei.sing.mahmi.common.entities.Project.project;
-import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
-import static es.uvigo.ei.sing.mahmi.common.utils.functions.NumericPredicates.between;
+import fj.data.Set;
+import lombok.val;
+import lombok.experimental.ExtensionMethod;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Path("/digestion")
@@ -98,32 +86,6 @@ public final class DigestionService extends DatabaseEntityAbstractService<Digest
     ) {
         val toUpdate = digestion.withId(Identifier.of(id));
         return buildUpdate(toUpdate);
-    }
-
-    @GET
-    @Path("/search")
-    public Response search(
-        @QueryParam("peptideID") @DefaultValue("0") final int peptideId,
-        @QueryParam("peptideSeq") @DefaultValue("") final String peptideSeq,
-        @QueryParam("enzymeID")  @DefaultValue("0") final int enzymeId,
-        @QueryParam("proteinID") @DefaultValue("0") final int proteinId,
-        @QueryParam("metagenomeID") @DefaultValue("0") final int metagenomeId,
-        @QueryParam("projectID") @DefaultValue("0") final int projectId,
-        @QueryParam("projectName") @DefaultValue("") final String projectName,
-        @QueryParam("projectRepo") @DefaultValue("") final String projectRepo,
-        @QueryParam("page")    @DefaultValue( "1") final int page,
-        @QueryParam("size")    @DefaultValue("50") final int size
-    ) {
-        return respond(() -> dao.search(
-            protein(Identifier.of(proteinId),
-            AminoAcidSequence.empty()),
-            metagenome(Identifier.of(metagenomeId),
-            project(Identifier.of(projectId),projectName,projectRepo),
-            Fasta.empty()),
-            peptide(Identifier.of(peptideId),AminoAcidSequence.fromString(peptideSeq).some()),
-            enzyme(Identifier.of(enzymeId),""),
-            (page - 1) * size, size
-        ), ds -> status(OK).entity(toGenericEntity(ds)));
     }
 
     @POST

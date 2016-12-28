@@ -182,6 +182,82 @@ CREATE TABLE  IF NOT EXISTS `users` (
 ENGINE = INNODB;
 
 
+-- -----------------------------------------------------
+-- Table `protein_information`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `protein_information` ;
+
+CREATE TABLE IF NOT EXISTS `protein_information` (
+  `protein_information_id` INT NOT NULL AUTO_INCREMENT,
+  `protein_id` INT NOT NULL,
+  `uniprot_id` VARCHAR( 10 ) NOT NULL,
+  `uniprot_organism` VARCHAR( 250 ) NOT NULL,
+  `uniprot_protein` VARCHAR( 250 ) NOT NULL,
+  `uniprot_gene` VARCHAR( 120 ) NOT NULL,
+  
+  PRIMARY KEY (`protein_information_id`),
+  INDEX `fk_protein_information_proteins1_idx` (`protein_id` ASC),
+  UNIQUE INDEX `fks_UNIQUE` (`protein_id` ASC),
+  CONSTRAINT `fk_protein_information_proteins1`
+    FOREIGN KEY (`protein_id`)
+    REFERENCES `proteins` (`protein_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+
+-- -----------------------------------------------------
+-- Table `metagenome_information`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `metagenome_information` ;
+
+CREATE TABLE IF NOT EXISTS `metagenome_information` (
+  `metagenome_information_id` INT NOT NULL AUTO_INCREMENT,
+  `protein_id` INT NOT NULL,
+  `gene_length` INT NOT NULL,
+  `gene_completeness` VARCHAR( 20 ) NOT NULL,
+  `gene_origin` VARCHAR( 5 ) NOT NULL,
+  `species_annotation_phylum` VARCHAR( 50 ) NOT NULL,
+  `species_annotation_genus` VARCHAR( 50 ) NOT NULL,
+  `kegg_annotation_phylum` VARCHAR( 20 ) NOT NULL,
+  `sample_occurrence_frequency` DOUBLE NOT NULL,
+  `individual_occurrence_frequency` DOUBLE NOT NULL,
+  `kegg_functional_category` VARCHAR( 150 ) NOT NULL,
+  
+  PRIMARY KEY (`metagenome_information_id`),
+  INDEX `fk_metagenome_information_proteins1_idx` (`protein_id` ASC),
+  UNIQUE INDEX `fks_UNIQUE` (`protein_id` ASC),
+  CONSTRAINT `fk_metagenome_information_proteins1`
+    FOREIGN KEY (`protein_id`)
+    REFERENCES `proteins` (`protein_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `metagenome_mixs`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `metagenome_mixs` ;
+
+CREATE TABLE IF NOT EXISTS `metagenome_mixs` (
+  `metagenome_mixs_id` INT NOT NULL AUTO_INCREMENT,
+  `metagenome_mixs_name` VARCHAR( 50 ) NOT NULL,
+  `metagenome_mixs_investigation_type` VARCHAR( 100 ) NOT NULL,
+  `metagenome_mixs_project_name` VARCHAR( 100 ) NOT NULL,
+  `metagenome_mixs_sequencing_method` VARCHAR( 50 ) NOT NULL,
+  `metagenome_mixs_collection_date` VARCHAR( 50 ) NOT NULL,
+  `metagenome_mixs_enviromental_package` VARCHAR( 100 ) NOT NULL,
+  `metagenome_mixs_latitude` VARCHAR( 20 ) NOT NULL,
+  `metagenome_mixs_longitude` VARCHAR( 20 ) NOT NULL,
+  `metagenome_mixs_location` VARCHAR( 50 ) NOT NULL,
+  `metagenome_mixs_biome` VARCHAR( 100 ) NOT NULL,
+  `metagenome_mixs_feature` VARCHAR( 100 ) NOT NULL,
+  `metagenome_mixs_material` VARCHAR( 100 ) NOT NULL,
+  
+  PRIMARY KEY (`metagenome_mixs_id`))
+ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
