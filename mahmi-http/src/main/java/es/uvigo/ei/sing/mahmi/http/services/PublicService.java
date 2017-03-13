@@ -1,9 +1,7 @@
 package es.uvigo.ei.sing.mahmi.http.services;
 
 import static es.uvigo.ei.sing.mahmi.common.entities.Peptide.peptide;
-import static es.uvigo.ei.sing.mahmi.common.entities.Protein.protein;
 import static javax.ws.rs.core.Response.status;
-import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.OK;
 import static jersey.repackaged.com.google.common.collect.Lists.newArrayList;
 
@@ -92,7 +90,7 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     }
 
     @GET
-    @Path("peptides/references")
+    @Path("peptides/reference")
     public Response getReferences() {
     	return respond(
             () -> dao.getReferences(),
@@ -104,12 +102,19 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     @Path("peptides")
     public Response getBioactives(
         @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("40000") final int size
+        @QueryParam("size") @DefaultValue("50000") final int size
     ) {
-    	return respond(
-            () -> dao.getBioactives((page - 1) * size, size),
-            as -> status(OK).entity(bioactiveToGenericEntity(as))
-        );
+    	if(size<50000)
+	    	return respond(
+	            () -> dao.getBioactives((page - 1) * size, size),
+	            as -> status(OK).entity(bioactiveToGenericEntity(as))
+	        );
+    	else
+	    	return respond(
+		            () -> dao.getBioactives((page - 1) * 50000, 50000),
+		            as -> status(OK).entity(bioactiveToGenericEntity(as))
+		        );
+    		
     }
     
     @GET
