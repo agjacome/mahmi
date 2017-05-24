@@ -1,15 +1,14 @@
 package es.uvigo.ei.sing.mahmi.browser;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -44,6 +43,199 @@ public class BrowserTest
      */
     public void testApp() throws FileNotFoundException, IOException 
     {
+//    	try (PrintWriter pw1 = new PrintWriter( new BufferedWriter( new FileWriter("/home/mahmi/tempfiles/rnaseq/fmpk-dentriticas.csv")))){
+//			List<String> lines= Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/1a/t_data.ctab"), Charset.defaultCharset());		
+//			final Set<P2<String, String>> list = new HashSet<>();
+//			final Map<String, Double> m1a = new HashMap<String, Double>();
+//			final Map<String, Double> m1b = new HashMap<String, Double>();
+//			final Map<String, Double> m3a = new HashMap<String, Double>();
+//			final Map<String, Double> m3b = new HashMap<String, Double>();
+//			final Map<String, Double> m4a = new HashMap<String, Double>();
+//			final Map<String, Double> m4b = new HashMap<String, Double>();
+//			final Map<String, Double> m5a = new HashMap<String, Double>();
+//			final Map<String, Double> m5b = new HashMap<String, Double>();
+//			final Map<String, Double> m6a = new HashMap<String, Double>();
+//			final Map<String, Double> m6b = new HashMap<String, Double>();
+//			final Map<String, Double> m7a = new HashMap<String, Double>();
+//			final Map<String, Double> m7b = new HashMap<String, Double>();
+//			final Map<String, Double> m8a = new HashMap<String, Double>();
+//			final Map<String, Double> m8b = new HashMap<String, Double>();
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m1a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/1b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m1b.put(line[5], Double.parseDouble(line[11]));
+//			}				
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/3a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m3a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/3b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m3b.put(line[5], Double.parseDouble(line[11]));
+//			}				
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/4a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m4a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/4b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m4b.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/5a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m5a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/5b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m5b.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/6a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m6a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/6b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m6b.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/7a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m7a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/7b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m7b.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/8a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m8a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/dentriticasv2/8b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m8b.put(line[5], Double.parseDouble(line[11]));
+//			}
+//			
+//			
+//			Iterator<P2<String, String>> iterator = list.iterator();
+//			
+//			while(iterator.hasNext()){
+//				P2<String, String> x = iterator.next();
+//				double v1a = 0.000000;
+//				if(m1a.get(x._1())!=null) v1a = m1a.get(x._1());
+//				double v1b = 0.000000;
+//				if(m1b.get(x._1())!=null) v1b = m1b.get(x._1());
+//				double v3a = 0.000000;
+//				if(m3a.get(x._1())!=null) v3a = m3a.get(x._1());
+//				double v3b = 0.000000;
+//				if(m3b.get(x._1())!=null) v3b = m3b.get(x._1());
+//				double v4a = 0.000000;
+//				if(m4a.get(x._1())!=null) v4a = m4a.get(x._1());
+//				double v4b = 0.000000;
+//				if(m4b.get(x._1())!=null) v4b = m4b.get(x._1());
+//				double v5a = 0.000000;
+//				if(m5a.get(x._1())!=null) v5a = m5a.get(x._1());
+//				double v5b = 0.000000;
+//				if(m5b.get(x._1())!=null) v5b = m5b.get(x._1());
+//				double v6a = 0.000000;
+//				if(m6a.get(x._1())!=null) v6a = m6a.get(x._1());
+//				double v6b = 0.000000;
+//				if(m6b.get(x._1())!=null) v6b = m6b.get(x._1());
+//				double v7a = 0.000000;
+//				if(m7a.get(x._1())!=null) v7a = m7a.get(x._1());
+//				double v7b = 0.000000;
+//				if(m7b.get(x._1())!=null) v7b = m7b.get(x._1());
+//				double v8a = 0.000000;
+//				if(m8a.get(x._1())!=null) v8a = m8a.get(x._1());
+//				double v8b = 0.000000;
+//				if(m8b.get(x._1())!=null) v8b = m8b.get(x._1());
+//					
+//				
+//				pw1.println(x._1()+";"+x._2()+";"+v1a+";"+v1b+";"+v3a+";"+v3b+";"+v4a+";"+v4b+";"+v5a+";"+v5b+";"+v6a+";"+v6b+";"+v7a+";"+v7b+";"+v8a+";"+v8b);
+//			}
+//    	try (PrintWriter pw1 = new PrintWriter( new BufferedWriter( new FileWriter("/home/mahmi/tempfiles/rnaseq/fmpk.csv")))){
+//			List<String> lines= Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/testtest/md1_a/t_data.ctab"), Charset.defaultCharset());		
+//			final Set<P2<String, String>> list = new HashSet<>();
+//			final Map<String, Double> m1a = new HashMap<String, Double>();
+//			final Map<String, Double> m1b = new HashMap<String, Double>();
+//			final Map<String, Double> m2a = new HashMap<String, Double>();
+//			final Map<String, Double> m2b = new HashMap<String, Double>();
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m1a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/testtest/md1_b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m1b.put(line[5], Double.parseDouble(line[11]));
+//			}				
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/testtest/md2_a/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m2a.put(line[5], Double.parseDouble(line[11]));
+//			}			
+//			lines = Files.readAllLines(Paths.get("/home/mahmi/rna_seq/sf_data/testtest/md2_b/t_data.ctab"), Charset.defaultCharset());
+//			for(int i=1; i<lines.size(); i++){
+//				final String[] line = lines.get(i).split("\t");
+//				list.add(p(line[5], line[9]));
+//				m2b.put(line[5], Double.parseDouble(line[11]));
+//			}	
+//			
+//			
+//			Iterator<P2<String, String>> iterator = list.iterator();
+//			
+//			while(iterator.hasNext()){
+//				P2<String, String> x = iterator.next();
+//				double v1a = 0.000000;
+//				if(m1a.get(x._1())!=null) v1a = m1a.get(x._1());
+//				double v1b = 0.000000;
+//				if(m1b.get(x._1())!=null) v1b = m1b.get(x._1());
+//				double v2a = 0.000000;
+//				if(m2a.get(x._1())!=null) v2a = m2a.get(x._1());
+//				double v2b = 0.000000;
+//				if(m2b.get(x._1())!=null) v2b = m2b.get(x._1());
+//					
+//				
+//				pw1.println(x._1()+";"+x._2()+";"+v1a+";"+v1b+";"+v2a+";"+v2b);
+//			}
+//			
+//			
+//			
+//    	}catch (final IOException e1) {
+//          e1.printStackTrace();;
+//    	}	
+    	
 //    	try (PrintWriter pw1 = new PrintWriter( new BufferedWriter( new FileWriter("/home/mahmi/tempfiles/ecoli/error.txt")))){
 //			final List<String> proteomes = Files.readAllLines(Paths.get("/home/mahmi/Downloads/ecoli.txt"), Charset.defaultCharset());			
 //			proteomes.forEach(x-> {		
@@ -125,33 +317,33 @@ public class BrowserTest
 //			});
 //			
 //			
-//			
+			
 //		}catch (final IOException e1) {
 //            e1.printStackTrace();;
 //        }
-    	
-    	
-//    	try {
-//			final List<String> peptides = Files.readAllLines(Paths.get("/home/mahmi/tempfiles/Uniprot/peptides.csv"), Charset.defaultCharset());			
-//						
-//			try (PrintWriter pw = new PrintWriter( new BufferedWriter( new FileWriter("/home/mahmi/tempfiles/Uniprot/mhproteins.15.fasta")))) {
-//				peptides.forEach(p -> {
-//					pw.println(">"+p.split("\t")[0]);
-//					pw.println(p.split("\t")[1]);
-//				});
-//			}catch (final IOException e) {
-//	            e.printStackTrace();
-//	        }
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-    	
-    	
 //    	
-//    	
-//    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/Uniprot/mhproteins.14.sql", false)))){	    	
-//	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/Uniprot/mhproteins.14.out"));
+    	
+    	try {
+			final List<String> peptides = Files.readAllLines(Paths.get("/home/mahmi/tempfiles/uniprot/mhproteins.17.fq"), Charset.defaultCharset());			
+						
+			try (PrintWriter pw = new PrintWriter( new BufferedWriter( new FileWriter("/home/mahmi/tempfiles/uniprot/mhproteins.17.fasta")))) {
+				peptides.forEach(p -> {
+					pw.println(">"+p.split("\t")[0]);
+					pw.println(p.split("\t")[1]);
+				});
+			}catch (final IOException e) {
+	            e.printStackTrace();
+	        }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	
+    	
+//    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/uniprot/mhproteins.16.sql", false)))){	    	
+//	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/uniprot/mhproteins.16.out"));
 //	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 //	        String line;
 //	        while ((line = reader.readLine()) != null) {
@@ -203,14 +395,14 @@ public class BrowserTest
 //        }catch(IOException e){
 //        	e.printStackTrace();
 //        }    	
-//    	
-//    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/insert.sql", false)))){	    	
-//	    	InputStream in = new FileInputStream(new File("/home/mahmi/Downloads/chemdner_patents_all.txt"));
+    	
+//    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/insertChemprotTrain.sql", false)))){	    	
+//	    	InputStream in = new FileInputStream(new File("/home/mahmi/Downloads/chemprot_train_abstracts.tsv"));
 //	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 //	        String line;
 //	        while ((line = reader.readLine()) != null) {
 //	            String[] fields = line.split("\t");
-//	            pw.println("insert into patents (patent_external_id, patent_title, patent_abstract) values ('"+fields[0]+"', '"+fields[1].replaceAll("\"", "").replaceAll("'", "")+"', '"+fields[2].replaceAll("\"", "").replaceAll("'", "")+"');");	            	
+//	            pw.println("insert ignore into abstracts (abstract_external_id, abstract_title, abstract_text) values ('"+fields[0]+"', '"+fields[1].replaceAll("\"", "").replaceAll("'", "")+"', '"+fields[2].replaceAll("\"", "").replaceAll("'", "")+"');");	            	
 //	            
 //	        }  //Prints the string content read from input stream
 //	        reader.close();
@@ -218,8 +410,8 @@ public class BrowserTest
 //        }catch(IOException e){
 //        	e.printStackTrace();
 //        }  
-    	
-    	
-        assertTrue( true );
+//    	
+//    	
+//        assertTrue( true );
     }
 }

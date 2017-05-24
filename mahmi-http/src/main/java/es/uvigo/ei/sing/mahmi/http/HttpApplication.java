@@ -13,8 +13,8 @@ import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProjectsDAO.mysqlP
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinInformationsDAO.mysqlProteinInformationsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLProteinsDAO.mysqlProteinsDAO;
 import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLTableStatsDAO.mysqlTableStatsDAO;
-import static es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLUsersDAO.mysqlUsersDAO;
-import static es.uvigo.ei.sing.mahmi.http.services.BrowserService.browserService;
+import static es.uvigo.ei.sing.mahmi.http.services.UtilsService.utilsService;
+import static es.uvigo.ei.sing.mahmi.http.utils.AccessLogger.accessLogger;
 import static es.uvigo.ei.sing.mahmi.http.services.DigestionService.digestionService;
 import static es.uvigo.ei.sing.mahmi.http.services.EnzymeService.enzymeService;
 import static es.uvigo.ei.sing.mahmi.http.services.MetaGenomeProteinsService.metaGenomeProteinsService;
@@ -24,7 +24,6 @@ import static es.uvigo.ei.sing.mahmi.http.services.ProjectService.projectService
 import static es.uvigo.ei.sing.mahmi.http.services.ProteinService.proteinService;
 import static es.uvigo.ei.sing.mahmi.http.services.PublicService.publicService;
 import static es.uvigo.ei.sing.mahmi.http.services.TableStatService.tableStatService;
-import static es.uvigo.ei.sing.mahmi.http.services.UserService.userService;
 import static es.uvigo.ei.sing.mahmi.loader.MGRastProjectLoader.mgRastLoader;
 import static es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController.projectLoaderCtrl;
 
@@ -46,8 +45,8 @@ import es.uvigo.ei.sing.mahmi.database.daos.ProjectsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinInformationsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-import es.uvigo.ei.sing.mahmi.database.daos.UsersDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.mysql.MySQLMetagenomeMIxSDAO;
+import es.uvigo.ei.sing.mahmi.http.utils.AccessLogger;
 import es.uvigo.ei.sing.mahmi.loader.ProjectLoaderController;
 import jersey.repackaged.com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
@@ -67,7 +66,6 @@ public final class HttpApplication extends Application {
         final ProjectsDAO            projectsDAO           = mysqlProjectsDAO(connectionPool);
         final ProteinsDAO            proteinsDAO           = mysqlProteinsDAO(connectionPool);
         final TableStatsDAO          tableStatsDAO         = mysqlTableStatsDAO(connectionPool);
-        final UsersDAO               usersDAO              = mysqlUsersDAO(connectionPool);
         final ProteinInformationsDAO proteinInformationsDAO = mysqlProteinInformationsDAO(connectionPool);
         final MetagenomeInformationsDAO metagenomeInformationsDAO = mysqlMetagenomeInformationsDAO(connectionPool);
         final MetagenomeMIxSDAO metagenomeMIxSDAO = MySQLMetagenomeMIxSDAO.mysqlMetagenomeMIxSDAO(connectionPool);
@@ -82,6 +80,7 @@ public final class HttpApplication extends Application {
 
         final MailSender mailSender = new MailSender();
         mailSender.init();
+        final AccessLogger accessLogger = accessLogger();
         
         return Sets.newHashSet(
             digestionService(digestionsDAO, cutterController),
@@ -92,9 +91,8 @@ public final class HttpApplication extends Application {
             projectService(projectsDAO, loaderController),
             proteinService(proteinsDAO),
             tableStatService(tableStatsDAO),
-            userService(usersDAO),
-            browserService(proteinInformationsDAO, browser(), mailSender),
-            publicService(peptidesDAO, proteinsDAO, proteinInformationsDAO, metagenomeInformationsDAO, metagenomeMIxSDAO, browser())
+            utilsService(accessLogger, mailSender),
+            publicService(peptidesDAO, proteinsDAO, proteinInformationsDAO, metagenomeInformationsDAO, metagenomeMIxSDAO, browser(), accessLogger)
         );
     }
 

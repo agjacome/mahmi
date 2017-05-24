@@ -43,22 +43,19 @@ public class MySQLMetagenomeMIxSDAO extends MySQLAbstractDAO<MetagenomeMIxS> imp
   
     @Override
     protected MetagenomeMIxS parse(ResultSet resultSet) throws SQLException {    	
-        final Identifier id = parseIdentifier(resultSet, "metagenome_mixs_id");
-        final String     name = parseString(resultSet, "metagenome_mixs_name");
-	    final String     investigation_type = parseString(resultSet, "metagenome_mixs_investigation_type");
-	    final String 	 project_name = parseString(resultSet, "metagenome_mixs_project_name");
-	    final String 	 sequencing_method = parseString(resultSet, "metagenome_mixs_sequencing_method");
-	    final String 	 collection_date = parseString(resultSet, "metagenome_mixs_collection_date");
-	    final String 	 enviromental_package = parseString(resultSet, "metagenome_mixs_enviromental_package");
-	    final String 	 latitude = parseString(resultSet, "metagenome_mixs_latitude");
-	    final String 	 longitude = parseString(resultSet, "metagenome_mixs_longitude");
-	    final String 	 location = parseString(resultSet, "metagenome_mixs_location");
-	    final String 	 biome = parseString(resultSet, "metagenome_mixs_biome");
-	    final String 	 feature = parseString(resultSet, "metagenome_mixs_feature");
-	    final String 	 material = parseString(resultSet, "metagenome_mixs_material");
-        return metagenomeMIxS(id, name, investigation_type, project_name, 
-				  sequencing_method, collection_date, enviromental_package,
-				  latitude, longitude, location, biome, feature, material );
+    	return metagenomeMIxS(parseIdentifier(resultSet, "metagenome_mixs_id"),
+    						  parseString(resultSet, "metagenome_mixs_name"),
+						      parseString(resultSet, "metagenome_mixs_investigation_type"),
+						      parseString(resultSet, "metagenome_mixs_project_name"),
+						      parseString(resultSet, "metagenome_mixs_sequencing_method"),
+						      parseString(resultSet, "metagenome_mixs_collection_date"),
+						      parseString(resultSet, "metagenome_mixs_enviromental_package"),
+						      parseString(resultSet, "metagenome_mixs_latitude"),
+						      parseString(resultSet, "metagenome_mixs_longitude"),
+						      parseString(resultSet, "metagenome_mixs_location"),
+						      parseString(resultSet, "metagenome_mixs_biome"),
+						      parseString(resultSet, "metagenome_mixs_feature"),
+						      parseString(resultSet, "metagenome_mixs_material"));
     }
     
     @Override
@@ -74,17 +71,17 @@ public class MySQLMetagenomeMIxSDAO extends MySQLAbstractDAO<MetagenomeMIxS> imp
     @Override
     protected DB<PreparedStatement> prepareSelect(Identifier id) {
         return sql(
-                "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE metagenome_information_id=?",
-                id
-            );
+            "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE metagenome_information_id=?",
+            id
+        );
     }
     
     @Override
     protected DB<PreparedStatement> prepareSelect(int limit, int offset) {
         return sql(
-                "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins LIMIT ? OFFSET ?",
-            limit, offset
-            );
+            "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins LIMIT ? OFFSET ?",
+        limit, offset
+        );
     }
     
     @Override
@@ -101,9 +98,9 @@ public class MySQLMetagenomeMIxSDAO extends MySQLAbstractDAO<MetagenomeMIxS> imp
 	public Option<MetagenomeMIxS> getByProtein(final Protein protein)
 			throws DAOException {
 		val sql = sql(
-                "SELECT * FROM metagenome_mixs WHERE metagenome_mixs_name = ?",
-                protein.getName().split("_")[0]
-            ).bind(query).bind(get);
+            "SELECT * FROM metagenome_mixs WHERE metagenome_mixs_name = ?",
+            protein.getName().split("_")[0]
+        ).bind(query).bind(get);
         return read(sql).toOption();
 	}
    

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.inject.Provider;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -18,9 +19,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.glassfish.grizzly.http.server.Request;
 
 import es.uvigo.ei.sing.mahmi.browser.Browser;
 import es.uvigo.ei.sing.mahmi.browser.utils.BlastAlignment;
@@ -40,6 +44,7 @@ import es.uvigo.ei.sing.mahmi.database.daos.MetagenomeMIxSDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.PeptidesDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinInformationsDAO;
 import es.uvigo.ei.sing.mahmi.database.daos.ProteinsDAO;
+import es.uvigo.ei.sing.mahmi.http.utils.AccessLogger;
 import es.uvigo.ei.sing.mahmi.http.wrappers.SearchWrapper;
 import es.uvigo.ei.sing.mahmi.http.wrappers.SourceProtein;
 import fj.data.Option;
@@ -51,24 +56,31 @@ import lombok.experimental.ExtensionMethod;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 @ExtensionMethod(OptionExtensionMethods.class)
 public final class PublicService extends DatabaseEntityAbstractService<Peptide, PeptidesDAO>{
+	
+	@Context
+    private Provider<Request> requestProvider;
+	
 	private Browser                browser;
 	private ProteinsDAO            proteinDAO;
 	private ProteinInformationsDAO proteinInfoDAO;
 	private MetagenomeInformationsDAO metagenomeInfoDAO;
 	private MetagenomeMIxSDAO      metagenomeMIxSDAO;
+	private AccessLogger		   accessLogger;
 	
     private PublicService(final PeptidesDAO peptidesDAO, 
 						  final ProteinsDAO proteinDAO, 
 						  final ProteinInformationsDAO proteinInfoDAO,
 						  final MetagenomeInformationsDAO metagenomeInfoDAO,
 						  final MetagenomeMIxSDAO metagenomeMIxSDAO,
-						  final Browser browser ) {
+						  final Browser browser,
+						  final AccessLogger accessLogger) {
     	super(peptidesDAO);
         this.browser = browser;
         this.proteinDAO = proteinDAO;
         this.proteinInfoDAO = proteinInfoDAO;
         this.metagenomeInfoDAO = metagenomeInfoDAO;
         this.metagenomeMIxSDAO = metagenomeMIxSDAO;
+        this.accessLogger      = accessLogger;
     }
 
     public static PublicService publicService(final PeptidesDAO dao, 
@@ -76,13 +88,15 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     										  final ProteinInformationsDAO proteinInfoDAO,
     										  final MetagenomeInformationsDAO metagenomeInfoDAO,
     										  final MetagenomeMIxSDAO metagenomeMIxSDAO,
-    										  final Browser browser ) {
-        return new PublicService(dao, proteinDAO, proteinInfoDAO, metagenomeInfoDAO, metagenomeMIxSDAO, browser);
+    										  final Browser browser,
+    										  final AccessLogger accessLogger) {
+        return new PublicService(dao, proteinDAO, proteinInfoDAO, metagenomeInfoDAO, metagenomeMIxSDAO, browser, accessLogger);
     }
     
     @GET
     @Path("proteins/{id}")
     public Response getByPeptide(@PathParam("id") final int id){
+    	accessLogger.log(requestProvider.get());    
         return respond(
                 () -> proteinDAO.getByPeptide(peptide(Identifier.of(id), AminoAcidSequence.empty())),
                 as -> Response.status(OK).entity(proteinToGenericEntity(as))
@@ -92,6 +106,7 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     @GET
     @Path("peptides/reference")
     public Response getReferences() {
+    	accessLogger.log(requestProvider.get());    
     	return respond(
             () -> dao.getReferences(),
             as -> status(OK).entity(referenceToGenericEntity(as))
@@ -104,6 +119,7 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
         @QueryParam("page") @DefaultValue( "1") final int page,
         @QueryParam("size") @DefaultValue("50000") final int size
     ) {
+    	accessLogger.log(requestProvider.get());    
     	if(size<50000)
 	    	return respond(
 	            () -> dao.getBioactives((page - 1) * size, size),
@@ -121,31 +137,32 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     @Path("private/peptides")
     public Response exploreBioactives(
         @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("40000") final int size,
+        @QueryParam("size") @DefaultValue("50") final int size,
         @QueryParam("filterType") @DefaultValue("") final String filterType,
         @QueryParam("filter") @DefaultValue("") final String filter
     ) {
+    	accessLogger.log(requestProvider.get());    
     	switch(filterType){
     		case "organism":
     			return respond(
-    		            () -> dao.getBioactivesByOrganism((page - 1) * size, size, "%"+filter+"%"),
-    		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-    		        );    		
+		            () -> dao.getBioactivesByOrganism((page - 1) * size, size, "%"+filter+"%"),
+		            as -> status(OK).entity(bioactiveToGenericEntity(as))
+		        );    		
     		case "gene":
     			return respond(
-    		            () -> dao.getBioactivesByGene((page - 1) * size, size, "%"+filter+"%"),
-    		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-    		        );    			
+		            () -> dao.getBioactivesByGene((page - 1) * size, size, "%"+filter+"%"),
+		            as -> status(OK).entity(bioactiveToGenericEntity(as))
+		        );    			
     		case "protein":
     			return respond(
-    		            () -> dao.getBioactivesByProtein((page - 1) * size, size, "%"+filter+"%"),
-    		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-    		        );    		
+		            () -> dao.getBioactivesByProtein((page - 1) * size, size, "%"+filter+"%"),
+		            as -> status(OK).entity(bioactiveToGenericEntity(as))
+		        );    		
     		case "length":
     			return respond(
-    		            () -> dao.getBioactivesByLength((page - 1) * size, size, filter),
-    		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-    		        );    			
+		            () -> dao.getBioactivesByLength((page - 1) * size, size, filter),
+		            as -> status(OK).entity(bioactiveToGenericEntity(as))
+		        );    			
     		default:
     			return respond(
 		            () -> dao.getBioactives((page - 1) * size, size),
@@ -157,9 +174,10 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     @GET
     @Path("peptides/sourceProteins/{id}")
     public Response getProteinsInfo(@PathParam("id") final int id){
-         final Set<Protein> proteins = proteinDAO.getByPeptide(Peptide.peptide(Identifier.of(id), AminoAcidSequence.empty()));
-         final List<SourceProtein> sourceProteins = new ArrayList<>();
-         proteins.forEach(p -> {
+    	accessLogger.log(requestProvider.get());    
+        final Set<Protein> proteins = proteinDAO.getByPeptide(Peptide.peptide(Identifier.of(id), AminoAcidSequence.empty()));
+        final List<SourceProtein> sourceProteins = new ArrayList<>();
+        proteins.forEach(p -> {
         	 final Option<ProteinInformation> proteinInfoO = proteinInfoDAO.getByProtein(p);
         	 final Option<MetagenomeInformation> metagenomeInfoO = metagenomeInfoDAO.getByProtein(p);
         	 final Option<MetagenomeMIxS> metagenomeMIxSO = metagenomeMIxSDAO.getByProtein(p);
@@ -180,6 +198,7 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     @POST
     @Path("peptides/search")
     public Response search(final SearchWrapper search){
+    	accessLogger.log(requestProvider.get());    
     	final BlastOptions blastOptions = new BlastOptions( search.getNum_alignments(),
 															search.getEvalue(),
 															search.getBlast_threshold(),

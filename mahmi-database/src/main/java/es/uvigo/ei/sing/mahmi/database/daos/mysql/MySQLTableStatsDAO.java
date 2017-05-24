@@ -1,22 +1,25 @@
 package es.uvigo.ei.sing.mahmi.database.daos.mysql;
 
+import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.identifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.longInt;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseIdentifier;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseLong;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.parseString;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.prepare;
+import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.sql;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import lombok.val;
-import lombok.experimental.ExtensionMethod;
-
-import fj.control.db.DB;
 
 import es.uvigo.ei.sing.mahmi.common.entities.TableStat;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.extensions.IterableExtensionMethods;
 import es.uvigo.ei.sing.mahmi.database.connection.ConnectionPool;
 import es.uvigo.ei.sing.mahmi.database.daos.TableStatsDAO;
-
-import static es.uvigo.ei.sing.mahmi.common.entities.TableStat.tableStat;
-import static es.uvigo.ei.sing.mahmi.database.utils.FunctionalJDBC.*;
+import fj.control.db.DB;
+import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(IterableExtensionMethods.class)
 public class MySQLTableStatsDAO extends MySQLAbstractDAO<TableStat> implements TableStatsDAO{
@@ -41,11 +44,9 @@ public class MySQLTableStatsDAO extends MySQLAbstractDAO<TableStat> implements T
   
     @Override
     protected TableStat parse(ResultSet resultSet) throws SQLException {
-        val id      = parseIdentifier(resultSet, "table_stats_id");
-        val name    = parseString(resultSet,"table_stats_name");
-        val counter = parseLong(resultSet, "table_stats_counter");
-
-        return tableStat(id, name, counter);
+    	return tableStat(parseIdentifier(resultSet, "table_stats_id"),
+				         parseString(resultSet,"table_stats_name"),
+				         parseLong(resultSet, "table_stats_counter"));
     }
     
     @Override
@@ -61,17 +62,17 @@ public class MySQLTableStatsDAO extends MySQLAbstractDAO<TableStat> implements T
     @Override
     protected DB<PreparedStatement> prepareSelect(Identifier id) {
         return sql(
-                "SELECT * FROM table_stats WHERE table_stats_id=?",
-                id
-            );
+            "SELECT * FROM table_stats WHERE table_stats_id=?",
+            id
+        );
     }
     
     @Override
     protected DB<PreparedStatement> prepareSelect(int limit, int offset) {
         return sql(
-                "SELECT * FROM table_stats LIMIT ? OFFSET ?",
-            limit, offset
-            );
+            "SELECT * FROM table_stats LIMIT ? OFFSET ?",
+        limit, offset
+        );
     }
     
     @Override

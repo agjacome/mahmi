@@ -57,7 +57,6 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
             "SELECT * FROM metagenomes NATURAL JOIN projects WHERE metagenome_id = ? LIMIT 1",
             id
         );
-
         val statement = sql.bind(query).bind(getWith(this::parseWithFasta));
         return read(statement).toOption();
     }
@@ -68,7 +67,6 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
             "SELECT COUNT(metagenome_id) FROM metagenomes WHERE project_id = ?",
             project.getId()
         );
-
         val statement = sql.bind(query).bind(count);
         return read(statement);
     }
@@ -79,64 +77,13 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     ) throws DAOException {
         val sql = sql(
             "SELECT metagenome_id, project_id, project_name, project_repository " +
-            "FROM metagenomes NATURAL JOIN projects " +
+            "FROM projects NATURAL JOIN metagenomes " +
             "WHERE project_id = ? " +
             "ORDER BY metagenome_id LIMIT ? OFFSET ?",
             project.getId()
         ).bind(integer(2, count)).bind(integer(3, start));
-
         val statement = sql.bind(query).bind(get);
         return read(statement).toSet(ordering);
-    }
-
-    @Override
-    public Set<MetaGenome> search(
-        final Project project, final int start, final int count
-    ) throws DAOException {
-        // TODO: clean-up
-        val sql = sql(
-            "SELECT metagenome_id, project_id, project_name, project_repository " +
-            "FROM metagenomes NATURAL JOIN projects " +
-            "WHERE (? = 0 OR project_id = ?) AND " +
-            "(? = '' OR project_name = ?) AND " +
-            "(? = '' OR project_repository = ?) " +
-            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
-            project.getId(),project.getId()
-        ).bind(string(3,project.getName()))
-         .bind(string(4,project.getName()))
-         .bind(string(5,project.getRepository()))
-         .bind(string(6,project.getRepository()))
-         .bind(integer(7, count))
-         .bind(integer(8, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toSet(ordering);
-    }
-
-    @Override
-    public Set<MetaGenome> getByProtein(
-        final Protein protein, final int start, final int count
-    ) throws DAOException {
-        val sql = sql(
-            "SELECT metagenome_id, project_id, project_name, project_repository " +
-            "FROM metagenomes NATURAL JOIN projects NATURAL JOIN metagenome_proteins " +
-            "WHERE protein_id = ? " +
-            "ORDER BY metagenome_id LIMIT ? OFFSET ?",
-            protein.getId()
-        ).bind(integer(2, count)).bind(integer(3, start));
-
-        val statement = sql.bind(query).bind(get);
-        return read(statement).toSet(ordering);
-    }
-
-    @Override
-    public void addProtein(
-        final MetaGenome metaGenome, final Protein protein, final long counter
-    ) throws DAOException {
-        val sql = prepareProteinInsert(metaGenome, protein, counter);
-
-        val statement = sql.bind(update);
-        write(statement);
     }
 
 
@@ -157,26 +104,10 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     }
 
     @Override
-    public void removeProtein(
-        final MetaGenome metaGenome, final Protein protein
-    ) throws DAOException {
-        val sql = sql(
-            "DELETE FROM metagenome_proteins " +
-            "WHERE metagenome_id = ? AND protein_id = ?",
-            metaGenome.getId(), protein.getId()
-        );
-
-        val statement = sql.bind(update);
-        write(statement);
-    }
-
-
-    @Override
     protected MetaGenome parse(final ResultSet results) throws SQLException {
-        val id      = parseIdentifier(results, "metagenome_id");
-        val project = parseProject(results);
-
-        return metagenome(id, project, Fasta.empty());
+    	return metagenome(parseIdentifier(results, "metagenome_id"),
+				          parseProject(results), 
+				          Fasta.empty());
     }
 
 
@@ -202,8 +133,6 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
         );
     }
 
-
-
     @Override
     public DB<PreparedStatement> prepareCount() {
         return prepare("SELECT COUNT(metagenome_id) FROM metagenomes");
@@ -211,13 +140,10 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
 
     @Override
     protected DB<PreparedStatement> prepareInsert(final MetaGenome metaGenome) {
-        val project = metaGenome.getProject().getId();
-        val genomes = metaGenome.getFasta();
-
         return sql(
             "INSERT INTO metagenomes (project_id, metagenome_fasta) VALUES (?, ?)",
-            project
-        ).bind(fasta(2, genomes));
+            metaGenome.getProject().getId()
+        ).bind(fasta(2, metaGenome.getFasta()));
     }
 
     @Override
@@ -227,13 +153,9 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
 
     @Override
     protected DB<PreparedStatement> prepareUpdate(final MetaGenome metaGenome) {
-        val id      = metaGenome.getId();
-        val project = metaGenome.getProject().getId();
-        val genomes = metaGenome.getFasta();
-
         return prepare(
             "UPDATE metagenomes SET project_id = ?, metagenome_fasta = ? WHERE metagenome_id = ?"
-        ).bind(identifier(1, project)).bind(fasta(2, genomes)).bind(identifier(3, id));
+        ).bind(identifier(1, metaGenome.getProject().getId())).bind(fasta(2, metaGenome.getFasta())).bind(identifier(3, metaGenome.getId()));
     }
 
     @Override
@@ -255,26 +177,20 @@ public final class MySQLMetaGenomesDAO extends MySQLAbstractDAO<MetaGenome> impl
     private MetaGenome parseWithFasta(
         final ResultSet results
     ) throws SQLException {
-        val metaGenome  = parse(results);
-        val genomeFasta = parseFasta(results);
-
-        return metaGenome.withFasta(genomeFasta);
+        return parse(results).withFasta(parseFasta(results));
     }
 
     private Project parseProject(final ResultSet results) throws SQLException {
-        val id   = parseIdentifier(results, "project_id");
-        val name = parseString(results, "project_name");
-        val repo = parseString(results, "project_repository");
-
-        return project(id, name, repo);
+    	return project(parseIdentifier(results, "project_id"),
+				       parseString(results, "project_name"),
+				       parseString(results, "project_repository"));
     }
 
     private Fasta<NucleobaseSequence> parseFasta(
         final ResultSet results
     ) throws SQLException {
         try {
-            val input = parseBlob(results, "metagenome_fasta");
-            return FastaReader.forNucleobase().fromInput(input);
+            return FastaReader.forNucleobase().fromInput(parseBlob(results, "metagenome_fasta"));
         } catch (final IOException ioe) {
             throw new SQLException(ioe);
         }

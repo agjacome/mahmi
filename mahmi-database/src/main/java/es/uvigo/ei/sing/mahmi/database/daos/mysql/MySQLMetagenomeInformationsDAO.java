@@ -47,28 +47,23 @@ public class MySQLMetagenomeInformationsDAO extends MySQLAbstractDAO<MetagenomeI
   
     @Override
     protected MetagenomeInformation parse(ResultSet resultSet) throws SQLException {    	
-        final Identifier id = parseIdentifier(resultSet, "metagenome_information_id");
-	    final Protein protein = parseProtein(resultSet);
-	    final String  geneLength = parseString(resultSet, "gene_length");
-	    final String  geneCompleteness = parseString(resultSet, "gene_completeness");
-	    final String  geneOrigin = parseString(resultSet, "gene_origin");
-	    final String  speciesAnnotationPhylum = parseString(resultSet, "species_annotation_phylum");
-	    final String  speciesAnnotationGenus = parseString(resultSet, "species_annotation_genus");
-	    final String  keggAnnotationPhylum = parseString(resultSet, "kegg_annotation_phylum");
-	    final String  sampleOcurrenceFrequency = parseString(resultSet, "sample_occurrence_frequency");
-	    final String  individualOcurrenceFrequency = parseString(resultSet, "individual_occurrence_frequency");
-	    final String  keggFunctionalCategory  = parseString(resultSet, "kegg_functional_category");
-        return metagenomeInformation(id, protein, geneLength, 
-					        		 geneCompleteness, geneOrigin, speciesAnnotationPhylum, speciesAnnotationGenus, 
-					        		 keggAnnotationPhylum, sampleOcurrenceFrequency,  individualOcurrenceFrequency,
-					        		 keggFunctionalCategory  );
+    	return metagenomeInformation(parseIdentifier(resultSet, "metagenome_information_id"),
+    								 parseProtein(resultSet),
+	    							 parseString(resultSet, "gene_length"),
+							    	 parseString(resultSet, "gene_completeness"),
+							    	 parseString(resultSet, "gene_origin"),
+							    	 parseString(resultSet, "species_annotation_phylum"),
+							    	 parseString(resultSet, "species_annotation_genus"),
+							    	 parseString(resultSet, "kegg_annotation_phylum"),
+							    	 parseString(resultSet, "sample_occurrence_frequency"),
+							    	 parseString(resultSet, "individual_occurrence_frequency"),
+							    	 parseString(resultSet, "kegg_functional_category"));
     }
     
     private Protein parseProtein(ResultSet resultSet) throws SQLException {
-    	val id  = parseIdentifier(resultSet, "protein_id");
-        val seq = parseAASequence(resultSet, "protein_sequence");
-    	val name = parseString(resultSet, "protein_name");
-    	return protein(id, seq, name);
+    	return protein(parseIdentifier(resultSet, "protein_id"),
+        			   parseAASequence(resultSet, "protein_sequence"),
+        			   parseString(resultSet, "protein_name"));
     }
     
     @Override
@@ -84,17 +79,17 @@ public class MySQLMetagenomeInformationsDAO extends MySQLAbstractDAO<MetagenomeI
     @Override
     protected DB<PreparedStatement> prepareSelect(Identifier id) {
         return sql(
-                "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE metagenome_information_id=?",
-                id
-            );
+            "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE metagenome_information_id=?",
+            id
+        );
     }
     
     @Override
     protected DB<PreparedStatement> prepareSelect(int limit, int offset) {
         return sql(
-                "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins LIMIT ? OFFSET ?",
-            limit, offset
-            );
+            "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins LIMIT ? OFFSET ?",
+        limit, offset
+        );
     }
     
     @Override
@@ -111,7 +106,7 @@ public class MySQLMetagenomeInformationsDAO extends MySQLAbstractDAO<MetagenomeI
 	public Option<MetagenomeInformation> getByProtein(Protein protein)
 			throws DAOException {
 		val sql = sql(
-                "SELECT * FROM metagenome_information NATURAL JOIN proteins WHERE protein_id=?",
+                "SELECT * FROM proteins NATURAL JOIN metagenome_information WHERE protein_id=?",
                 protein.getId()
             ).bind(query).bind(get);
         return read(sql).toOption();
@@ -121,7 +116,7 @@ public class MySQLMetagenomeInformationsDAO extends MySQLAbstractDAO<MetagenomeI
 	public Set<MetagenomeInformation> getByPeptide(Peptide peptide)
 			throws DAOException {
 		val sql = sql(
-                "SELECT * FROM metagenome_information NATURAL JOIN digestions NATURAL JOIN proteins NATURAL JOIN peptides WHERE peptide_id=?",
+                "SELECT * FROM peptides natural join proteins natural join digestions natural join metagenome_information WHERE peptide_id=?",
                 peptide.getId()
             ).bind(query).bind(get);
         return read(sql).toSet(ordering);

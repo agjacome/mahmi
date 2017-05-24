@@ -39,16 +39,13 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
 
     @Override
     protected Enzyme parse(final ResultSet results) throws SQLException {
-        val id   = parseIdentifier(results, "enzyme_id");
-        val name = parseString(results, "enzyme_name");
-
-        return enzyme(id, name);
+        return enzyme(parseIdentifier(results, "enzyme_id"),
+        			  parseString(results, "enzyme_name"));
     }
 
     @Override
     protected DB<PreparedStatement> prepareSelect(final Enzyme enzyme) {
-        val name = enzyme.getName();
-        return sql("SELECT * FROM enzymes WHERE enzyme_name = ? LIMIT 1", name);
+        return sql("SELECT * FROM enzymes WHERE enzyme_name = ? LIMIT 1", enzyme.getName());
     }
 
     @Override
@@ -84,12 +81,9 @@ public final class MySQLEnzymesDAO extends MySQLAbstractDAO<Enzyme> implements E
 
     @Override
     protected DB<PreparedStatement> prepareUpdate(final Enzyme enzyme) {
-        val id   = enzyme.getId();
-        val name = enzyme.getName();
-
         return sql(
-            "UPDATE enzymes SET enzyme_name = ? WHERE enzyme_id = ?", name
-        ).bind(identifier(2, id));
+            "UPDATE enzymes SET enzyme_name = ? WHERE enzyme_id = ?", enzyme.getName()
+        ).bind(identifier(2, enzyme.getId()));
     }
 
 }

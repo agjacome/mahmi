@@ -47,22 +47,18 @@ public class MySQLProteinInformationsDAO extends MySQLAbstractDAO<ProteinInforma
   
     @Override
     protected ProteinInformation parse(ResultSet resultSet) throws SQLException {
-        val id        		= parseIdentifier(resultSet, "protein_information_id");
-        val protein   		= parseProtein(resultSet);
-        val uniprotId 		= parseString(resultSet, "uniprot_id");
-        val uniprotOrganism = parseString(resultSet, "uniprot_organism");
-        val uniprotProtein  = parseString(resultSet, "uniprot_protein");
-        val uniprotGene     = parseString(resultSet, "uniprot_gene");
-
-        return proteinInformation(id, protein, uniprotId, uniprotOrganism, uniprotProtein, uniprotGene);
+    	return proteinInformation(parseIdentifier(resultSet, "protein_information_id"),
+						          parseProtein(resultSet),
+						          parseString(resultSet, "uniprot_id"),
+						          parseString(resultSet, "uniprot_organism"),
+						          parseString(resultSet, "uniprot_protein"),
+						          parseString(resultSet, "uniprot_gene"));
     }
     
     private Protein parseProtein(ResultSet resultSet) throws SQLException {
-    	val id  = parseIdentifier(resultSet, "protein_id");
-        val seq = parseAASequence(resultSet, "protein_sequence");
-        val name = parseString(resultSet, "protein_name");
-    	
-    	return protein(id, seq, name);
+    	return protein(parseIdentifier(resultSet, "protein_id"),
+			           parseAASequence(resultSet, "protein_sequence"),
+			           parseString(resultSet, "protein_name"));
     }
     
     @Override
@@ -78,17 +74,17 @@ public class MySQLProteinInformationsDAO extends MySQLAbstractDAO<ProteinInforma
     @Override
     protected DB<PreparedStatement> prepareSelect(Identifier id) {
         return sql(
-                "SELECT * FROM protein_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE protein_information_id=?",
-                id
-            );
+            "SELECT * FROM protein_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE protein_information_id=?",
+            id
+        );
     }
     
     @Override
     protected DB<PreparedStatement> prepareSelect(int limit, int offset) {
         return sql(
-                "SELECT * FROM protein_information NATURAL JOIN digestions NATURAL JOIN proteins LIMIT ? OFFSET ?",
-            limit, offset
-            );
+            "SELECT * FROM protein_information NATURAL JOIN digestions NATURAL JOIN proteins LIMIT ? OFFSET ?",
+        limit, offset
+        );
     }
     
     @Override
@@ -105,9 +101,9 @@ public class MySQLProteinInformationsDAO extends MySQLAbstractDAO<ProteinInforma
 	public Option<ProteinInformation> getByProtein(Protein protein)
 			throws DAOException {
 		val sql = sql(
-                "SELECT * FROM protein_information NATURAL JOIN digestions NATURAL JOIN proteins WHERE protein_id=?",
-                protein.getId()
-            ).bind(query).bind(get);
+            "SELECT * FROM proteins NATURAL JOIN digestions NATURAL JOIN protein_information WHERE protein_id=?",
+            protein.getId()
+        ).bind(query).bind(get);
         return read(sql).toOption();
 	}
 
@@ -115,9 +111,9 @@ public class MySQLProteinInformationsDAO extends MySQLAbstractDAO<ProteinInforma
 	public Set<ProteinInformation> getByPeptide(Peptide peptide)
 			throws DAOException {
 		val sql = sql(
-                "SELECT * FROM protein_information NATURAL JOIN digestions NATURAL JOIN proteins NATURAL JOIN peptides WHERE peptide_id=?",
-                peptide.getId()
-            ).bind(query).bind(get);
+            "SELECT * FROM peptides NATURAL JOIN digestions NATURAL JOIN proteins NATURAL JOIN protein_information WHERE peptide_id=?",
+            peptide.getId()
+        ).bind(query).bind(get);
         return read(sql).toSet(ordering);
 	}
    
