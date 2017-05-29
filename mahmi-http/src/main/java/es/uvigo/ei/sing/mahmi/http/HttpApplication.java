@@ -87,7 +87,7 @@ public final class HttpApplication extends Application {
             enzymeService(enzymesDAO),
             metaGenomeService(metaGenomesDAO),
             metaGenomeProteinsService(metaGenomeProteinsDAO),
-            peptideService(peptidesDAO),
+            peptideService(peptidesDAO, accessLogger),
             projectService(projectsDAO, loaderController),
             proteinService(proteinsDAO),
             tableStatService(tableStatsDAO),

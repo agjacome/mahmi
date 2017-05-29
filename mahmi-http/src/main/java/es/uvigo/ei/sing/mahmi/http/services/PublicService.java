@@ -134,44 +134,6 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
     }
     
     @GET
-    @Path("private/peptides")
-    public Response exploreBioactives(
-        @QueryParam("page") @DefaultValue( "1") final int page,
-        @QueryParam("size") @DefaultValue("50") final int size,
-        @QueryParam("filterType") @DefaultValue("") final String filterType,
-        @QueryParam("filter") @DefaultValue("") final String filter
-    ) {
-    	accessLogger.log(requestProvider.get());    
-    	switch(filterType){
-    		case "organism":
-    			return respond(
-		            () -> dao.getBioactivesByOrganism((page - 1) * size, size, "%"+filter+"%"),
-		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-		        );    		
-    		case "gene":
-    			return respond(
-		            () -> dao.getBioactivesByGene((page - 1) * size, size, "%"+filter+"%"),
-		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-		        );    			
-    		case "protein":
-    			return respond(
-		            () -> dao.getBioactivesByProtein((page - 1) * size, size, "%"+filter+"%"),
-		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-		        );    		
-    		case "length":
-    			return respond(
-		            () -> dao.getBioactivesByLength((page - 1) * size, size, filter),
-		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-		        );    			
-    		default:
-    			return respond(
-		            () -> dao.getBioactives((page - 1) * size, size),
-		            as -> status(OK).entity(bioactiveToGenericEntity(as))
-		        );    			
-    	}
-    }
-    
-    @GET
     @Path("peptides/sourceProteins/{id}")
     public Response getProteinsInfo(@PathParam("id") final int id){
     	accessLogger.log(requestProvider.get());    
