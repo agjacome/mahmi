@@ -1,6 +1,14 @@
 package es.uvigo.ei.sing.mahmi.browser.utils;
 
-//ProMoST
+import es.uvigo.ei.sing.mahmi.browser.Browser;
+
+/**
+ * {@linkplain Browser} is a class that provides isoelectric point and molecular weight calculator
+ * using ProMoST algorithm
+ * 
+ * @author Aitor Blanco-Miguez
+ *
+ */
 public class PeptideCalculator {
 	
 	final static char[] aminoac    = { 'A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I', 'L', 'K', 'M',
@@ -20,12 +28,24 @@ public class PeptideCalculator {
 	                            131.1926, 147.1766, 97.1167, 87.0782, 101.1051, 186.2132,
 	                            163.176, 99.1326 };
 	
+	/**
+	 * Calculates the isoelectric point of an amino acid sequence
+	 * 
+	 * @param sequence An amino acid sequence
+	 * @return The isoelectric point of the sequence
+	 */
 	public double calculatePI (final String sequence) {
 		double pI = findPi(doFormula(0.0, sequence), 0.5, 0.0, sequence) - 0.5;
 		pI = findPi(doFormula(pI, sequence), .01, pI, sequence) - .01;			
 		return Math.round(pI*Math.pow(10,2))/Math.pow(10,2);
 	}
 	
+	/**
+	 * Calculates the molecular weight of an amino acid sequence
+	 * 
+	 * @param sequence An amino acid sequence
+	 * @return The molecular weight of the sequence
+	 */
 	public Double calculateMW(final String sequence){
 		char aminoAcid;
 		Double mW = 18.01524;

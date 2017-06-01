@@ -21,6 +21,10 @@ import static fj.Hash.stringHash;
 import static fj.Ord.stringOrd;
 import static fj.data.Array.array;
 
+/**
+ * @author Alberto Gutierrez-Jacome
+ *
+ */
 @Slf4j
 @Getter
 @AllArgsConstructor(staticName = "fromByteArray")

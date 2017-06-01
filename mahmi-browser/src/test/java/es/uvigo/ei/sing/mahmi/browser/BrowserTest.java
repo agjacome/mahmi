@@ -389,60 +389,99 @@ public class BrowserTest
 //			e.printStackTrace();
 //		}
     	
-    	
-    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/uniprot/mhproteins.21.sql", false)))){	    	
-	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/uniprot/mhproteins.21.out"));
+    	String line = "";
+        String previous = "";
+        
+    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/uniprot/mhproteins.18.sql", false)))){	    	
+	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/uniprot/mhproteins.18.2.out"));
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-	        String line;
 	        while ((line = reader.readLine()) != null) {
-	            if(line.startsWith("Query=")){
-	            	String nextLine = reader.readLine();
-	            	boolean nohits = false;
-	            	while(!nextLine.startsWith(">")){
-	            		nextLine = reader.readLine();
-	            		if(nextLine.startsWith("*****")){
-	            			nohits = true;
-	            			break;
-	            		}
-	            	}
-	            	if(!nohits){
-		            	String indv = nextLine;
-		            	nextLine = reader.readLine();
-		            	while(!nextLine.startsWith("Length=")){
-		            		indv+=nextLine;
-		            		nextLine = reader.readLine();
-		            	}
-		            	String prot_id = line.substring(7);
-		            	String description = indv.substring(1);
-		            	String info = description.split("[|]")[2];
-		            	String uniprot_id = description.split("[|]")[1];
-		            	String uniprot_protein = "";
-		            	String uniprot_organism = "";
-		            	String uniprot_gene = "";
-		            	try{
-		            		uniprot_protein = info.split("OS=")[0].replace("'", "");
-		            		uniprot_protein = uniprot_protein.substring(0, uniprot_protein.length()-1);
-		            	}catch(Exception e){ }
-		            	try{
-		            		uniprot_gene = info.split("OS=")[1].split("GN=")[1].split("PE=")[0].replace("'", "");
-		            		uniprot_gene = uniprot_gene.substring(0, uniprot_gene.length()-1);
-		            	}catch(Exception e){ }
-		            	try{
-		            		uniprot_organism = info.split("OS=")[1].split("GN=")[0].replace("'", "");
-		            		uniprot_organism = uniprot_organism.substring(0, uniprot_organism.length()-1);
-		            	}catch(Exception e){ }
-		            	String sql = "INSERT INTO protein_information (protein_id, uniprot_id, uniprot_organism, uniprot_protein, uniprot_gene) VALUES "
-		            			+ "("+prot_id+",'"+uniprot_id+"', '"+uniprot_organism+"', '"+uniprot_protein+"', '"+uniprot_gene+"');";
-//		            	System.out.println(sql);
-		            	pw.println(sql);
-	            	}
+	            String[] ln = line.split("\t");
+	            if(!previous.equals(ln[0])){
+		        	previous = ln[0];
+	            	String prot_id = ln[0];
+	            	String uniprot_id = ln[1].split("[|]")[1];
+	            	String uniprot_protein = "";
+	            	String uniprot_organism = "";
+	            	String uniprot_gene = "";
+	            	try{
+		            	uniprot_protein = ln[1].split("[|]")[2]+" "+ln[2].split("OS=")[0].replaceAll("'", "").replaceAll("\"", "");
+		        		uniprot_protein = uniprot_protein.substring(0, uniprot_protein.length()-1);
+	            	}catch (Exception e){}
+	        		try{
+		            	uniprot_organism = ln[2].split("OS=")[1].split("GN=")[0].replaceAll("'", "").replaceAll("\"", "");
+		        		uniprot_organism = uniprot_organism.substring(0, uniprot_organism.length()-1);
+	        		}catch (Exception e){}
+	        		try{
+		            	uniprot_gene = ln[2].split("OS=")[1].split("GN=")[1].split("PE=")[0].replaceAll("'", "").replaceAll("\"", "");
+		        		uniprot_gene = uniprot_gene.substring(0, uniprot_gene.length()-1);
+	        		}catch (Exception e){}
+	
+	            	String sql = "INSERT IGNORE INTO protein_information (protein_id, uniprot_id, uniprot_organism, uniprot_protein, uniprot_gene) VALUES "
+	            			+ "("+prot_id+",'"+uniprot_id+"', '"+uniprot_organism+"', '"+uniprot_protein+"', '"+uniprot_gene+"');";
+	//		            	System.out.println(sql);
+	            	pw.println(sql);
 	            }
-	        }  //Prints the string content read from input stream
+	        }
 	        reader.close();
 
         }catch(IOException e){
         	e.printStackTrace();
         }    	
+//    	
+//    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/mh.sql", false)))){	    	
+//	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/mh.out"));
+//	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+//	        String line;
+//	        while ((line = reader.readLine()) != null) {
+//	            if(line.startsWith("Query=")){
+//	            	String nextLine = reader.readLine();
+//	            	boolean nohits = false;
+//	            	while(!nextLine.startsWith(">")){
+//	            		nextLine = reader.readLine();
+//	            		if(nextLine.startsWith("*****")){
+//	            			nohits = true;
+//	            			break;
+//	            		}
+//	            	}
+//	            	if(!nohits){
+//		            	String indv = nextLine;
+//		            	nextLine = reader.readLine();
+//		            	while(!nextLine.startsWith("Length=")){
+//		            		indv+=nextLine;
+//		            		nextLine = reader.readLine();
+//		            	}
+//		            	String prot_id = line.substring(7);
+//		            	String description = indv.substring(1);
+//		            	String info = description.split("[|]")[2];
+//		            	String uniprot_id = description.split("[|]")[1];
+//		            	String uniprot_protein = "";
+//		            	String uniprot_organism = "";
+//		            	String uniprot_gene = "";
+//		            	try{
+//		            		uniprot_protein = info.split("OS=")[0].replace("'", "");
+//		            		uniprot_protein = uniprot_protein.substring(0, uniprot_protein.length()-1);
+//		            	}catch(Exception e){ }
+//		            	try{
+//		            		uniprot_gene = info.split("OS=")[1].split("GN=")[1].split("PE=")[0].replace("'", "");
+//		            		uniprot_gene = uniprot_gene.substring(0, uniprot_gene.length()-1);
+//		            	}catch(Exception e){ }
+//		            	try{
+//		            		uniprot_organism = info.split("OS=")[1].split("GN=")[0].replace("'", "");
+//		            		uniprot_organism = uniprot_organism.substring(0, uniprot_organism.length()-1);
+//		            	}catch(Exception e){ }
+//		            	String sql = "INSERT INTO protein_information (protein_id, uniprot_id, uniprot_organism, uniprot_protein, uniprot_gene) VALUES "
+//		            			+ "("+prot_id+",'"+uniprot_id+"', '"+uniprot_organism+"', '"+uniprot_protein+"', '"+uniprot_gene+"');";
+////		            	System.out.println(sql);
+//		            	pw.println(sql);
+//	            	}
+//	            }
+//	        }  //Prints the string content read from input stream
+//	        reader.close();
+//
+//        }catch(IOException e){
+//        	e.printStackTrace();
+//        }    	
     	
 //    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/insertChemprotTrain.sql", false)))){	    	
 //	    	InputStream in = new FileInputStream(new File("/home/mahmi/Downloads/chemprot_train_abstracts.tsv"));

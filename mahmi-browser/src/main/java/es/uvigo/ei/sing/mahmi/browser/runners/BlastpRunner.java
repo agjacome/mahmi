@@ -8,87 +8,133 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
-import es.uvigo.ei.sing.mahmi.browser.utils.BlastOptions;
 
+/**
+ * {@linkplain BlastpRunner} is the blastp binaries executor.
+ *
+ * @author Aitor Blanco-Miguez
+ * 
+ * @see BlastOptions
+ *
+ */
 @Slf4j
 @AllArgsConstructor(staticName = "blastp")
 final public class BlastpRunner implements Runnable {
 
-    private final Path         input;
-    private final Path         output;
-    private final String       db;
-    private final BlastOptions blastOptions;
+	/**
+	 * The input sequence path
+	 */
+	private final Path input;
+	
+	/**
+	 * The alignments output path
+	 */
+	private final Path output;
+	
+	/**
+	 * The Blast database against which to align
+	 */
+	private final String db;
+	
+	/**
+	 * The BlastP execution options
+	 */
+	private final BlastOptions blastOptions;
 
-    @Override
-    public void run() {
-        try {
-            val process = buildProcess().start();
-            redirectErrorToLogs(process);
-            checkExitValue(process.waitFor());
-        } catch (final IOException | InterruptedException ie){
-            log.error("BlastP error", ie);
-            throw new RuntimeException(ie);
-        }
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+	public void run() {
+		try {
+			val process = buildProcess().start();
+			redirectErrorToLogs(process);
+			checkExitValue(process.waitFor());
+		} catch (final IOException | InterruptedException ie) {
+			log.error("BlastP error", ie);
+			throw new RuntimeException(ie);
+		}
+	}
 
-    private ProcessBuilder buildProcess() {
-    	final List<String> blastWithOptions =  getBlastWithOptions();
-        return new ProcessBuilder(
-        		blastWithOptions.toArray(new String[blastWithOptions.size()])
-        ).redirectOutput(output.toFile());
-    }
-    
-    private List<String> getBlastWithOptions(){
-    	final List<String> blast = new ArrayList<String>();
-    	blast.add("blastp");
-    	blast.add("-query");
-    	blast.add(input.toString());
-    	blast.add("-db");
-    	blast.add(db);
-    	blast.add("-evalue");
-    	blast.add(String.valueOf(blastOptions.getEvalue()));
-    	blast.add("-word_size");
-    	blast.add(String.valueOf(blastOptions.getWord_size()));
-    	blast.add("-gapopen");
-    	blast.add(String.valueOf(blastOptions.getGapopen()));
-    	blast.add("-gapextend");
-    	blast.add(String.valueOf(blastOptions.getGapextend()));
-    	blast.add("-threshold");
-    	blast.add(String.valueOf(blastOptions.getBlast_threshold()));
-    	blast.add("-num_alignments");
-    	blast.add(String.valueOf(blastOptions.getNum_alignments()));
-    	blast.add("-window_size");
-    	blast.add(String.valueOf(blastOptions.getWindow_size()));
+	/**
+	 * Builds the blastp execution process
+	 * 
+	 * @return the {@link ProcessBuilder} of blastp execution
+	 */
+	private ProcessBuilder buildProcess() {
+		final List<String> blastWithOptions = getBlastWithOptions();
+		return new ProcessBuilder(blastWithOptions.toArray(new String[blastWithOptions.size()]))
+				.redirectOutput(this.output.toFile());
+	}
 
-    	if(blastOptions.isUngapped()){
-        	blast.add("-comp_based_stats");
-    		blast.add("-ungapped");
-    	}
-    	if(blastOptions.getBest_hit_overhang() > 0){
-        	blast.add("-best_hit_overhang");
-    		blast.add(String.valueOf(blastOptions.getBest_hit_overhang()));    		
-    	}
-    	if(blastOptions.getBest_hit_score_edge() > 0){
-        	blast.add("-best_hit_score_edge");
-    		blast.add(String.valueOf(blastOptions.getBest_hit_score_edge()));    		
-    	}
-    	
-    	return blast;
-    }
+	/**
+	 * Constructs the BlastP command with the {@link BlastOptions}
+	 * 
+	 * @return The {@code List} of constructed BlastP options
+	 */
+	private List<String> getBlastWithOptions() {
+		final List<String> blast = new ArrayList<String>();
+		blast.add("blastp");
+		blast.add("-query");
+		blast.add(this.input.toString());
+		blast.add("-db");
+		blast.add(this.db);
+		blast.add("-evalue");
+		blast.add(String.valueOf(this.blastOptions.getEvalue()));
+		blast.add("-word_size");
+		blast.add(String.valueOf(this.blastOptions.getWord_size()));
+		blast.add("-gapopen");
+		blast.add(String.valueOf(this.blastOptions.getGapopen()));
+		blast.add("-gapextend");
+		blast.add(String.valueOf(this.blastOptions.getGapextend()));
+		blast.add("-threshold");
+		blast.add(String.valueOf(this.blastOptions.getBlast_threshold()));
+		blast.add("-num_alignments");
+		blast.add(String.valueOf(this.blastOptions.getNum_alignments()));
+		blast.add("-window_size");
+		blast.add(String.valueOf(this.blastOptions.getWindow_size()));
 
-    private void checkExitValue(final int value) throws IOException {
-        if (value != 0) throw new IOException(
-            MessageFormat.format("BlastP exited anormally ({})", value)
-        );
-    }
+		if (this.blastOptions.isUngapped()) {
+			blast.add("-comp_based_stats");
+			blast.add("-ungapped");
+		}
+		if (this.blastOptions.getBest_hit_overhang() > 0) {
+			blast.add("-best_hit_overhang");
+			blast.add(String.valueOf(this.blastOptions.getBest_hit_overhang()));
+		}
+		if (this.blastOptions.getBest_hit_score_edge() > 0) {
+			blast.add("-best_hit_score_edge");
+			blast.add(String.valueOf(this.blastOptions.getBest_hit_score_edge()));
+		}
 
-    private void redirectErrorToLogs(final Process proc) throws IOException {
-        try (val stderr = new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
-            stderr.lines().forEach(log::info);
-        }
-    }
+		return blast;
+	}
+
+	/**
+	 * Checks if BlastP execution exited anormally
+	 * 
+	 * @param value The exit value
+	 * @throws IOException
+	 */
+	private void checkExitValue(final int value) throws IOException {
+		if (value != 0)
+			throw new IOException(MessageFormat.format("BlastP exited anormally ({})", value));
+	}
+
+	/**
+	 * Redirects errors to log
+	 * 
+	 * @param proc The process to log errors
+	 * @throws IOException
+	 */
+	private void redirectErrorToLogs(final Process proc) throws IOException {
+		try (val stderr = new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
+			stderr.lines().forEach(log::info);
+		}
+	}
 
 }

@@ -20,6 +20,10 @@ import static fj.Ord.optionOrd;
 import static fj.data.Natural.natural;
 import static fj.data.Option.none;
 
+/**
+ * @author Alberto Gutierrez-Jacome
+ *
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Identifier {

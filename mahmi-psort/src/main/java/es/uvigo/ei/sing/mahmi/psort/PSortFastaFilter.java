@@ -15,48 +15,98 @@ import es.uvigo.ei.sing.mahmi.common.serializers.fasta.FastaReader;
 
 import static es.uvigo.ei.sing.mahmi.psort.PSortRunner.psort;
 
+/**
+ * {@linkplain PSortFastaFilter} is a class that executes PSortB
+ * 
+ * @author Aitor Blanco-Miguez
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Fasta
+ * @see AminoAcidSequence
+ * @see PSortGramMode
+ * @see PSortFilterType
+ *
+ */
 @AllArgsConstructor(staticName = "of")
 public final class PSortFastaFilter {
 
-    private final PSortGramMode            mode;
-    private final EnumSet<PSortFilterType> filter;
+	/**
+	 * The PSortB gram mode
+	 */
+	private final PSortGramMode mode;
 
-    public Fasta<AminoAcidSequence> filter(final Path input) throws IOException {
-        val output = runPsort(input);
-        val fasta  = filterFasta(
-            FastaReader.forAminoAcid().fromPath(input), output
-        );
+	/**
+	 * The PSortB subcellular location filter
+	 */
+	private final EnumSet<PSortFilterType> filter;
 
-        Files.deleteIfExists(output);
+	/**
+	 * Runs PSortB over a sequence input file and filter by subcellular location
+	 * 
+	 * @param input
+	 *            The sequences input file
+	 * @return The filtered input sequences {@linkplain Fasta}
+	 * @throws IOException
+	 * 
+	 * @see Fasta
+	 * @see AminoAcidSequence
+	 */
+	public Fasta<AminoAcidSequence> filter(final Path input) throws IOException {
+		val output = runPsort(input);
+		val fasta = filterFasta(FastaReader.forAminoAcid().fromPath(input), output);
 
-        return fasta;
-    }
+		Files.deleteIfExists(output);
 
-    private Path runPsort(final Path input) {
-        val output = input.resolveSibling("psortb.out");
-        psort(mode, input, output).run();
-        return output;
-    }
+		return fasta;
+	}
 
-    // FIXME: all filtered sequences and contents of outfile are kept in memory,
-    // if the original Fasta file is too big or if the filter does not delete
-    // enough sequences, this can cause memory-related problems.
-    private Fasta<AminoAcidSequence> filterFasta(
-        final Fasta<AminoAcidSequence> fasta, final Path output
-    ) throws IOException {
-        val pattern = PSortFilterType.compile(filter);
+	/**
+	 * Runs PSortB and returns the ouput file
+	 * 
+	 * @param input
+	 *            The sequences input file
+	 * @return The PSortB output file
+	 */
+	private Path runPsort(final Path input) {
+		val output = input.resolveSibling("psortb.out");
+		psort(mode, input, output).run();
+		return output;
+	}
 
-        val outLines  = Files.lines(output).skip(1);
-        val fastaIter = fasta.iterator();
+	/*
+	 * FIXME: all filtered sequences and contents of outfile are kept in memory,
+	 * if the original Fasta file is too big or if the filter does not delete
+	 * enough sequences, this can cause memory-related problems.
+	 */
+	/**
+	 * Filters a {@linkplain Fasta} sequences by subcellular location
+	 * 
+	 * @param fasta
+	 *            The input {@linkplain Fasta} sequences
+	 * @param output
+	 *            The output PSortB file
+	 * @return The filtered {@linkplain Fasta} sequences
+	 * @throws IOException
+	 * 
+	 * @see Fasta
+	 * @see AminoAcidSequence
+	 */
+	private Fasta<AminoAcidSequence> filterFasta(	final Fasta<AminoAcidSequence> fasta,
+													final Path output) throws IOException {
+		val pattern = PSortFilterType.compile(filter);
 
-        val filtered = new java.util.LinkedList<AminoAcidSequence>();
+		val outLines = Files.lines(output).skip(1);
+		val fastaIter = fasta.iterator();
 
-        outLines.forEach(line -> {
-            val sequence = fastaIter.next();
-            if (Pattern.matches(pattern, line)) filtered.add(sequence);
-        });
+		val filtered = new java.util.LinkedList<AminoAcidSequence>();
 
-        return Fasta.of(filtered.iterator());
-    }
+		outLines.forEach(line -> {
+			val sequence = fastaIter.next();
+			if (Pattern.matches(pattern, line))
+				filtered.add(sequence);
+		});
+
+		return Fasta.of(filtered.iterator());
+	}
 
 }
