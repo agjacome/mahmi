@@ -392,8 +392,8 @@ public class BrowserTest
     	String line = "";
         String previous = "";
         
-    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/uniprot/mhproteins.18.sql", false)))){	    	
-	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/uniprot/mhproteins.18.2.out"));
+    	try ( PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("/home/mahmi/tempfiles/uniprot/mhproteins.21.sql", false)))){	    	
+	    	InputStream in = new FileInputStream(new File("/home/mahmi/tempfiles/uniprot/mhproteins.21.out"));
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 	        while ((line = reader.readLine()) != null) {
 	            String[] ln = line.split("\t");
@@ -417,7 +417,7 @@ public class BrowserTest
 		        		uniprot_gene = uniprot_gene.substring(0, uniprot_gene.length()-1);
 	        		}catch (Exception e){}
 	
-	            	String sql = "INSERT IGNORE INTO protein_information (protein_id, uniprot_id, uniprot_organism, uniprot_protein, uniprot_gene) VALUES "
+	            	String sql = "INSERT INTO protein_information (protein_id, uniprot_id, uniprot_organism, uniprot_protein, uniprot_gene) VALUES "
 	            			+ "("+prot_id+",'"+uniprot_id+"', '"+uniprot_organism+"', '"+uniprot_protein+"', '"+uniprot_gene+"');";
 	//		            	System.out.println(sql);
 	            	pw.println(sql);

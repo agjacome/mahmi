@@ -62,7 +62,7 @@ public class Browser {
 
 	/**
 	 * Performs a MAHMI web search against the reference/posible Blast database
-	 * Search an {@link AminiAcidSequence} aligning against the MAHMI Blast database(s)
+	 * Search an {@link AminoAcidSequence} aligning against the MAHMI Blast database(s)
 	 * 
 	 * @param sequence The sequence to align
 	 * @param databases The list of databases against witch to align. Accepted databases are 

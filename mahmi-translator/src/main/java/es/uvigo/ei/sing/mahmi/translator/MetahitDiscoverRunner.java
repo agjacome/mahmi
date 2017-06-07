@@ -17,6 +17,7 @@ import com.typesafe.config.ConfigFactory;
 
 import es.uvigo.ei.sing.mahmi.common.entities.sequences.AminoAcidSequence;
 
+@Deprecated
 @Slf4j
 @AllArgsConstructor(staticName = "mhdiscover")
 public class MetahitDiscoverRunner {

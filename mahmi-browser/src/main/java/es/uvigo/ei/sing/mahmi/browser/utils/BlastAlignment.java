@@ -488,7 +488,7 @@ public class BlastAlignment {
 	/**
 	 * The {@code comparison} setter function
 	 * 
-	 * @param comparation The comparison between query and subject
+	 * @param comparison The comparison between query and subject
 	 */
 	public void setComparison(String comparison) {
 		this.comparison = comparison;

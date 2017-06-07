@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Slf4j
 @AllArgsConstructor(staticName = "blastdbcmd")
 final class BlastDbCmdRunner implements Runnable {
