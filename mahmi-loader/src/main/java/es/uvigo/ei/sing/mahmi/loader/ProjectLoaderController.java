@@ -13,6 +13,7 @@ import fj.P2;
 import fj.data.HashMap;
 import fj.data.Set;
 
+import es.uvigo.ei.sing.mahmi.common.entities.Entity;
 import es.uvigo.ei.sing.mahmi.common.entities.MetaGenome;
 import es.uvigo.ei.sing.mahmi.common.entities.Project;
 import es.uvigo.ei.sing.mahmi.common.entities.Protein;
@@ -81,7 +82,7 @@ public final class ProjectLoaderController {
     /**
      * Loads the files of a {@link Project}
      * 
-     * @param project The project {@linkplain Entity}
+     * @param project The project {@link Entity}
      * @param projectPath The project path
      * @return The entity of the project and the {@linkplain CompletableFuture} of the file load
      * process
@@ -99,7 +100,7 @@ public final class ProjectLoaderController {
     /**
      * Inserts into MAHMI Database the genomes and the proteins FASTAS
      * 
-     * @param project The project {@linkplain Entity}
+     * @param project The project {@link Entity}
      * @param genomeFasta The FASTA of the genomes
      * @param proteinFasta The FASTA of the proteins
      * @throws LoaderException
@@ -124,7 +125,7 @@ public final class ProjectLoaderController {
     /**
      * Finds the files in the project path, loads the FASTAs and update the table stats.
      * 
-     * @param project The project {@linkplain Entity}
+     * @param project The project {@link Entity}
      * @param path The project path
      * 
      * @see Project
@@ -146,7 +147,7 @@ public final class ProjectLoaderController {
      * Inserts a protein FASTA into the MAHMI database and its metagenome-protein relationships
      * 
      * @param metaGenome The metagenome to related
-     * @param fasta The protein {@linkplain Fasta}
+     * @param fasta The protein {@link Fasta}
      * 
      * @see Fasta
      * @see AminoAcidSequence
@@ -171,7 +172,7 @@ public final class ProjectLoaderController {
      * Inserts a project into the MAHMI database
      * 
      * @param project The project to insert
-     * @return The project with {@linkplain Identifier}
+     * @return The project with {@link Identifier}
      * 
      * @see Project
      */
@@ -184,7 +185,7 @@ public final class ProjectLoaderController {
      * Inserts a metagenome into the MAHMI database
      * 
      * @param metaGenome The metagenome to insert
-     * @return The metagenome with {@linkplain Identifier}
+     * @return The metagenome with {@link Identifier}
      * 
      * @see Metagenome
      */
@@ -196,8 +197,8 @@ public final class ProjectLoaderController {
     /**
      * Inserts a set of proteins into the MAHMI database
      * 
-     * @param proteins The {@linkplain Set} of proteins to insert
-     * @return The proteins with {@linkplain Identifier}
+     * @param proteins The {@code Set} of proteins to insert
+     * @return The proteins with {@link Identifier}
      * 
      * @see Protein
      */

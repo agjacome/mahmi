@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@linkplain MGRastProjectLoader} is an implementation for {@link ProjectLoader} to loading 
- * MGRast based projects. Is the default loader of MAHMI
+ * MGRast based projects. Is the default project loader of MAHMI
  * 
  * @author Alberto Gutierrez-Jacome
  * @author Aitor Blanco-Miguez

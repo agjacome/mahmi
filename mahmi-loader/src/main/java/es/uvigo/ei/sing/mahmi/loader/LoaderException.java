@@ -1,7 +1,7 @@
 package es.uvigo.ei.sing.mahmi.loader;
 
 /**
- * {@linkplain LoaderException} is the MAHMI {@code Loader} custom {@linkplain Exception}
+ * {@linkplain LoaderException} is the MAHMI {@code Loader} custom {@linkplain RuntimeException}
  * 
  * @author Alberto Gutierrez-Jacome
  *
