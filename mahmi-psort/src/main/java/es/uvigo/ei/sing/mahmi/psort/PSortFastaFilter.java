@@ -46,7 +46,7 @@ public final class PSortFastaFilter {
 	 * @param input
 	 *            The sequences input file
 	 * @return The filtered input sequences {@linkplain Fasta}
-	 * @throws IOException 
+	 * @throws IOException
 	 * 
 	 * @see Fasta
 	 * @see AminoAcidSequence

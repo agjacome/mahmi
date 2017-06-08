@@ -16,29 +16,73 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
 
-@Getter @Wither
+/**
+ * {@linkplain ReferencePeptide} is a class that represents a reference peptide
+ * 
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Entity
+ * @see Identifier
+ * @see AminoAcidSequence
+ */
+@Getter
+@Wither
 @AllArgsConstructor(staticName = "referencePeptide")
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class ReferencePeptide implements Entity<ReferencePeptide> {
 
-    public static final Hash<ReferencePeptide>  hash  = CompoundSequence.hash.contramap(ReferencePeptide::getSequence);
-    public static final Equal<ReferencePeptide> equal = CompoundSequence.equal.contramap(ReferencePeptide::getSequence);
-    public static final Ord<ReferencePeptide>   ord   = CompoundSequence.ord.contramap(ReferencePeptide::getSequence);
+	public static final Hash<ReferencePeptide> hash = CompoundSequence.hash
+			.contramap(ReferencePeptide::getSequence);
+	public static final Equal<ReferencePeptide> equal = CompoundSequence.equal
+			.contramap(ReferencePeptide::getSequence);
+	public static final Ord<ReferencePeptide> ord = CompoundSequence.ord
+			.contramap(ReferencePeptide::getSequence);
 
-    private final Identifier        id;
-    private final AminoAcidSequence sequence;
-    private final String            bioactivity;
+	/**
+	 * The reference peptide identifier
+	 */
+	private final Identifier id;
 
-    @VisibleForJAXB public ReferencePeptide() {
-        this(new Identifier(), AminoAcidSequence.empty(), "");
-    }
+	/**
+	 * The reference peptide amino acid sequence
+	 */
+	private final AminoAcidSequence sequence;
 
-    public static ReferencePeptide referencePeptide(final AminoAcidSequence sequence, final String bioactivity) {
-        return referencePeptide(Identifier.empty(), sequence, bioactivity);
-    }
+	/**
+	 * The reference peptide bioactivity
+	 */
+	private final String bioactivity;
 
-    public SHA1 getSHA1() {
-        return sequence.getSHA1();
-    }
+	/**
+	 * {@linkplain ReferencePeptide} default constructor
+	 */
+	@VisibleForJAXB
+	public ReferencePeptide() {
+		this(new Identifier(), AminoAcidSequence.empty(), "");
+	}
+
+	/**
+	 * Constructs a new instance of {@linkplain ReferencePeptide} without {@link Identifier}
+	 * 
+	 * @param sequence
+	 *            The reference peptide amino acid sequence
+	 * @param bioactivity
+	 *            The reference peptide bioactivity
+	 * @return A new instance of {@linkplain ReferencePeptide}
+	 */
+	public static ReferencePeptide referencePeptide(final AminoAcidSequence sequence,
+													final String bioactivity) {
+		return referencePeptide(Identifier.empty(), sequence, bioactivity);
+	}
+
+	/**
+	 * Gets the SHA1 of the sequence
+	 * 
+	 * @return The SHA1 of the {@link #sequence}
+	 */
+	public SHA1 getSHA1() {
+		return sequence.getSHA1();
+	}
 
 }

@@ -21,6 +21,9 @@ import static fj.data.Natural.natural;
 import static fj.data.Option.none;
 
 /**
+ * {@linkplain Identifier} is a class that represents the identifier of a
+ * database entity
+ * 
  * @author Alberto Gutierrez-Jacome
  *
  */
@@ -28,37 +31,66 @@ import static fj.data.Option.none;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Identifier {
 
-    public static final Hash<Identifier> hash =
-        optionHash(longHash.contramap(Natural::longValue)).contramap(Identifier::getValue);
+	public static final Hash<Identifier> hash   = optionHash(longHash.contramap(Natural::longValue))
+			.contramap(Identifier::getValue);
 
-    public static final Equal<Identifier> equal =
-        optionEqual(longEqual.contramap(Natural::longValue)).contramap(Identifier::getValue);
+	public static final Equal<Identifier> equal = optionEqual(
+			longEqual.contramap(Natural::longValue)).contramap(Identifier::getValue);
 
-    public static final Ord<Identifier> ord =
-        optionOrd(longOrd.contramap(Natural::longValue)).contramap(Identifier::getValue);
+	public static final Ord<Identifier> ord     = optionOrd(longOrd.contramap(Natural::longValue))
+			.contramap(Identifier::getValue);
 
-    private final Option<Natural> value;
+	/**
+	 * The value of the identifier
+	 */
+	private final Option<Natural> value;
 
-    @VisibleForJAXB
-    public Identifier() {
-        this(none());
-    }
+	/**
+	 * {@linkplain Identifier} default empty constructor
+	 */
+	@VisibleForJAXB
+	public Identifier() {
+		this(none());
+	}
 
-    public static Identifier empty() {
-        return new Identifier(none());
-    }
+	/**
+	 * Constructs a empty instance of {@linkplain Identifier}
+	 * 
+	 * @return A empty instance of {@linkplain Identifier}
+	 */
+	public static Identifier empty() {
+		return new Identifier(none());
+	}
 
-    public static Identifier of(final long value) {
-        return new Identifier(natural(value));
-    }
+	/**
+	 * Constructs a new instance of {@linkplain Identifier} by a {@code long}
+	 * value
+	 * 
+	 * @param value
+	 *            The value of the identifier
+	 * @return A new instance of {@linkplain Identifier}
+	 */
+	public static Identifier of(final long value) {
+		return new Identifier(natural(value));
+	}
 
-    public boolean isEmpty() {
-        return value.isNone();
-    }
+	/**
+	 * Checks if a {@linkplain Identifier} is empty
+	 * 
+	 * @return Whether a {@linkplain Identifier} is empty
+	 */
+	public boolean isEmpty() {
+		return value.isNone();
+	}
 
-    @Override
-    public String toString() {
-        return value.option("NULL", n -> "" + n.intValue());
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return value.option("NULL", n -> "" + n.intValue());
+	}
 
 }

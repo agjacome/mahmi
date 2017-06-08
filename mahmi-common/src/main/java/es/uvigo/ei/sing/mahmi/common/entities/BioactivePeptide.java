@@ -16,32 +16,83 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.Wither;
 
-@Getter @Wither
+/**
+ * {@linkplain BioactivePeptide} is a class that represents a potential bioactive peptide
+ * 
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Entity
+ * @see Identifier
+ * @see AminoAcidSequence
+ * @see ReferencePeptide
+ *
+ */
+@Getter
+@Wither
 @AllArgsConstructor(staticName = "bioactivePeptide")
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class BioactivePeptide implements Entity<BioactivePeptide> {
 
-    public static final Hash<BioactivePeptide>  hash  = CompoundSequence.hash.contramap(BioactivePeptide::getSequence);
-    public static final Equal<BioactivePeptide> equal = CompoundSequence.equal.contramap(BioactivePeptide::getSequence);
-    public static final Ord<BioactivePeptide>   ord   = CompoundSequence.ord.contramap(BioactivePeptide::getSequence);
+	public static final Hash<BioactivePeptide> hash = CompoundSequence.hash
+			.contramap(BioactivePeptide::getSequence);
+	public static final Equal<BioactivePeptide> equal = CompoundSequence.equal
+			.contramap(BioactivePeptide::getSequence);
+	public static final Ord<BioactivePeptide> ord = CompoundSequence.ord
+			.contramap(BioactivePeptide::getSequence);
 
-    private final Identifier        id;
-    private final AminoAcidSequence sequence;
-    private final double            similarity;
-    private final ReferencePeptide  reference;
+	/**
+	 * The bioactive peptide identifier
+	 */
+	private final Identifier id;
 
-    @VisibleForJAXB public BioactivePeptide() {
-        this(new Identifier(), AminoAcidSequence.empty(), 0.0, new ReferencePeptide());
-    }
+	/**
+	 * The bioactive peptide amino acid sequence
+	 */
+	private final AminoAcidSequence sequence;
 
-    public static BioactivePeptide bioactivePeptide(final AminoAcidSequence sequence, 
-										    	   final double similarity,
-										    	   final ReferencePeptide reference) {
-        return bioactivePeptide(Identifier.empty(), sequence, similarity, reference);
-    }
+	/**
+	 * The percentage of similarity between {@code this} and the reference peptide
+	 */
+	private final double similarity;
 
-    public SHA1 getSHA1() {
-        return sequence.getSHA1();
-    }
+	/**
+	 * The reference peptide
+	 */
+	private final ReferencePeptide reference;
+
+	/**
+	 * {@linkplain BioactivePeptide} default constructor
+	 */
+	@VisibleForJAXB
+	public BioactivePeptide() {
+		this(new Identifier(), AminoAcidSequence.empty(), 0.0, new ReferencePeptide());
+	}
+
+	/**
+	 * Constructs a new instance of {@linkplain BioactivePeptide} without {@link Identifier}
+	 * 
+	 * @param sequence
+	 *            The amino acid sequence of the peptide
+	 * @param similarity
+	 *            The percentage of similitude with the reference peptide
+	 * @param reference
+	 *            The reference peptide {@linkplain BioactivePeptide}
+	 * @return A new instance of {@linkplain BioactivePeptide}
+	 */
+	public static BioactivePeptide bioactivePeptide(final AminoAcidSequence sequence,
+													final double similarity,
+													final ReferencePeptide reference) {
+		return bioactivePeptide(Identifier.empty(), sequence, similarity, reference);
+	}
+
+	/**
+	 * Gets the SHA1 of the sequence
+	 * 
+	 * @return The SHA1 of the {@link #sequence}
+	 */
+	public SHA1 getSHA1() {
+		return sequence.getSHA1();
+	}
 
 }

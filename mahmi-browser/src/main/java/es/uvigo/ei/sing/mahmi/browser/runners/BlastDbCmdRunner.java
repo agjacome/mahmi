@@ -23,18 +23,20 @@ final public class BlastDbCmdRunner implements Runnable {
 	 * The input sequence path
 	 */
 	private final Path input;
-	
+
 	/**
 	 * The alignments output path
 	 */
 	private final Path output;
-	
+
 	/**
 	 * The Blast database against which to align
 	 */
 	private final String db;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
@@ -55,19 +57,15 @@ final public class BlastDbCmdRunner implements Runnable {
 	 * @return the {@link ProcessBuilder} of blastdbcmd execution
 	 */
 	private ProcessBuilder buildProcess() {
-		return new ProcessBuilder(  "blastdbcmd", 
-									"-db", 
-									this.db, 
-									"-dbtype", 
-									"prot",
-									"-entry_batch",
-									this.input.toString()).redirectOutput(this.output.toFile());
+		return new ProcessBuilder("blastdbcmd", "-db", this.db, "-dbtype", "prot", "-entry_batch",
+				this.input.toString()).redirectOutput(this.output.toFile());
 	}
 
 	/**
 	 * Checks if BlastDbCMD execution exited anormally
 	 * 
-	 * @param value The exit value
+	 * @param value
+	 *            The exit value
 	 * @throws IOException
 	 */
 	private void checkExitValue(final int value) throws IOException {
@@ -78,7 +76,8 @@ final public class BlastDbCmdRunner implements Runnable {
 	/**
 	 * Redirects errors to log
 	 * 
-	 * @param proc The process to log errors
+	 * @param proc
+	 *            The process to log errors
 	 * @throws IOException
 	 */
 	private void redirectErrorToLogs(final Process proc) throws IOException {

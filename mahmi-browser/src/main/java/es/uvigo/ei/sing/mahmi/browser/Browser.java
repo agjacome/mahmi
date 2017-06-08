@@ -37,15 +37,15 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Browser {
-	
+
 	/**
-	 *  The {@link PeptideCalculator} that calculates the molecular mass and the isoelectric point
-	 *  of the sequences
+	 * The {@link PeptideCalculator} that calculates the molecular mass and the
+	 * isoelectric point of the sequences
 	 */
 	final PeptideCalculator pc;
-	
+
 	/**
-	 *  {@linkplain Browser} private default constructor
+	 * {@linkplain Browser} private default constructor
 	 */
 	private Browser() {
 		pc = new PeptideCalculator();
@@ -62,15 +62,22 @@ public class Browser {
 
 	/**
 	 * Performs a MAHMI web search against the reference/posible Blast database
-	 * Search an {@link AminoAcidSequence} aligning against the MAHMI Blast database(s)
+	 * Search an {@link AminoAcidSequence} aligning against the MAHMI Blast
+	 * database(s)
 	 * 
-	 * @param sequence The sequence to align
-	 * @param databases The list of databases against witch to align. Accepted databases are 
-	 * {@code refdb} and {@code posdb} 
-	 * @param threshold The Blast execution potential bioactivity threshold
-	 * @param bioactivity The list of potential bioactivities to search
-	 * @param path The temporal alignment folder
-	 * @param blastOptions The Blast execution options
+	 * @param sequence
+	 *            The sequence to align
+	 * @param databases
+	 *            The list of databases against witch to align. Accepted
+	 *            databases are {@code refdb} and {@code posdb}
+	 * @param threshold
+	 *            The Blast execution potential bioactivity threshold
+	 * @param bioactivity
+	 *            The list of potential bioactivities to search
+	 * @param path
+	 *            The temporal alignment folder
+	 * @param blastOptions
+	 *            The Blast execution options
 	 * @return the list of {@link BlastAlignment}s
 	 * 
 	 * @see BlastOptions
@@ -93,11 +100,11 @@ public class Browser {
 		return filter(alignments, threshold, bioactivity, path);
 	}
 
-	
 	/**
 	 * Creates the auxiliary folders to perform the alignment
 	 * 
-	 * @param path The temporal folder in which create the auxiliary folders
+	 * @param path
+	 *            The temporal folder in which create the auxiliary folders
 	 */
 	private void createAuxiliaryFolders(final Path path) {
 		final File searchFile = new File(path.toString());
@@ -109,13 +116,17 @@ public class Browser {
 	}
 
 	/**
-	 * Filters a list of BlastAlignments for its potential bioactivity and its percentage 
-	 * (threshold)
+	 * Filters a list of BlastAlignments for its potential bioactivity and its
+	 * percentage (threshold)
 	 * 
-	 * @param alignments The input list of the Blast alignments
-	 * @param threshold The Blast execution potential bioactivity threshold to filter
-	 * @param bioactivity The list of bioactivities to filter
-	 * @param path The temporal folder of the alignment
+	 * @param alignments
+	 *            The input list of the Blast alignments
+	 * @param threshold
+	 *            The Blast execution potential bioactivity threshold to filter
+	 * @param bioactivity
+	 *            The list of bioactivities to filter
+	 * @param path
+	 *            The temporal folder of the alignment
 	 * @return The list of filter Blast alignments
 	 * 
 	 * @see BlastAlignment
@@ -133,10 +144,13 @@ public class Browser {
 	}
 
 	/**
-	 * Converts a list of alignments without sequence into a list of alignments with sequence
+	 * Converts a list of alignments without sequence into a list of alignments
+	 * with sequence
 	 * 
-	 * @param alignments The input list of the Blast alignments 
-	 * @param path The temporal folder of the alignment
+	 * @param alignments
+	 *            The input list of the Blast alignments
+	 * @param path
+	 *            The temporal folder of the alignment
 	 * @return The list of Blast alignments with sequence
 	 * 
 	 * @see BlastAlignment
@@ -144,8 +158,8 @@ public class Browser {
 	private List<BlastAlignment> getAlignmentsWithSequences(final List<BlastAlignment> alignments,
 															final Path path) {
 		final List<BlastAlignment> alignmentsWithSequences = new LinkedList<BlastAlignment>();
-		final List<BlastAlignment> references			   = new LinkedList<BlastAlignment>();
-		final List<BlastAlignment> posibles 			   = new LinkedList<BlastAlignment>();
+		final List<BlastAlignment> references = new LinkedList<BlastAlignment>();
+		final List<BlastAlignment> posibles = new LinkedList<BlastAlignment>();
 
 		alignments.forEach(a -> {
 			if (a.getDescription().startsWith("MHM_POS"))
@@ -166,12 +180,16 @@ public class Browser {
 	}
 
 	/**
-	 * Adds to the second list the alignments of the first list with the sequences of the map, 
-	 * calculating too the molecular weight and isoelectric point of the sequences
+	 * Adds to the second list the alignments of the first list with the
+	 * sequences of the map, calculating too the molecular weight and
+	 * isoelectric point of the sequences
 	 * 
-	 * @param alignments The list of Blast alignments to add
-	 * @param alignmentsWithSequence The list to add the Blast alignments. 
-	 * @param map The map contains the id and the sequences of the alignments.
+	 * @param alignments
+	 *            The list of Blast alignments to add
+	 * @param alignmentsWithSequence
+	 *            The list to add the Blast alignments.
+	 * @param map
+	 *            The map contains the id and the sequences of the alignments.
 	 * 
 	 * @see BlastAlignment
 	 * @see AminoAcidSequence
@@ -186,9 +204,11 @@ public class Browser {
 	}
 
 	/**
-	 * Calculates the isoelectric point and molecular weight of the input alignment
+	 * Calculates the isoelectric point and molecular weight of the input
+	 * alignment
 	 * 
-	 * @param alignment The alignment without isoelectric point and molecular weight
+	 * @param alignment
+	 *            The alignment without isoelectric point and molecular weight
 	 * @return The alignment with isoelectric point and molecular weight
 	 * 
 	 * @see BlastAlignment
@@ -202,9 +222,12 @@ public class Browser {
 	/**
 	 * Gets a {@link Map} relating alignments with their associated sequences
 	 * 
-	 * @param path The temporal path of the alignment
-	 * @param references Whether to search in MAHMI reference database
-	 * @param posibles Whether to search in MAHMI posible database
+	 * @param path
+	 *            The temporal path of the alignment
+	 * @param references
+	 *            Whether to search in MAHMI reference database
+	 * @param posibles
+	 *            Whether to search in MAHMI posible database
 	 * @return A map relating alignment with sequence
 	 * 
 	 * @see AminoAcidSequence
@@ -221,10 +244,13 @@ public class Browser {
 	}
 
 	/**
-	 * Populates the alignment-sequence {@link Map} with the text plain blastdbcmd output
+	 * Populates the alignment-sequence {@link Map} with the text plain
+	 * blastdbcmd output
 	 * 
-	 * @param path The temporal path of the alignment
-	 * @param map The map to populate
+	 * @param path
+	 *            The temporal path of the alignment
+	 * @param map
+	 *            The map to populate
 	 * 
 	 * @see AminoAcidSequence
 	 */
@@ -253,8 +279,10 @@ public class Browser {
 	/**
 	 * Checks if an alignments passes the potential bioactivity threshold
 	 * 
-	 * @param alignment The alignment to check
-	 * @param threshold The threshold to check
+	 * @param alignment
+	 *            The alignment to check
+	 * @param threshold
+	 *            The threshold to check
 	 * @return Whether the alignment pass the threshold
 	 * 
 	 * @see BlastAlignment
@@ -274,8 +302,10 @@ public class Browser {
 	/**
 	 * Checks if an alignment has one of the bioactivities of the list
 	 * 
-	 * @param alignment The alignment to check bioactivity
-	 * @param bioactivity The list of bioactivities to check
+	 * @param alignment
+	 *            The alignment to check bioactivity
+	 * @param bioactivity
+	 *            The list of bioactivities to check
 	 * @return Whether the alignment has one of the bioactivities
 	 * 
 	 * @see BlastAlignment
@@ -290,7 +320,8 @@ public class Browser {
 	/**
 	 * Parses BlastP output file into a {@linkplain List} of Blast alignments
 	 * 
-	 * @param path The Blastp output file
+	 * @param path
+	 *            The Blastp output file
 	 * @return The parsed list of Blast alignments
 	 * 
 	 * @see BlastAlignment
@@ -313,12 +344,12 @@ public class Browser {
 							firstLine += perhapsSecond;
 					}
 					iterator.next();
-					final String[] thirdLine  = iterator.next().split(",");
+					final String[] thirdLine = iterator.next().split(",");
 					final String[] fourthLine = iterator.next().split(",");
 					iterator.next();
-					final String fiveLine 	  = iterator.next().substring(5);
-					final String sixLine 	  = iterator.next();
-					final String sevenLine 	  = iterator.next().substring(5);
+					final String fiveLine = iterator.next().substring(5);
+					final String sixLine = iterator.next();
+					final String sevenLine = iterator.next().substring(5);
 					alignments.add(new BlastAlignment(firstLine,
 							Double.parseDouble(thirdLine[0].split(" ")[3]),
 							Double.parseDouble(thirdLine[1].split(" ")[4]),
@@ -351,10 +382,14 @@ public class Browser {
 	/**
 	 * Executes BlastP to perform an alignment
 	 * 
-	 * @param input The {@linkplain Path} in which perform the alignment
-	 * @param aas The sequence to align
-	 * @param db The Blast database against which align
-	 * @param blastOptions The BlastP execution options
+	 * @param input
+	 *            The {@linkplain Path} in which perform the alignment
+	 * @param aas
+	 *            The sequence to align
+	 * @param db
+	 *            The Blast database against which align
+	 * @param blastOptions
+	 *            The BlastP execution options
 	 * @return The {@linkplain Path} to the BlastP output file
 	 * 
 	 * @see AminoAcidSequence
@@ -378,16 +413,19 @@ public class Browser {
 	/**
 	 * Executes BlastDbCmd to search alignment sequences
 	 * 
-	 * @param alignments The {@linkplain List} of alignments to search sequences
-	 * @param path The {@linkplain Path} in which execute BlastDbCmd
-	 * @param db The Blast database in which search
+	 * @param alignments
+	 *            The {@linkplain List} of alignments to search sequences
+	 * @param path
+	 *            The {@linkplain Path} in which execute BlastDbCmd
+	 * @param db
+	 *            The Blast database in which search
 	 * @return The {@linkplain Path} to the BlastDbCmd output file
 	 */
 	private Path runBlastDbCmd(	final List<BlastAlignment> alignments,
 								final Path path,
 								final String db) {
 		final Path readPath = Paths.get(path.toString() + "/hits.txt");
-		final Path output   = Paths.get(path.toString() + "/blastdbcmd.out");
+		final Path output = Paths.get(path.toString() + "/blastdbcmd.out");
 		try (final PrintWriter pw = new PrintWriter(
 				new BufferedWriter(new FileWriter(readPath.toString(), false)))) {
 			alignments.forEach(a -> pw.println(a.getDescription()));

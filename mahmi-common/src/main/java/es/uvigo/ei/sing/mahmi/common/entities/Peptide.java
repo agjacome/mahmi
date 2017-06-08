@@ -17,31 +17,71 @@ import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.SHA1;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@Getter @Wither
+/**
+ * {@linkplain Peptide} is a class that represents a peptide
+ * 
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Entity
+ * @see Identifier
+ * @see AminoAcidSequence
+ */
+@Getter
+@Wither
 @AllArgsConstructor(staticName = "peptide")
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class Peptide implements Entity<Peptide> {
 
-    // public static final Hash<Peptide>  hash  = Hash.stringHash.comap(p -> p.getSequence().asString());
-    // public static final Equal<Peptide> equal = Equal.stringEqual.comap(p -> p.getSequence().asString());
-    // public static final Ord<Peptide>   ord   = Ord.stringOrd.comap(p -> p.getSequence().asString());
-    public static final Hash<Peptide>  hash  = CompoundSequence.hash.contramap(Peptide::getSequence);
-    public static final Equal<Peptide> equal = CompoundSequence.equal.contramap(Peptide::getSequence);
-    public static final Ord<Peptide>   ord   = CompoundSequence.ord.contramap(Peptide::getSequence);
+	// public static final Hash<Peptide> hash = Hash.stringHash.comap(p ->
+	// p.getSequence().asString());
+	// public static final Equal<Peptide> equal = Equal.stringEqual.comap(p ->
+	// p.getSequence().asString());
+	// public static final Ord<Peptide> ord = Ord.stringOrd.comap(p ->
+	// p.getSequence().asString());
+	public static final Hash<Peptide> hash   = CompoundSequence.hash
+			.contramap(Peptide::getSequence);
+	public static final Equal<Peptide> equal = CompoundSequence.equal
+			.contramap(Peptide::getSequence);
+	public static final Ord<Peptide> ord     = CompoundSequence.ord
+			.contramap(Peptide::getSequence);
 
-    private final Identifier        id;
-    private final AminoAcidSequence sequence;
+	/**
+	 * The peptide identifier
+	 */
+	private final Identifier id;
 
-    @VisibleForJAXB public Peptide() {
-        this(new Identifier(), AminoAcidSequence.empty());
-    }
+	/**
+	 * The peptide amino acid sequence
+	 */
+	private final AminoAcidSequence sequence;
 
-    public static Peptide peptide(final AminoAcidSequence sequence) {
-        return peptide(Identifier.empty(), sequence);
-    }
+	/**
+	 * {@linkplain Peptide} default constructor
+	 */
+	@VisibleForJAXB
+	public Peptide() {
+		this(new Identifier(), AminoAcidSequence.empty());
+	}
 
-    public SHA1 getSHA1() {
-        return sequence.getSHA1();
-    }
+	/**
+	 * Constructs a new instance of {@linkplain Peptide} without {@link Identifier}
+	 * 
+	 * @param sequence
+	 *            The peptide amino acid sequence
+	 * @return A new instance of {@linkplain Peptide}
+	 */
+	public static Peptide peptide(final AminoAcidSequence sequence) {
+		return peptide(Identifier.empty(), sequence);
+	}
+
+	/**
+	 * Gets the SHA1 of the sequence
+	 * 
+	 * @return The SHA1 of the {@link #sequence}
+	 */
+	public SHA1 getSHA1() {
+		return sequence.getSHA1();
+	}
 
 }

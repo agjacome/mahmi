@@ -16,6 +16,14 @@ import static fj.P.p;
 import static fj.data.Stream.iterableStream;
 import static fj.function.Characters.toUpperCase;
 
+/**
+ * {@linkplain AminoAcid} is a enum that represents an amino acid {@link Compound}
+ * 
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Compound
+ *
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum AminoAcid implements Compound {
@@ -56,9 +64,22 @@ public enum AminoAcid implements Compound {
         charHash.contramap(toUpperCase)
     );
 
+    /**
+     * The full name of the amino acid
+     */
     private final String fullName;
+    
+    /**
+     * The code of the amino acid
+     */
     private final char   code;
 
+    /**
+     * Gets an amino acid from code
+     * 
+     * @param code The code of the amino acid
+     * @return The amino acid as an {@code Option}
+     */
     public static Option<AminoAcid> fromCode(final char code) {
         return codes.get(code);
     }

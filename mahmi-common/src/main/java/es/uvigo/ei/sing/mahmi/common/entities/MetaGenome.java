@@ -15,26 +15,60 @@ import es.uvigo.ei.sing.mahmi.common.serializers.jaxb.NucleobaseFastaAdapter;
 import es.uvigo.ei.sing.mahmi.common.utils.Identifier;
 import es.uvigo.ei.sing.mahmi.common.utils.annotations.VisibleForJAXB;
 
-@Getter @Wither
+/**
+ * {@linkplain MetaGenome} is a class that represents a metagenome
+ * 
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Entity
+ * @see Identifier
+ * @see Fasta
+ * @see Project
+ *
+ */
+@Getter
+@Wither
 @AllArgsConstructor(staticName = "metagenome")
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class MetaGenome implements Entity<MetaGenome> {
 
-    private final Identifier id;
-    private final Project    project;
+	/**
+	 * The metagenome identifier
+	 */
+	private final Identifier id;
 
-    @XmlJavaTypeAdapter(NucleobaseFastaAdapter.class)
-    private final Fasta<NucleobaseSequence> fasta;
+	/**
+	 * The project of the metagenome
+	 */
+	private final Project project;
 
-    @VisibleForJAXB
-    public MetaGenome() {
-        this(new Identifier(), new Project(), Fasta.empty());
-    }
+	/**
+	 * The metagenome FASTA
+	 */
+	@XmlJavaTypeAdapter(NucleobaseFastaAdapter.class)
+	private final Fasta<NucleobaseSequence> fasta;
 
-    public static MetaGenome metagenome(
-        final Project project, final Fasta<NucleobaseSequence> fasta
-    ) {
-        return metagenome(Identifier.empty(), project, fasta);
-    }
+	/**
+	 * {@linkplain MetaGenome} default constructor
+	 */
+	@VisibleForJAXB
+	public MetaGenome() {
+		this(new Identifier(), new Project(), Fasta.empty());
+	}
+
+	/**
+	 * Constructs a new instance of {@linkplain MetaGenome} without {@link Identifier}
+	 * 
+	 * @param project
+	 *            The project of the metagenome
+	 * @param fasta
+	 *            The metagenome FASTA
+	 * @return A new instance of {@linkplain MetaGenome}
+	 */
+	public static MetaGenome metagenome(final Project project,
+										final Fasta<NucleobaseSequence> fasta) {
+		return metagenome(Identifier.empty(), project, fasta);
+	}
 
 }

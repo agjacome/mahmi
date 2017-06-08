@@ -22,6 +22,8 @@ import static fj.Ord.stringOrd;
 import static fj.data.Array.array;
 
 /**
+ * {@linkplain SHA1} is a class that performs SHA1 encryption
+ * 
  * @author Alberto Gutierrez-Jacome
  *
  */
@@ -31,44 +33,88 @@ import static fj.data.Array.array;
 @ExtensionMethod(ArrayExtensionMethods.class)
 public final class SHA1 {
 
-    public static final Hash<SHA1>  hash  = stringHash.contramap(SHA1::asHexString);
-    public static final Equal<SHA1> equal = stringEqual.contramap(SHA1::asHexString);
-    public static final Ord<SHA1>   ord   = stringOrd.contramap(SHA1::asHexString);
+	public static final Hash<SHA1> hash   = stringHash.contramap(SHA1::asHexString);
+	public static final Equal<SHA1> equal = stringEqual.contramap(SHA1::asHexString);
+	public static final Ord<SHA1> ord     = stringOrd.contramap(SHA1::asHexString);
 
-    private final Array<Byte> digest;
+	private final Array<Byte> digest;
 
-    private SHA1(final Byte ... hash) {
-        this.digest = array(hash);
-    }
+	/**
+	 * {@linkplain SHA1} constructor by an array of {@code Byte}
+	 * 
+	 * @param hash
+	 *            The array of {@code Byte} to encrypt
+	 */
+	private SHA1(final Byte... hash) {
+		this.digest = array(hash);
+	}
 
-    private SHA1(final byte ... hash) {
-        this.digest = array(hash.box());
-    }
+	/**
+	 * {@linkplain SHA1} constructor by an array of {@code byte}
+	 * 
+	 * @param hash
+	 *            The array of {@code byte} to encrypt
+	 */
+	private SHA1(final byte... hash) {
+		this.digest = array(hash.box());
+	}
 
-    public static SHA1 of(final String str) {
-        return new SHA1(DigestUtils.sha1(str));
-    }
+	/**
+	 * {@linkplain SHA1} constructor by a {@code String}
+	 * 
+	 * @param str
+	 *            The {@code String} to encrypt
+	 */
+	public static SHA1 of(final String str) {
+		return new SHA1(DigestUtils.sha1(str));
+	}
 
-    public static Option<SHA1> fromByteArray(final byte ... hash) {
-        return Option.iif(hash.length == 20, hash).map(SHA1::new);
-    }
+	/**
+	 * Encrypts an array of {@code byte}
+	 * 
+	 * @param hash
+	 *            The array of {@code byte} to encrypt
+	 * @return The encrypted value as {@code Option}
+	 */
+	public static Option<SHA1> fromByteArray(final byte... hash) {
+		return Option.iif(hash.length == 20, hash).map(SHA1::new);
+	}
 
-    public static Option<SHA1> fromByteArray(final Byte ... hash) {
-        return Option.iif(hash.length == 20, hash).map(SHA1::new);
-    }
+	/**
+	 * Encrypts an array of {@code Byte}
+	 * 
+	 * @param hash
+	 *            The array of {@code Byte} to encrypt
+	 * @return The encrypted value as {@code Option}
+	 */
+	public static Option<SHA1> fromByteArray(final Byte... hash) {
+		return Option.iif(hash.length == 20, hash).map(SHA1::new);
+	}
 
-    public static Option<SHA1> fromHexString(final String code) {
-        try {
-            return fromByteArray(Hex.decodeHex(code.toCharArray()));
-        } catch (final DecoderException de) {
-            log.error("Could not parse SHA1 hash", de);
-            return Option.none();
-        }
-    }
+	/**
+	 * Encrypts a {@code String}
+	 * 
+	 * @param code
+	 *            The {@code String} to encrypt
+	 * @return The encrypted value as {@code Option}
+	 */
+	public static Option<SHA1> fromHexString(final String code) {
+		try {
+			return fromByteArray(Hex.decodeHex(code.toCharArray()));
+		} catch (final DecoderException de) {
+			log.error("Could not parse SHA1 hash", de);
+			return Option.none();
+		}
+	}
 
-    public String asHexString() {
-        final byte[ ] array = digest.array(Byte[ ].class).unbox();
-        return Hex.encodeHexString(array);
-    }
+	/**
+	 * Gets the encrypted value as {@code String}
+	 * 
+	 * @return The encrypted value as {@code String}
+	 */
+	public String asHexString() {
+		final byte[] array = digest.array(Byte[].class).unbox();
+		return Hex.encodeHexString(array);
+	}
 
 }

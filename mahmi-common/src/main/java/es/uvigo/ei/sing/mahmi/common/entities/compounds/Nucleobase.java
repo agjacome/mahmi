@@ -17,6 +17,14 @@ import static fj.P.p;
 import static fj.data.Stream.iterableStream;
 import static fj.function.Characters.toLowerCase;
 
+/**
+ * {@linkplain Nucleobase} is a enum that represents an nucleo base {@link Compound}
+ * 
+ * @author Alberto Gutierrez-Jacome
+ * 
+ * @see Compound
+ *
+ */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Nucleobase implements Compound {
@@ -40,9 +48,22 @@ public enum Nucleobase implements Compound {
         );
     }
 
+    /**
+     * The full name of the nucleo base
+     */
     private final String fullName;
+    
+    /**
+     * The code of the nucleo base
+     */
     private final char   code;
 
+    /**
+     * Gets an nucleo base from code
+     * 
+     * @param code The code of the nucleo base
+     * @return The nucleo base as an {@code Option}
+     */
     public static Option<Nucleobase> fromCode(final char code) {
         return codes.get(code);
     }

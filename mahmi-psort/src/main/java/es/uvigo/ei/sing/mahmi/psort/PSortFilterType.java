@@ -18,17 +18,16 @@ import static java.util.stream.Collectors.joining;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum PSortFilterType {
 
-	Cytoplasmic("Cytoplasmic"), 
-	CytoplasmicMembrane("CytoPlasmic"), 
-	Extracellular("Extracellular"), 
-	Unknown("Unknown");
+	Cytoplasmic("Cytoplasmic"), CytoplasmicMembrane("CytoPlasmic"), Extracellular(
+			"Extracellular"), Unknown("Unknown");
 
 	private final String regex;
 
 	/**
 	 * Constructs a subcellular location filter expression for PSortB
 	 * 
-	 * @param filter The subcellular locations
+	 * @param filter
+	 *            The subcellular locations
 	 * @return The compiled subcellular location expression
 	 */
 	static String compile(final EnumSet<PSortFilterType> filter) {
@@ -57,7 +56,8 @@ public enum PSortFilterType {
 	/**
 	 * Gets a multiple subcellular location {@linkplain EnumSet}
 	 * 
-	 * @param that The second subcellular location
+	 * @param that
+	 *            The second subcellular location
 	 * @return The multiple subcellular location {@linkplain EnumSet}
 	 */
 	public EnumSet<PSortFilterType> or(final PSortFilterType that) {

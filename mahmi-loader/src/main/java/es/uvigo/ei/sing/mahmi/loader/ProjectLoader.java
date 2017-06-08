@@ -17,14 +17,15 @@ import es.uvigo.ei.sing.mahmi.common.entities.sequences.NucleobaseSequence;
  */
 public interface ProjectLoader {
 
-    /**
-     * Loads a MAHMI project
-     * 
-     * @param projectPath The folder containing the project
-     * @return The pair of metagenomes and proteomes of the project
-     * @throws LoaderException
-     */
-    public Stream<P2<Fasta<NucleobaseSequence>, Fasta<AminoAcidSequence>>> loadProject(
+	/**
+	 * Loads a MAHMI project
+	 * 
+	 * @param projectPath
+	 *            The folder containing the project
+	 * @return The pair of metagenomes and proteomes of the project
+	 * @throws LoaderException
+	 */
+	public Stream<P2<Fasta<NucleobaseSequence>, Fasta<AminoAcidSequence>>> loadProject(
         final Path projectPath
     ) throws LoaderException;
 
