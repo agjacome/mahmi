@@ -5,7 +5,6 @@ import static fj.data.Option.none;
 import static fj.data.Option.some;
 
 import es.uvigo.ei.sing.mahmi.common.entities.compounds.AminoAcid;
-import es.uvigo.ei.sing.mahmi.common.entities.compounds.Nucleobase;
 import fj.Monoid;
 import fj.data.Option;
 import fj.data.Seq;

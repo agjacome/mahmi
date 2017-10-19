@@ -30,6 +30,13 @@ import es.uvigo.ei.sing.mahmi.common.utils.extensions.OptionExtensionMethods;
 import static fj.data.Option.none;
 import static fj.data.Option.some;
 
+/**
+ * {@linkplain FastaReader} is the class that reads FASTA files
+ * 
+ * @author Alberto Gutierrez-Jacome
+ *
+ * @param <A> The specific compound
+ */
 @Slf4j
 @AllArgsConstructor(staticName = "fastaReader")
 @ExtensionMethod(OptionExtensionMethods.class)
