@@ -171,12 +171,17 @@ public final class PublicService extends DatabaseEntityAbstractService<Peptide, 
 															search.getGapextend(),
 															search.getGapopen(),
 															search.isUngapped() );
-    	
+    	final String path;
+    	if(search.getPath()=="")
+    		path="/var/mahmitmp";
+    	else
+    		path=search.getPath();
+    			
     	return respond(() -> browser.search( AminoAcidSequence.fromString(search.getSequence()).some(),
 					    				   	 search.getDatabases(),
 					    					 search.getThreshold(),
 					    					 search.getBioactivity(),
-					    					 Paths.get(search.getPath()+"/"+UUID.randomUUID().toString()),
+					    					 Paths.get(path+"/"+UUID.randomUUID().toString()),
 					    					 blastOptions ), al -> status(OK).entity(toGenericEntity(al)));	
     }
 
